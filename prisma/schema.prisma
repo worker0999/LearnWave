@@ -1,0 +1,291 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-client
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ai_chat_history {
+  id          String   @id
+  user_id     String
+  session_id  String
+  messages    Json
+  context     String?
+  tokens_used Int
+  created_at  DateTime @default(now())
+  users       users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model announcements {
+  id              String     @id
+  title           String
+  content         String
+  target_branches String[]
+  target_years    Int[]
+  target_roles    UserRole[]
+  is_active       Boolean    @default(true)
+  priority        Priority   @default(MEDIUM)
+  attachment_url  String?
+  created_by      String
+  created_at      DateTime   @default(now())
+  updated_at      DateTime
+}
+
+model bookings {
+  id                String          @id
+  student_id        String
+  mentor_id         String
+  mentor_session_id String
+  scheduled_at      DateTime
+  duration_minutes  Int
+  price             Decimal         @db.Decimal(6, 2)
+  status            BookingStatus   @default(PENDING)
+  payment_id        String?         @unique
+  meeting_link      String?
+  cancel_reason     String?
+  created_at        DateTime        @default(now())
+  updated_at        DateTime
+  mentors           mentors         @relation(fields: [mentor_id], references: [id], onDelete: Cascade)
+  mentor_sessions   mentor_sessions @relation(fields: [mentor_session_id], references: [id], onDelete: Cascade)
+  users             users           @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  payments          payments?
+}
+
+model chat_messages {
+  id             String      @id
+  room_id        String
+  sender_id      String
+  content        String
+  message_type   MessageType @default(TEXT)
+  attachment_url String?
+  is_edited      Boolean     @default(false)
+  edited_at      DateTime?
+  created_at     DateTime    @default(now())
+  chat_rooms     chat_rooms  @relation(fields: [room_id], references: [id], onDelete: Cascade)
+  users          users       @relation(fields: [sender_id], references: [id], onDelete: Cascade)
+}
+
+model chat_rooms {
+  id              String          @id
+  name            String
+  type            RoomType        @default(GENERAL)
+  branch          String?
+  year            Int?
+  session_id      String?
+  is_active       Boolean         @default(true)
+  participant_ids String[]
+  created_by      String
+  created_at      DateTime        @default(now())
+  chat_messages   chat_messages[]
+}
+
+model mentor_sessions {
+  id               String      @id
+  mentor_id        String
+  title            String
+  description      String
+  duration_minutes Int
+  price            Decimal     @db.Decimal(6, 2)
+  session_type     SessionType @default(ONE_ON_ONE)
+  max_participants Int         @default(1)
+  tags             String[]
+  is_active        Boolean     @default(true)
+  created_at       DateTime    @default(now())
+  updated_at       DateTime
+  bookings         bookings[]
+  mentors          mentors     @relation(fields: [mentor_id], references: [id], onDelete: Cascade)
+}
+
+model mentors {
+  id              String            @id
+  user_id         String            @unique
+  approved        Boolean           @default(false)
+  approved_at     DateTime?
+  approval_notes  String?
+  rating          Decimal           @default(0.00) @db.Decimal(3, 2)
+  total_sessions  Int               @default(0)
+  total_earnings  Decimal           @default(0.00) @db.Decimal(10, 2)
+  resume_url      String?
+  expertise_areas String[]
+  hourly_rate     Decimal           @db.Decimal(6, 2)
+  is_available    Boolean           @default(true)
+  created_at      DateTime          @default(now())
+  updated_at      DateTime
+  bookings        bookings[]
+  mentor_sessions mentor_sessions[]
+  users           users             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model notes {
+  id             String   @id
+  title          String
+  description    String
+  subject        String
+  branch         String?
+  semester       Int?
+  unit           Int?
+  file_url       String
+  file_size      BigInt
+  file_type      String
+  uploaded_by    String
+  is_public      Boolean  @default(true)
+  download_count Int      @default(0)
+  created_at     DateTime @default(now())
+  updated_at     DateTime
+  users          users    @relation(fields: [uploaded_by], references: [id], onDelete: Cascade)
+}
+
+model payments {
+  id                  String        @id
+  user_id             String
+  booking_id          String?       @unique
+  amount              Decimal       @db.Decimal(10, 2)
+  currency            String        @default("INR")
+  status              PaymentStatus @default(PENDING)
+  payment_method      PaymentMethod @default(RAZORPAY)
+  razorpay_order_id   String?
+  razorpay_payment_id String?
+  refund_id           String?
+  created_at          DateTime      @default(now())
+  updated_at          DateTime
+  bookings            bookings?     @relation(fields: [booking_id], references: [id])
+  users               users         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model results_snapshots {
+  id         String        @id
+  student_id String
+  usn        String
+  semester   Int
+  data       Json
+  source     ResultsSource @default(MANUAL_ENTRY)
+  scraped_at DateTime?
+  created_at DateTime      @default(now())
+  updated_at DateTime
+  users      users         @relation(fields: [student_id], references: [id], onDelete: Cascade)
+}
+
+model user_profiles {
+  id            String   @id @default(cuid())
+  user_id       String   @unique
+  first_name    String
+  last_name     String
+  phone         String?
+  branch        String?
+  year          Int?
+  semester      Int?
+  avatar_url    String?
+  bio           String?
+  voice_enabled Boolean  @default(true)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now())
+  users         users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model users {
+  id                String              @id @default(cuid())
+  email             String              @unique
+  usn               String?             @unique
+  password_hash     String
+  role              UserRole            @default(STUDENT)
+  email_verified    Boolean             @default(false)
+  is_active         Boolean             @default(true)
+  created_at        DateTime            @default(now())
+  updated_at        DateTime            @default(now())
+  last_login        DateTime?
+  ai_chat_history   ai_chat_history[]
+  bookings          bookings[]
+  chat_messages     chat_messages[]
+  mentors           mentors?
+  notes             notes[]
+  payments          payments[]
+  results_snapshots results_snapshots[]
+  user_profiles     user_profiles?
+  resources         resources[]
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum MessageType {
+  TEXT
+  FILE
+  IMAGE
+  SYSTEM
+}
+
+enum PaymentMethod {
+  RAZORPAY
+  WALLET
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ResultsSource {
+  MANUAL_ENTRY
+  SCRAPED
+  IMPORTED
+}
+
+enum RoomType {
+  BRANCH
+  YEAR
+  GENERAL
+  PLACEMENT
+  SESSION
+}
+
+enum SessionType {
+  ONE_ON_ONE
+  GROUP
+  WEBINAR
+}
+
+enum UserRole {
+  STUDENT
+  MENTOR
+  ADMIN
+}
+
+model resources {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  type        String
+  subject     String
+  semester    Int
+  unit        String?
+  fileName    String
+  fileUrl     String
+  fileSize    Int
+  uploaded_by String
+  created_at  DateTime @default(now())
+
+  users users @relation(fields: [uploaded_by], references: [id], onDelete: Cascade)
+}
+
+
+

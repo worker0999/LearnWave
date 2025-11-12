@@ -1,0 +1,22 @@
+.timerContainer {
+  position: fixed;
+  z-index: 9999;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
+}
+
+.timerContainer[data-dragging='true'] {
+  cursor: grabbing;
+}
+
+.timerContainer[data-dragging='false'] {
+  cursor: grab;
+}
+
+.progressBar {
+  height: 100%;
+  background: linear-gradient(to right, #06b6d4, #3b82f6);
+  border-radius: 9999px;
+  transition: width 500ms ease-in-out;
+}
