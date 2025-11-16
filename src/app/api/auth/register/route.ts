@@ -28,6 +28,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Check if USN is provided and already exists (optional field)
+    if (usn) {
+      const existingUSN = await db.users.findUnique({
+        where: { usn }
+      })
+      if (existingUSN) {
+        return NextResponse.json(
+          { error: 'User with this USN already exists' },
+          { status: 409 }
+        )
+      }
+    }
+
     // Hash password
     const hashedPassword = await hashPassword(password)
 

@@ -10,32 +10,29 @@ export class GeminiProvider implements AIProvider {
   name = 'Gemini'
   type = 'gemini' as const
   private genAI: GoogleGenerativeAI
+  // model candidates and simple caching
+  private _candidateModels: string[]
+  private _currentCandidateIndex: number
+  private _cachedModelName?: string
 
   constructor(apiKey: string) {
     this.genAI = new GoogleGenerativeAI(apiKey)
+    // initialize candidate models and cache
+    this._candidateModels = [
+      'gemini-2.0-flash',
+      'gemini-1.5-flash',
+      'gemini-1.5-pro',
+      'gemini-pro',
+      'gemini-1.0-pro'
+    ]
+    this._currentCandidateIndex = 0
+    this._cachedModelName = this._candidateModels[0]
   }
 
   async generateResponse(messages: any[], options: any = {}): Promise<string> {
     try {
       // Use a known reliable Gemini model
-      if (!(this as any)._cachedModelName) {
-        // List of Gemini models known to support generateContent in v1beta API (ordered by preference)
-        const candidateModels = [
-          'gemini-2.0-flash',
-          'gemini-1.5-flash',
-          'gemini-1.5-pro',
-          'gemini-pro',
-          'gemini-1.0-pro'
-        ]
-        
-        // Try each model in sequence only when actually generating content (lazy initialization)
-        // For now, pick the first one and test it on first actual use
-        (this as any)._candidateModels = candidateModels
-        (this as any)._currentCandidateIndex = 0
-        (this as any)._cachedModelName = candidateModels[0]
-      }
-
-      let modelName = (this as any)._cachedModelName
+  const modelName: string = this._cachedModelName || this._candidateModels[0]
       console.log('Using Gemini model:', modelName)
       
       try {
@@ -47,11 +44,16 @@ export class GeminiProvider implements AIProvider {
             maxOutputTokens: options.max_tokens || 1000,
           }
         })
-
-        // Convert messages to Gemini format
+        // Convert messages to Gemini format (single prompt string)
         const geminiMessages = this.convertToGeminiFormat(messages)
 
-        const result = await model.generateContent(geminiMessages)
+        // Defensive check: ensure the model object supports generateContent
+        if (!model || typeof (model as any).generateContent !== 'function') {
+          const hint = typeof model === 'object' ? JSON.stringify(Object.keys(model || {})) : String(model)
+          throw new Error(`Selected model does not support generateContent() - model shape: ${hint}`)
+        }
+
+        const result = await (model as any).generateContent(geminiMessages)
         const response = await result.response
         console.log(`✓ Model ${modelName} succeeded`)
         return response.text()
@@ -61,7 +63,7 @@ export class GeminiProvider implements AIProvider {
         const index = ((this as any)._currentCandidateIndex || 0) + 1
         
         if (index < candidates.length) {
-          console.log(`✗ Model ${modelName} failed, trying next...`)
+          console.log(`✗ Model ${modelName} failed, trying next...`);
           (this as any)._currentCandidateIndex = index
           (this as any)._cachedModelName = candidates[index]
           // Retry with new model
@@ -74,8 +76,16 @@ export class GeminiProvider implements AIProvider {
         }
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : String(err)
-      console.error('Gemini API Error:', message)
+      // Normalize error message safely for logging
+      let message: string
+      try {
+        if (err instanceof Error) message = err.message
+        else if (typeof err === 'string') message = err
+        else message = JSON.stringify(err)
+      } catch (e) {
+        message = String(err)
+      }
+      console.error('Gemini API Error:', message, '\nRaw error:', err)
       throw new Error(`Gemini API Error: ${message}`)
     }
   }

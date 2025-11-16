@@ -164,3 +164,47 @@ This scaffold includes a comprehensive set of modern web development tools:
 ---
 
 Built with ❤️ for the developer community. Supercharged by [Z.ai](https://chat.z.ai) 🚀
+
+## 🤖 Gemini (Google Generative AI) integration
+
+This project includes a lightweight Gemini integration using the `@google/generative-ai` client. The core logic is in `src/lib/ai-config.ts` and the chat API is exposed at `src/app/api/ai/chat/route.ts`.
+
+Quick setup:
+
+1. Enable the Generative AI API in your Google Cloud project and create an API key or service account with the appropriate permissions.
+2. Add the key to your environment (server-side only). Example in `.env.local` (do NOT commit):
+
+```
+GEMINI_API_KEY=your_gemini_api_key_here
+# Optional: choose a model
+GEMINI_MODEL=gemini-2.0-flash
+```
+
+3. Start the dev server:
+
+```
+npm install
+npm run dev
+```
+
+4. Quick local test (script):
+
+Run the included test helper which uses the same client as the app:
+
+```
+# Use tsx to run TypeScript directly
+npx tsx scripts/test-gemini.ts
+```
+
+5. Test the chat API endpoint (server must be running):
+
+Example using curl (replace TOKEN with a valid bearer token for your app):
+
+```
+curl -X POST "http://localhost:3000/api/ai/chat" \
+	-H "Content-Type: application/json" \
+	-H "Authorization: Bearer <TOKEN>" \
+	-d '{"message":"Hello, can you introduce yourself?","context":"academic_help"}'
+```
+
+If you see responses, your Gemini integration is working. If the library throws authentication errors, double-check the `GEMINI_API_KEY` value and that the Generative AI API is enabled for your project.

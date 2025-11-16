@@ -32,8 +32,10 @@ import {
   CheckCircle,
   AlertCircle,
   Play,
-  Pause
+  Pause,
+  Copy
 } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
 
 interface ChatMessage {
   id: string
@@ -58,6 +60,14 @@ interface GeneratedContent {
 
 export default function AIAssistant() {
   const { user, isAuthenticated } = useAuth()
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      // Could add a toast here
+    } catch (e) {
+      console.error('Copy failed', e)
+    }
+  }
   const [activeTab, setActiveTab] = useState('chat')
   const [loading, setLoading] = useState(false)
   const [voiceMode, setVoiceMode] = useState(false)
@@ -455,10 +465,38 @@ export default function AIAssistant() {
                               : 'bg-white/10 text-purple-200 border border-white/20'
                           }`}
                         >
-                          <p className="text-sm">{message.content}</p>
-                          <p className="text-xs opacity-70 mt-1">
-                            {message.timestamp.toLocaleTimeString()}
-                          </p>
+                          {message.role === 'assistant' ? (
+                            <div className="space-y-2">
+                              <div className="prose prose-invert text-sm max-w-none">
+                                <ReactMarkdown
+                                  components={{
+                                    code({node, inline, className, children, ...props}: any){
+                                      if (inline) {
+                                        return <code className="bg-white/10 px-1 rounded">{children}</code>
+                                      }
+                                      return (
+                                        <pre className="bg-zinc-900 text-white p-3 rounded overflow-auto text-sm"><code {...props}>{children}</code></pre>
+                                      )
+                                    }
+                                  }}
+                                >
+                                  {message.content}
+                                </ReactMarkdown>
+                              </div>
+
+                              <div className="flex items-center justify-between">
+                                <p className="text-xs opacity-70">{message.timestamp.toLocaleTimeString()}</p>
+                                <Button size="sm" variant="outline" onClick={() => copyToClipboard(message.content)}>
+                                  <Copy className="w-4 h-4 mr-2" /> Copy
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <p className="text-sm">{message.content}</p>
+                              <p className="text-xs opacity-70 mt-1">{message.timestamp.toLocaleTimeString()}</p>
+                            </>
+                          )}
                         </div>
                       </div>
                     ))}
