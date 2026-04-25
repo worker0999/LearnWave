@@ -6,28 +6,12 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/hooks/use-toast'
-import { 
-  Bell, 
-  Plus,
-  Search,
-  Filter,
-  Trash2,
-  RefreshCw,
-  Eye,
-  Edit,
-  Send,
-  Megaphone,
-  Calendar,
-  Users,
-  AlertCircle,
-  CheckCircle
-} from 'lucide-react'
+import { Bell, Plus, Trash2, RefreshCw } from 'lucide-react'
 
 interface Announcement {
   id: string
@@ -35,549 +19,190 @@ interface Announcement {
   content: string
   type: string
   createdAt: string
-  createdBy: string
-  status?: 'DRAFT' | 'PUBLISHED' | 'SCHEDULED'
-  scheduledFor?: string
-  readCount?: number
 }
 
 export default function AdminAnnouncementsPage() {
   const { user } = useAuth()
   const { toast } = useToast()
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
-  const [loading, setLoading] = useState(false)
-  const [actionLoading, setActionLoading] = useState<string | null>(null)
-  const [createDialogOpen, setCreateDialogOpen] = useState(false)
-
-  // Filtering
-  const [searchTerm, setSearchTerm] = useState('')
-  const [typeFilter, setTypeFilter] = useState('ALL')
-  const [statusFilter, setStatusFilter] = useState('ALL')
-
-  // Create form
-  const [createForm, setCreateForm] = useState({
-    title: '',
-    content: '',
-    type: 'GENERAL',
-    status: 'PUBLISHED',
-    scheduledFor: ''
-  })
+  const [loading, setLoading] = useState(true)
+  const [isDeleting, setIsDeleting] = useState<string | null>(null)
+  const [showDialog, setShowDialog] = useState(false)
+  const [form, setForm] = useState({ title: '', content: '', type: 'GENERAL' })
 
   const fetchAnnouncements = async () => {
     setLoading(true)
     try {
       const token = localStorage.getItem('token')
-      const params = new URLSearchParams({
-        ...(searchTerm && { search: searchTerm }),
-        ...(typeFilter !== 'ALL' && { type: typeFilter }),
-        ...(statusFilter !== 'ALL' && { status: statusFilter })
+      const res = await fetch('/api/admin/announcements', {
+        headers: { 'Authorization': `Bearer ${token}` }
       })
-
-      const response = await fetch(`/api/admin/announcements?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-
-      if (response.ok) {
-        const data = await response.json()
+      if (res.ok) {
+        const data = await res.json()
         setAnnouncements(data.announcements || [])
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to fetch announcements",
-          variant: "destructive"
-        })
       }
-    } catch (error) {
-      console.error('Error fetching announcements:', error)
-      toast({
-        title: "Error",
-        description: "Failed to fetch announcements",
-        variant: "destructive"
-      })
+    } catch (err) {
+      toast({ title: "Error", description: "Failed to load announcements", variant: "destructive" })
     } finally {
       setLoading(false)
     }
   }
 
-  const handleCreateAnnouncement = async () => {
-    if (!createForm.title || !createForm.content) {
-      toast({
-        title: "Error",
-        description: "Title and content are required",
-        variant: "destructive"
-      })
+  const handleCreate = async () => {
+    if (!form.title || !form.content) {
+      toast({ title: "Validation Error", description: "Title and content are required", variant: "destructive" })
       return
     }
-
-    setActionLoading('create')
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch('/api/admin/announcements', {
+      const res = await fetch('/api/admin/announcements', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(createForm)
+        body: JSON.stringify(form)
       })
-
-      if (response.ok) {
-        const data = await response.json()
-        toast({
-          title: "Success",
-          description: data.message,
-        })
-        
-        // Reset form and refresh
-        setCreateForm({
-          title: '',
-          content: '',
-          type: 'GENERAL',
-          status: 'PUBLISHED',
-          scheduledFor: ''
-        })
-        setCreateDialogOpen(false)
+      if (res.ok) {
+        toast({ title: "Success", description: "Announcement published" })
+        setShowDialog(false)
+        setForm({ title: '', content: '', type: 'GENERAL' })
         fetchAnnouncements()
-      } else {
-        const errorData = await response.json()
-        toast({
-          title: "Error",
-          description: errorData.error || "Failed to create announcement",
-          variant: "destructive"
-        })
       }
-    } catch (error) {
-      console.error('Error creating announcement:', error)
-      toast({
-        title: "Error",
-        description: "Failed to create announcement",
-        variant: "destructive"
-      })
-    } finally {
-      setActionLoading(null)
+    } catch (err) {
+      toast({ title: "Error", description: "Failed to create", variant: "destructive" })
     }
   }
 
-  const handleDeleteAnnouncement = async (announcementId: string) => {
-    if (!confirm('Are you sure you want to delete this announcement?')) {
-      return
-    }
-
-    setActionLoading(announcementId)
+  const handleDelete = async (id: string) => {
+    if (!confirm('Delete this announcement?')) return
+    setIsDeleting(id)
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch(`/api/admin/announcements?id=${announcementId}`, {
+      const res = await fetch(`/api/admin/announcements?id=${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       })
-
-      if (response.ok) {
-        toast({
-          title: "Success",
-          description: "Announcement deleted successfully",
-        })
-        
+      if (res.ok) {
+        toast({ title: "Success", description: "Announcement deleted" })
         fetchAnnouncements()
-      } else {
-        const errorData = await response.json()
-        toast({
-          title: "Error",
-          description: errorData.error || "Failed to delete announcement",
-          variant: "destructive"
-        })
       }
-    } catch (error) {
-      console.error('Error deleting announcement:', error)
-      toast({
-        title: "Error",
-        description: "Failed to delete announcement",
-        variant: "destructive"
-      })
+    } catch (err) {
+      toast({ title: "Error", description: "Delete failed", variant: "destructive" })
     } finally {
-      setActionLoading(null)
+      setIsDeleting(null)
     }
   }
-
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'EXAM': return 'bg-red-500'
-      case 'VTU_CIRCULAR': return 'bg-blue-500'
-      case 'COLLEGE_EVENT': return 'bg-green-500'
-      case 'URGENT': return 'bg-orange-500'
-      default: return 'bg-purple-500'
-    }
-  }
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'PUBLISHED': return 'bg-green-500'
-      case 'DRAFT': return 'bg-gray-500'
-      case 'SCHEDULED': return 'bg-yellow-500'
-      default: return 'bg-gray-500'
-    }
-  }
-
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'EXAM': return <AlertCircle className="w-4 h-4" />
-      case 'VTU_CIRCULAR': return <Send className="w-4 h-4" />
-      case 'COLLEGE_EVENT': return <Calendar className="w-4 h-4" />
-      default: return <Bell className="w-4 h-4" />
-    }
-  }
-
-  useEffect(() => {
-    if (user) {
-      fetchAnnouncements()
-    }
-  }, [user])
 
   useEffect(() => {
     fetchAnnouncements()
-  }, [searchTerm, typeFilter, statusFilter])
+  }, [])
 
   return (
     <DashboardLayout userRole="ADMIN">
-      <div className="p-6">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+      <div className="p-8 space-y-6">
+        <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">Announcement Management</h1>
-            <p className="text-purple-200">Create and manage platform announcements</p>
+            <h1 className="text-4xl font-bold text-[#4A3F33]">Announcements</h1>
+            <p className="text-[#9B8B7E]">Broadcast important updates to all users</p>
           </div>
-          <div className="flex space-x-2">
-            <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Announcement
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-slate-900 border-white/20 max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle className="text-white">Create New Announcement</DialogTitle>
-                  <DialogDescription className="text-purple-200">
-                    Send an announcement to all platform users
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-white text-sm font-medium mb-2 block">Title *</label>
-                    <Input
-                      placeholder="Enter announcement title"
-                      value={createForm.title}
-                      onChange={(e) => setCreateForm(prev => ({ ...prev, title: e.target.value }))}
-                      className="bg-white/10 border-white/20 text-white placeholder-purple-300"
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-white text-sm font-medium mb-2 block">Type</label>
-                      <Select value={createForm.type} onValueChange={(value) => setCreateForm(prev => ({ ...prev, type: value }))}>
-                        <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="GENERAL">General</SelectItem>
-                          <SelectItem value="EXAM">Exam</SelectItem>
-                          <SelectItem value="VTU_CIRCULAR">VTU Circular</SelectItem>
-                          <SelectItem value="COLLEGE_EVENT">College Event</SelectItem>
-                          <SelectItem value="URGENT">Urgent</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <label className="text-white text-sm font-medium mb-2 block">Status</label>
-                      <Select value={createForm.status} onValueChange={(value) => setCreateForm(prev => ({ ...prev, status: value }))}>
-                        <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="DRAFT">Draft</SelectItem>
-                          <SelectItem value="PUBLISHED">Publish Now</SelectItem>
-                          <SelectItem value="SCHEDULED">Schedule</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  {createForm.status === 'SCHEDULED' && (
-                    <div>
-                      <label className="text-white text-sm font-medium mb-2 block">Schedule For</label>
-                      <Input
-                        type="datetime-local"
-                        value={createForm.scheduledFor}
-                        onChange={(e) => setCreateForm(prev => ({ ...prev, scheduledFor: e.target.value }))}
-                        className="bg-white/10 border-white/20 text-white"
-                      />
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="text-white text-sm font-medium mb-2 block">Content *</label>
-                    <Textarea
-                      placeholder="Enter announcement content"
-                      value={createForm.content}
-                      onChange={(e) => setCreateForm(prev => ({ ...prev, content: e.target.value }))}
-                      className="bg-white/10 border-white/20 text-white placeholder-purple-300 min-h-[120px]"
-                    />
-                  </div>
-
-                  <div className="flex justify-end space-x-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => setCreateDialogOpen(false)}
-                      className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      onClick={handleCreateAnnouncement}
-                      disabled={actionLoading === 'create'}
-                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-                    >
-                      {actionLoading === 'create' ? (
-                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                      ) : (
-                        <Send className="w-4 h-4 mr-2" />
-                      )}
-                      {createForm.status === 'PUBLISHED' ? 'Publish Now' : 'Create Announcement'}
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-            
-            <Button
-              onClick={() => fetchAnnouncements()}
-              variant="outline"
-              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Refresh
+          <div className="flex gap-3">
+            <Button onClick={fetchAnnouncements} variant="outline" className="border-[#E8DFD3] text-[#6B5844]">
+              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Refresh
+            </Button>
+            <Button onClick={() => setShowDialog(true)} className="bg-[#6B5844] hover:bg-[#4A3F33] text-white">
+              <Plus className="w-4 h-4 mr-2" /> New Announcement
             </Button>
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-white/10 backdrop-blur-md border-white/20">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Total Announcements</CardTitle>
-              <Megaphone className="h-4 w-4 text-purple-300" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">{announcements.length}</div>
-              <p className="text-xs text-purple-300">All time</p>
-            </CardContent>
-          </Card>
+        <div className="grid gap-6">
+          {announcements.length === 0 && !loading && (
+            <Card className="bg-white border-[#E8DFD3] p-12 text-center">
+              <Bell className="w-12 h-12 text-[#E8DFD3] mx-auto mb-4" />
+              <p className="text-[#9B8B7E]">No announcements yet. Create one to get started.</p>
+            </Card>
+          )}
 
-          <Card className="bg-white/10 backdrop-blur-md border-white/20">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Published</CardTitle>
-              <CheckCircle className="h-4 w-4 text-green-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                {announcements.filter(a => a.status === 'PUBLISHED').length}
-              </div>
-              <p className="text-xs text-purple-300">Active announcements</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/10 backdrop-blur-md border-white/20">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Drafts</CardTitle>
-              <Edit className="h-4 w-4 text-gray-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                {announcements.filter(a => a.status === 'DRAFT').length}
-              </div>
-              <p className="text-xs text-purple-300">Unpublished</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/10 backdrop-blur-md border-white/20">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Total Reach</CardTitle>
-              <Users className="h-4 w-4 text-blue-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                {announcements.reduce((sum, a) => sum + (a.readCount || 0), 0)}
-              </div>
-              <p className="text-xs text-purple-300">Total reads</p>
-            </CardContent>
-          </Card>
+          {announcements.map((ann) => (
+            <Card key={ann.id} className="bg-white border-[#E8DFD3]">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-3">
+                    <CardTitle className="text-xl text-[#4A3F33]">{ann.title}</CardTitle>
+                    <Badge className={
+                      ann.type === 'URGENT' ? 'bg-red-100 text-red-600' :
+                        ann.type === 'INFO' ? 'bg-blue-100 text-blue-600' :
+                          'bg-[#F5F0EA] text-[#6B5844]'
+                    }>
+                      {ann.type}
+                    </Badge>
+                  </div>
+                  <CardDescription className="text-[#9B8B7E]">
+                    Posted on {new Date(ann.createdAt).toLocaleDateString()}
+                  </CardDescription>
+                </div>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  disabled={isDeleting === ann.id}
+                  onClick={() => handleDelete(ann.id)}
+                  className="text-red-400 hover:text-red-600 hover:bg-red-50"
+                >
+                  <Trash2 size={18} />
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <p className="text-[#6B5844] whitespace-pre-wrap">{ann.content}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        {/* Filters */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 mb-6">
-          <CardContent className="p-4">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-300 w-4 h-4" />
-                  <Input
-                    placeholder="Search announcements..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-purple-300"
-                  />
-                </div>
+        <Dialog open={showDialog} onOpenChange={setShowDialog}>
+          <DialogContent className="bg-white border-[#E8DFD3]">
+            <DialogHeader>
+              <DialogTitle className="text-[#4A3F33]">Create New Announcement</DialogTitle>
+              <DialogDescription>Fill in the details below to broadcast an update.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#6B5844]">Title</label>
+                <Input
+                  placeholder="e.g. Schedule Update"
+                  value={form.title}
+                  onChange={e => setForm({ ...form, title: e.target.value })}
+                  className="border-[#E8DFD3]"
+                />
               </div>
-              <div className="w-full md:w-40">
-                <Select value={typeFilter} onValueChange={setTypeFilter}>
-                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#6B5844]">Type</label>
+                <Select value={form.type} onValueChange={v => setForm({ ...form, type: v })}>
+                  <SelectTrigger className="border-[#E8DFD3]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ALL">All Types</SelectItem>
                     <SelectItem value="GENERAL">General</SelectItem>
-                    <SelectItem value="EXAM">Exam</SelectItem>
-                    <SelectItem value="VTU_CIRCULAR">VTU Circular</SelectItem>
-                    <SelectItem value="COLLEGE_EVENT">College Event</SelectItem>
                     <SelectItem value="URGENT">Urgent</SelectItem>
+                    <SelectItem value="INFO">Information</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="w-full md:w-32">
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ALL">All Status</SelectItem>
-                    <SelectItem value="PUBLISHED">Published</SelectItem>
-                    <SelectItem value="DRAFT">Draft</SelectItem>
-                    <SelectItem value="SCHEDULED">Scheduled</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#6B5844]">Content</label>
+                <Textarea
+                  placeholder="Type your announcement here..."
+                  value={form.content}
+                  onChange={e => setForm({ ...form, content: e.target.value })}
+                  className="border-[#E8DFD3] min-h-[150px]"
+                />
               </div>
+              <Button onClick={handleCreate} className="w-full bg-[#6B5844] hover:bg-[#4A3F33] text-white">
+                Publish Announcement
+              </Button>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Announcements Table */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
-          <CardHeader>
-            <CardTitle className="text-white">All Announcements</CardTitle>
-            <CardDescription className="text-purple-200">
-              Manage and monitor platform announcements
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <RefreshCw className="w-6 h-6 text-purple-300 animate-spin" />
-              </div>
-            ) : announcements.length === 0 ? (
-              <div className="text-center py-8">
-                <Bell className="w-12 h-12 text-purple-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-2">No announcements found</h3>
-                <p className="text-purple-200 mb-6">
-                  {searchTerm || typeFilter !== 'ALL' || statusFilter !== 'ALL'
-                    ? 'Try adjusting your filters' 
-                    : 'Create your first announcement to get started'
-                  }
-                </p>
-                <Button
-                  onClick={() => setCreateDialogOpen(true)}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Announcement
-                </Button>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-white/10">
-                      <TableHead className="text-purple-200">Announcement</TableHead>
-                      <TableHead className="text-purple-200">Type</TableHead>
-                      <TableHead className="text-purple-200">Status</TableHead>
-                      <TableHead className="text-purple-200">Reach</TableHead>
-                      <TableHead className="text-purple-200">Created</TableHead>
-                      <TableHead className="text-purple-200">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {announcements.map((announcement) => (
-                      <TableRow key={announcement.id} className="border-white/10">
-                        <TableCell>
-                          <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                              {getTypeIcon(announcement.type)}
-                            </div>
-                            <div>
-                              <p className="text-white font-medium">{announcement.title}</p>
-                              <p className="text-purple-300 text-sm line-clamp-1">
-                                {announcement.content.substring(0, 100)}...
-                              </p>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={getTypeColor(announcement.type)}>
-                            {announcement.type.replace('_', ' ')}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={getStatusColor(announcement.status || 'PUBLISHED')}>
-                            {announcement.status || 'PUBLISHED'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-purple-200">
-                          {announcement.readCount || 0} reads
-                        </TableCell>
-                        <TableCell className="text-purple-200">
-                          {new Date(announcement.createdAt).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex space-x-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="border-purple-400 text-purple-200"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="border-purple-400 text-purple-200"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => handleDeleteAnnouncement(announcement.id)}
-                              disabled={actionLoading === announcement.id}
-                            >
-                              {actionLoading === announcement.id ? (
-                                <RefreshCw className="w-4 h-4 animate-spin" />
-                              ) : (
-                                <Trash2 className="w-4 h-4" />
-                              )}
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   )

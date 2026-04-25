@@ -8,15 +8,15 @@ import { existsSync } from 'fs'
 export async function GET(request: NextRequest) {
   try {
     console.log('📁 File download request received')
-    
+
     const token = getTokenFromHeaders(request.headers)
-    
+
     if (!token) {
       console.log('❌ No token provided')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const decoded = verifyToken(token)
+    const decoded = await verifyToken(token)
     if (!decoded || (decoded.role !== 'STUDENT' && decoded.role !== 'ADMIN')) {
       console.log('❌ Invalid token or role')
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -81,20 +81,20 @@ export async function GET(request: NextRequest) {
     // Read file from disk
     const filePath = join(process.cwd(), resource.fileUrl)
     console.log(`🔍 Full file path: ${filePath}`)
-    
+
     if (!existsSync(filePath)) {
       console.log('❌ File does not exist on disk')
       return NextResponse.json({ error: 'File not found on disk' }, { status: 404 })
     }
-    
+
     try {
       const fileBuffer = await readFile(filePath)
       console.log(`✅ File read successfully, size: ${fileBuffer.length} bytes`)
-      
+
       // Determine content type based on file extension
       const fileExtension = resource.fileName?.split('.').pop()?.toLowerCase()
       let contentType = 'application/octet-stream'
-      
+
       switch (fileExtension) {
         case 'pdf':
           contentType = 'application/pdf'
@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
 
       console.log(`📋 Content-Type: ${contentType}`)
 
-      const disposition = preview 
+      const disposition = preview
         ? `inline; filename="${resource.fileName || 'preview'}"`
         : `attachment; filename="${resource.fileName || 'download'}"`
 

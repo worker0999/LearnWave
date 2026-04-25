@@ -10,17 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/hooks/use-toast'
-import { 
-  Users, 
+import {
+  Users,
   Search,
-  Filter,
-  Trash2,
   RefreshCw,
-  Star,
-  UserPlus,
+  Trash2,
   Eye,
-  Edit,
-  Calendar
+  Star
 } from 'lucide-react'
 
 interface User {
@@ -35,375 +31,186 @@ interface User {
   mentorProfile?: {
     approved: boolean
     rating?: number
-    hourlyRate?: number
     expertise?: string[]
-  }
-  _count?: {
-    mentorSessions: number
-    studentSessions: number
   }
 }
 
 export default function AdminUsersPage() {
-  const { user } = useAuth()
+  const { user: currentUser } = useAuth()
   const { toast } = useToast()
   const [users, setUsers] = useState<User[]>([])
-  const [loading, setLoading] = useState(false)
-  const [actionLoading, setActionLoading] = useState<string | null>(null)
-
-  // Pagination and filtering
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
+  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('ALL')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
-  const fetchUsers = async (page = 1, search = '', role = 'ALL') => {
+  const fetchUsers = async () => {
     setLoading(true)
     try {
       const token = localStorage.getItem('token')
       const params = new URLSearchParams({
-        page: page.toString(),
+        page: currentPage.toString(),
         limit: '10',
-        ...(search && { search }),
-        ...(role !== 'ALL' && { role })
+        ...(searchTerm && { search: searchTerm }),
+        ...(roleFilter !== 'ALL' && { role: roleFilter })
       })
 
-      const response = await fetch(`/api/admin/users?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const res = await fetch(`/api/admin/users?${params}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
       })
 
-      if (response.ok) {
-        const data = await response.json()
+      if (res.ok) {
+        const data = await res.json()
         setUsers(data.users)
         setTotalPages(data.pagination.pages)
-        setCurrentPage(data.pagination.page)
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to fetch users",
-          variant: "destructive"
-        })
       }
-    } catch (error) {
-      console.error('Error fetching users:', error)
-      toast({
-        title: "Error",
-        description: "Failed to fetch users",
-        variant: "destructive"
-      })
+    } catch (err) {
+      toast({ title: "Error", description: "Failed to fetch users", variant: "destructive" })
     } finally {
       setLoading(false)
     }
   }
 
   const handleDeleteUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-      return
-    }
-
-    setActionLoading(userId)
+    if (!confirm('Are you sure you want to delete this user?')) return
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch(`/api/admin/users?userId=${userId}`, {
+      const res = await fetch(`/api/admin/users?userId=${userId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       })
-
-      if (response.ok) {
-        toast({
-          title: "Success",
-          description: "User deleted successfully",
-        })
-        
-        // Refresh data
-        fetchUsers(currentPage, searchTerm, roleFilter)
-      } else {
-        const errorData = await response.json()
-        toast({
-          title: "Error",
-          description: errorData.error || "Failed to delete user",
-          variant: "destructive"
-        })
+      if (res.ok) {
+        toast({ title: "Success", description: "User deleted" })
+        fetchUsers()
       }
-    } catch (error) {
-      console.error('Error deleting user:', error)
-      toast({
-        title: "Error",
-        description: "Failed to delete user",
-        variant: "destructive"
-      })
-    } finally {
-      setActionLoading(null)
+    } catch (err) {
+      toast({ title: "Error", description: "Delete failed", variant: "destructive" })
     }
   }
 
   useEffect(() => {
-    if (user) {
-      fetchUsers()
-    }
-  }, [user])
-
-  useEffect(() => {
-    fetchUsers(currentPage, searchTerm, roleFilter)
+    fetchUsers()
   }, [currentPage, searchTerm, roleFilter])
 
   return (
     <DashboardLayout userRole="ADMIN">
-      <div className="p-6">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+      <div className="p-8 space-y-6">
+        <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">User Management</h1>
-            <p className="text-purple-200">Manage all platform users</p>
+            <h1 className="text-4xl font-bold text-[#4A3F33]">User Management</h1>
+            <p className="text-[#9B8B7E]">Manage all students, mentors, and admins</p>
           </div>
-          <div className="flex space-x-2">
-            <Button
-              onClick={() => fetchUsers()}
-              variant="outline"
-              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Refresh
-            </Button>
-          </div>
+          <Button onClick={fetchUsers} variant="outline" className="border-[#E8DFD3] text-[#6B5844]">
+            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Refresh
+          </Button>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-white/10 backdrop-blur-md border-white/20">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Total Users</CardTitle>
-              <Users className="h-4 w-4 text-purple-300" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">{users.length}</div>
-              <p className="text-xs text-purple-300">Registered users</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/10 backdrop-blur-md border-white/20">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Students</CardTitle>
-              <UserPlus className="h-4 w-4 text-green-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                {users.filter(u => u.role === 'STUDENT').length}
-              </div>
-              <p className="text-xs text-purple-300">Active students</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/10 backdrop-blur-md border-white/20">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Mentors</CardTitle>
-              <Star className="h-4 w-4 text-blue-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                {users.filter(u => u.role === 'MENTOR').length}
-              </div>
-              <p className="text-xs text-purple-300">Expert mentors</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/10 backdrop-blur-md border-white/20">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Admins</CardTitle>
-              <Eye className="h-4 w-4 text-red-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                {users.filter(u => u.role === 'ADMIN').length}
-              </div>
-              <p className="text-xs text-purple-300">Platform admins</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Filters */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 mb-6">
-          <CardContent className="p-4">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-300 w-4 h-4" />
-                  <Input
-                    placeholder="Search by name, email, or USN..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-purple-300"
-                  />
-                </div>
-              </div>
-              <div className="w-full md:w-48">
-                <Select value={roleFilter} onValueChange={setRoleFilter}>
-                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ALL">All Roles</SelectItem>
-                    <SelectItem value="STUDENT">Students</SelectItem>
-                    <SelectItem value="MENTOR">Mentors</SelectItem>
-                    <SelectItem value="ADMIN">Admins</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Users Table */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="bg-white border-[#E8DFD3]">
           <CardHeader>
-            <CardTitle className="text-white">All Users</CardTitle>
-            <CardDescription className="text-purple-200">
-              Manage and monitor platform users
-            </CardDescription>
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9B8B7E]" />
+                <Input
+                  placeholder="Search by name or email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 border-[#E8DFD3]"
+                />
+              </div>
+              <Select value={roleFilter} onValueChange={setRoleFilter}>
+                <SelectTrigger className="w-full md:w-48 border-[#E8DFD3]">
+                  <SelectValue placeholder="All Roles" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Roles</SelectItem>
+                  <SelectItem value="STUDENT">Students</SelectItem>
+                  <SelectItem value="MENTOR">Mentors</SelectItem>
+                  <SelectItem value="ADMIN">Admins</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <RefreshCw className="w-6 h-6 text-purple-300 animate-spin" />
-              </div>
-            ) : users.length === 0 ? (
-              <div className="text-center py-8">
-                <Users className="w-12 h-12 text-purple-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-2">No users found</h3>
-                <p className="text-purple-200">
-                  {searchTerm || roleFilter !== 'ALL' 
-                    ? 'Try adjusting your filters' 
-                    : 'No users have registered yet'
-                  }
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-white/10">
-                        <TableHead className="text-purple-200">User</TableHead>
-                        <TableHead className="text-purple-200">Role</TableHead>
-                        <TableHead className="text-purple-200">Details</TableHead>
-                        <TableHead className="text-purple-200">Sessions</TableHead>
-                        <TableHead className="text-purple-200">Joined</TableHead>
-                        <TableHead className="text-purple-200">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {users.map((user) => (
-                        <TableRow key={user.id} className="border-white/10">
-                          <TableCell>
-                            <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
-                                <span className="text-white text-sm font-bold">
-                                  {user.name.charAt(0).toUpperCase()}
-                                </span>
-                              </div>
-                              <div>
-                                <p className="text-white font-medium">{user.name}</p>
-                                <p className="text-purple-300 text-sm">{user.email}</p>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge 
-                              className={
-                                user.role === 'ADMIN' ? 'bg-red-500' :
-                                user.role === 'MENTOR' ? 'bg-blue-500' : 'bg-green-500'
-                              }
-                            >
-                              {user.role}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div className="text-purple-200 text-sm">
-                              {user.usn && <p>USN: {user.usn}</p>}
-                              {user.branch && <p>Branch: {user.branch}</p>}
-                              {user.semester && <p>Semester: {user.semester}</p>}
-                              {user.mentorProfile && (
-                                <div className="mt-1">
-                                  <p>Rating: {user.mentorProfile.rating || 'N/A'}</p>
-                                  <p>Rate: ₹{user.mentorProfile.hourlyRate || 0}/hr</p>
-                                </div>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="text-purple-200 text-sm">
-                              <p>Mentor: {user._count?.mentorSessions || 0}</p>
-                              <p>Student: {user._count?.studentSessions || 0}</p>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-purple-200">
-                            {new Date(user.createdAt).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex space-x-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="border-purple-400 text-purple-200"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="border-purple-400 text-purple-200"
-                              >
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => handleDeleteUser(user.id)}
-                                disabled={actionLoading === user.id}
-                              >
-                                {actionLoading === user.id ? (
-                                  <RefreshCw className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  <Trash2 className="w-4 h-4" />
-                                )}
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+            <Table>
+              <TableHeader>
+                <TableRow className="border-[#E8DFD3]">
+                  <TableHead>User</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Details</TableHead>
+                  <TableHead>Joined</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.map((u) => (
+                  <TableRow key={u.id} className="border-[#E8DFD3]">
+                    <TableCell>
+                      <div>
+                        <div className="font-medium text-[#4A3F33]">{u.name}</div>
+                        <div className="text-sm text-[#9B8B7E]">{u.email}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={
+                        u.role === 'ADMIN' ? 'bg-red-100 text-red-700 hover:bg-red-100' :
+                          u.role === 'MENTOR' ? 'bg-blue-100 text-blue-700 hover:bg-blue-100' :
+                            'bg-green-100 text-green-700 hover:bg-green-100'
+                      }>
+                        {u.role}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-[#6B5844] text-sm">
+                      {u.role === 'STUDENT' ? `${u.branch || 'N/A'} (Sem ${u.semester || '?'})` :
+                        u.role === 'MENTOR' ? (
+                          <div className="flex items-center gap-1">
+                            <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                            {u.mentorProfile?.rating || 'No rating'}
+                          </div>
+                        ) : '-'}
+                    </TableCell>
+                    <TableCell className="text-[#9B8B7E] text-sm">
+                      {new Date(u.createdAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button size="icon" variant="ghost" className="text-[#9B8B7E] hover:text-[#6B5844]">
+                          <Eye size={18} />
+                        </Button>
+                        {u.id !== currentUser?.id && (
+                          <Button size="icon" variant="ghost" onClick={() => handleDeleteUser(u.id)} className="text-red-400 hover:text-red-600 hover:bg-red-50">
+                            <Trash2 size={18} />
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
 
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="flex justify-center items-center space-x-2 mt-6">
-                    <Button
-                      variant="outline"
-                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                      disabled={currentPage === 1}
-                      className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                    >
-                      Previous
-                    </Button>
-                    <span className="text-purple-200">
-                      Page {currentPage} of {totalPages}
-                    </span>
-                    <Button
-                      variant="outline"
-                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                      disabled={currentPage === totalPages}
-                      className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                    >
-                      Next
-                    </Button>
-                  </div>
-                )}
-              </>
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-6">
+                <Button
+                  variant="outline"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(p => p - 1)}
+                  className="border-[#E8DFD3]"
+                >
+                  Previous
+                </Button>
+                <div className="flex items-center px-4 text-[#6B5844]">
+                  Page {currentPage} of {totalPages}
+                </div>
+                <Button
+                  variant="outline"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(p => p + 1)}
+                  className="border-[#E8DFD3]"
+                >
+                  Next
+                </Button>
+              </div>
             )}
           </CardContent>
         </Card>

@@ -44,22 +44,22 @@ export default function MentorResources() {
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-white">Resources</h1>
-          <p className="text-purple-200">Upload, manage, and share learning materials</p>
+          <h1 className="text-3xl font-bold text-[#4A3F33]">Resources</h1>
+          <p className="text-[#9B8B7E]">Upload, manage, and share learning materials</p>
         </div>
 
         {/* Tabs Section */}
-        <Tabs defaultValue="upload" className="text-white">
-          <TabsList className="bg-white/10 border border-white/20 rounded-xl backdrop-blur-md mb-4">
+        <Tabs defaultValue="upload" className="text-[#4A3F33]">
+          <TabsList className="bg-[#F5F0EA] border border-[#E8DFD3] rounded-xl backdrop-blur-md mb-4">
             <TabsTrigger
               value="upload"
-              className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+              className="data-[state=active]:bg-cyan-600 data-[state=active]:text-[#4A3F33]"
             >
               Upload Resources
             </TabsTrigger>
             <TabsTrigger
               value="manage"
-              className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+              className="data-[state=active]:bg-cyan-600 data-[state=active]:text-[#4A3F33]"
             >
               Manage Resources
             </TabsTrigger>
@@ -67,13 +67,13 @@ export default function MentorResources() {
 
           {/* Upload Tab */}
           <TabsContent value="upload">
-            <Card className="bg-white/10 backdrop-blur-md border-white/20">
+            <Card className="bg-white border-[#E8DFD3]">
               <CardHeader>
-                <CardTitle className="text-white">Upload New Resource</CardTitle>
+                <CardTitle className="text-[#4A3F33]">Upload New Resource</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="title" className="text-purple-200">
+                  <Label htmlFor="title" className="text-[#9B8B7E]">
                     Title
                   </Label>
                   <Input
@@ -81,12 +81,12 @@ export default function MentorResources() {
                     placeholder="Enter resource title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="bg-white/5 border-white/20 text-white placeholder:text-purple-300"
+                    className="bg-white border-[#E8DFD3] text-[#4A3F33] placeholder:text-[#6B5844]"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description" className="text-purple-200">
+                  <Label htmlFor="description" className="text-[#9B8B7E]">
                     Description
                   </Label>
                   <Textarea
@@ -95,12 +95,12 @@ export default function MentorResources() {
                     rows={4}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="bg-white/5 border-white/20 text-white placeholder:text-purple-300"
+                    className="bg-white border-[#E8DFD3] text-[#4A3F33] placeholder:text-[#6B5844]"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="file" className="text-purple-200">
+                  <Label htmlFor="file" className="text-[#9B8B7E]">
                     File
                   </Label>
                   <Input
@@ -108,10 +108,10 @@ export default function MentorResources() {
                     type="file"
                     onChange={handleFileChange}
                     accept=".pdf,.doc,.docx,.ppt,.pptx"
-                    className="bg-white/5 border-white/20 text-white file:text-purple-300"
+                    className="bg-white border-[#E8DFD3] text-[#4A3F33] file:text-[#6B5844]"
                   />
                   {selectedFile && (
-                    <p className="text-sm text-purple-300">
+                    <p className="text-sm text-[#6B5844]">
                       Selected file: <span className="font-semibold">{selectedFile.name}</span>
                     </p>
                   )}
@@ -120,7 +120,7 @@ export default function MentorResources() {
                 <Button
                   onClick={handleUpload}
                   disabled={!selectedFile}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                  className="bg-cyan-600 hover:bg-cyan-700 text-[#4A3F33]"
                 >
                   Upload Resource
                 </Button>
@@ -130,13 +130,13 @@ export default function MentorResources() {
 
           {/* Manage Tab */}
           <TabsContent value="manage">
-            <Card className="bg-white/10 backdrop-blur-md border-white/20">
+            <Card className="bg-white border-[#E8DFD3]">
               <CardHeader>
-                <CardTitle className="text-white">Your Resources</CardTitle>
+                <CardTitle className="text-[#4A3F33]">Your Resources</CardTitle>
               </CardHeader>
               <CardContent>
                 {/* TODO: Replace with dynamic resource list */}
-                <p className="text-purple-200 italic">No resources uploaded yet.</p>
+                <p className="text-[#9B8B7E] italic">No resources uploaded yet.</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -145,3 +145,4 @@ export default function MentorResources() {
     </DashboardLayout>
   )
 }
+

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-client
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -204,9 +201,55 @@ model users {
   mentors           mentors?
   notes             notes[]
   payments          payments[]
+  resources         resources[]
   results_snapshots results_snapshots[]
   user_profiles     user_profiles?
-  resources         resources[]
+  user_settings     user_settings?
+}
+
+model user_settings {
+  id                         String   @id @default(cuid())
+  user_id                    String   @unique
+  email_notifications        Boolean  @default(true)
+  push_notifications         Boolean  @default(false)
+  announcement_notifications Boolean  @default(true)
+  assignment_notifications   Boolean  @default(true)
+  theme                      String   @default("light")
+  created_at                 DateTime @default(now())
+  updated_at                 DateTime @updatedAt
+  users                      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model resources {
+  id              String            @id @default(cuid())
+  title           String
+  description     String?
+  uploaded_by     String
+  created_at      DateTime          @default(now())
+  fileName        String
+  fileSize        Int
+  fileUrl         String
+  semester        Int
+  subject         String
+  type            String
+  unit            String?
+  processed       Boolean           @default(false)
+  document_chunks document_chunks[]
+  users           users             @relation(fields: [uploaded_by], references: [id], onDelete: Cascade)
+}
+
+model document_chunks {
+  id          String    @id @default(cuid())
+  resource_id String
+  page_number Int
+  chunk_index Int
+  content     String
+  token_count Int
+  created_at  DateTime  @default(now())
+  resources   resources @relation(fields: [resource_id], references: [id], onDelete: Cascade)
+
+  @@index([resource_id])
+  @@index([resource_id, page_number])
 }
 
 enum BookingStatus {
@@ -269,23 +312,3 @@ enum UserRole {
   MENTOR
   ADMIN
 }
-
-model resources {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  type        String
-  subject     String
-  semester    Int
-  unit        String?
-  fileName    String
-  fileUrl     String
-  fileSize    Int
-  uploaded_by String
-  created_at  DateTime @default(now())
-
-  users users @relation(fields: [uploaded_by], references: [id], onDelete: Cascade)
-}
-
-
-

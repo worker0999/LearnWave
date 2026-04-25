@@ -210,7 +210,7 @@ export default function AdminSettingsPage() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">Platform Settings</h1>
-            <p className="text-purple-200">Configure platform settings and preferences</p>
+            <p className="text-cyan-200">Configure platform settings and preferences</p>
           </div>
           <div className="flex space-x-2">
             <Button
@@ -226,7 +226,7 @@ export default function AdminSettingsPage() {
 
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <RefreshCw className="w-8 h-8 text-purple-300 animate-spin" />
+            <RefreshCw className="w-8 h-8 text-cyan-300 animate-spin" />
           </div>
         ) : (
           <div className="space-y-6">
@@ -237,7 +237,7 @@ export default function AdminSettingsPage() {
                   <Globe className="w-5 h-5 mr-2 text-blue-400" />
                   General Settings
                 </CardTitle>
-                <CardDescription className="text-purple-200">
+                <CardDescription className="text-cyan-200">
                   Basic platform configuration
                 </CardDescription>
               </CardHeader>
@@ -307,7 +307,7 @@ export default function AdminSettingsPage() {
                   <Button
                     onClick={() => saveSettings('general')}
                     disabled={saving === 'general'}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                    className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
                   >
                     {saving === 'general' ? (
                       <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
@@ -327,7 +327,7 @@ export default function AdminSettingsPage() {
                   <Mail className="w-5 h-5 mr-2 text-green-400" />
                   Email Settings
                 </CardTitle>
-                <CardDescription className="text-purple-200">
+                <CardDescription className="text-cyan-200">
                   Configure email notifications and SMTP settings
                 </CardDescription>
               </CardHeader>
@@ -398,7 +398,7 @@ export default function AdminSettingsPage() {
                   <Button
                     onClick={() => saveSettings('email')}
                     disabled={saving === 'email'}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                    className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
                   >
                     {saving === 'email' ? (
                       <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
@@ -418,7 +418,7 @@ export default function AdminSettingsPage() {
                   <CreditCard className="w-5 h-5 mr-2 text-yellow-400" />
                   Payment Settings
                 </CardTitle>
-                <CardDescription className="text-purple-200">
+                <CardDescription className="text-cyan-200">
                   Configure payment gateway and commission settings
                 </CardDescription>
               </CardHeader>
@@ -481,7 +481,7 @@ export default function AdminSettingsPage() {
                   <Button
                     onClick={() => saveSettings('payment')}
                     disabled={saving === 'payment'}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                    className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
                   >
                     {saving === 'payment' ? (
                       <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
@@ -501,7 +501,7 @@ export default function AdminSettingsPage() {
                   <Shield className="w-5 h-5 mr-2 text-red-400" />
                   Security Settings
                 </CardTitle>
-                <CardDescription className="text-purple-200">
+                <CardDescription className="text-cyan-200">
                   Configure security and authentication settings
                 </CardDescription>
               </CardHeader>
@@ -557,7 +557,7 @@ export default function AdminSettingsPage() {
                   <Button
                     onClick={() => saveSettings('security')}
                     disabled={saving === 'security'}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                    className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
                   >
                     {saving === 'security' ? (
                       <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
@@ -574,10 +574,10 @@ export default function AdminSettingsPage() {
             <Card className="bg-white/10 backdrop-blur-md border-white/20">
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
-                  <Zap className="w-5 h-5 mr-2 text-purple-400" />
+                  <Zap className="w-5 h-5 mr-2 text-cyan-400" />
                   Feature Settings
                 </CardTitle>
-                <CardDescription className="text-purple-200">
+                <CardDescription className="text-cyan-200">
                   Enable or disable platform features
                 </CardDescription>
               </CardHeader>
@@ -588,7 +588,7 @@ export default function AdminSettingsPage() {
                       <Bell className="w-5 h-5 text-blue-400" />
                       <div>
                         <p className="text-white font-medium">AI Assistant</p>
-                        <p className="text-purple-300 text-sm">AI-powered learning support</p>
+                        <p className="text-cyan-300 text-sm">AI-powered learning support</p>
                       </div>
                     </div>
                     <Switch
@@ -602,7 +602,7 @@ export default function AdminSettingsPage() {
                       <Users className="w-5 h-5 text-green-400" />
                       <div>
                         <p className="text-white font-medium">Forum</p>
-                        <p className="text-purple-300 text-sm">Discussion boards</p>
+                        <p className="text-cyan-300 text-sm">Discussion boards</p>
                       </div>
                     </div>
                     <Switch
@@ -616,7 +616,7 @@ export default function AdminSettingsPage() {
                       <Database className="w-5 h-5 text-yellow-400" />
                       <div>
                         <p className="text-white font-medium">Resources</p>
-                        <p className="text-purple-300 text-sm">Study materials</p>
+                        <p className="text-cyan-300 text-sm">Study materials</p>
                       </div>
                     </div>
                     <Switch
@@ -627,10 +627,10 @@ export default function AdminSettingsPage() {
 
                   <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <Star className="w-5 h-5 text-purple-400" />
+                      <Star className="w-5 h-5 text-cyan-400" />
                       <div>
                         <p className="text-white font-medium">Mentorship</p>
-                        <p className="text-purple-300 text-sm">1:1 mentoring sessions</p>
+                        <p className="text-cyan-300 text-sm">1:1 mentoring sessions</p>
                       </div>
                     </div>
                     <Switch
@@ -644,7 +644,7 @@ export default function AdminSettingsPage() {
                       <Megaphone className="w-5 h-5 text-red-400" />
                       <div>
                         <p className="text-white font-medium">Announcements</p>
-                        <p className="text-purple-300 text-sm">Platform notifications</p>
+                        <p className="text-cyan-300 text-sm">Platform notifications</p>
                       </div>
                     </div>
                     <Switch
@@ -658,7 +658,7 @@ export default function AdminSettingsPage() {
                   <Button
                     onClick={() => saveSettings('features')}
                     disabled={saving === 'features'}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                    className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
                   >
                     {saving === 'features' ? (
                       <RefreshCw className="w-4 h-4 mr-2 animate-spin" />

@@ -1,17 +1,17 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Switch } from '@/components/ui/switch'
 import { Progress } from '@/components/ui/progress'
-import { toast } from '@/hooks/use-toast'
+import { useToast } from '@/hooks/use-toast'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
-import { PlusCircle, Star, Clock, Users } from 'lucide-react'
+import { Star, Clock, Users, Save, Loader2, PlusCircle, Trash2 } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface MentorProfile {
   id: string
@@ -25,388 +25,223 @@ interface MentorProfile {
   skills: string[]
   timezone: string
   availability: Record<string, boolean>
-  preferences: {
-    notifications: boolean
-    emailUpdates: boolean
-    publicProfile: boolean
-  }
-  socials: {
-    linkedin?: string
-    github?: string
-    twitter?: string
-  }
 }
 
-export default function MentorProfile() {
+export default function MentorProfilePage() {
+  const { token } = useAuth()
+  const { toast } = useToast()
   const [profile, setProfile] = useState<MentorProfile | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
   const [newSkill, setNewSkill] = useState('')
 
   useEffect(() => {
-    const loadProfile = async () => {
+    const fetchProfile = async () => {
       try {
-        setIsLoading(true)
-        await new Promise((r) => setTimeout(r, 800)) // simulate API
-        setProfile({
-          id: '1',
-          name: 'John Mentor',
-          email: 'john.mentor@example.com',
-          avatar: undefined,
-          bio: 'Experienced web development mentor passionate about helping others grow.',
-          specialization: 'Full-Stack Development',
-          experience: 5,
-          hourlyRate: 50,
-          skills: ['React', 'Next.js', 'Node.js', 'TypeScript'],
-          timezone: 'UTC-5',
-          availability: {
-            monday: true,
-            tuesday: true,
-            wednesday: true,
-            thursday: true,
-            friday: true,
-            saturday: false,
-            sunday: false,
-          },
-          preferences: {
-            notifications: true,
-            emailUpdates: true,
-            publicProfile: true,
-          },
-          socials: {
-            linkedin: 'https://linkedin.com/in/johnmentor',
-            github: 'https://github.com/johnmentor',
-          },
+        const response = await fetch('/api/mentor/profile', {
+          headers: { 'Authorization': `Bearer ${token}` }
         })
-      } catch {
-        toast({
-          title: 'Error loading profile',
-          description: 'Please refresh and try again.',
-        })
+        if (response.ok) {
+          const data = await response.json()
+          setProfile(data.profile)
+        }
+      } catch (error) {
+        toast({ title: 'Error', description: 'Failed to load profile.', variant: 'destructive' })
       } finally {
         setIsLoading(false)
       }
     }
-    loadProfile()
-  }, [])
-
-  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setIsUploadingPhoto(true)
-    try {
-      await new Promise((r) => setTimeout(r, 500))
-      const url = URL.createObjectURL(file)
-      setProfile((p) => p && { ...p, avatar: url })
-      toast({ title: 'Photo updated', description: 'Your new photo has been set.' })
-    } finally {
-      setIsUploadingPhoto(false)
-    }
-  }
+    if (token) fetchProfile()
+  }, [token, toast])
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!profile) return
     setIsSaving(true)
     try {
-      await new Promise((r) => setTimeout(r, 700))
-      toast({ title: 'Profile saved', description: 'Your updates have been saved successfully.' })
+      const response = await fetch('/api/mentor/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(profile)
+      })
+      if (response.ok) {
+        toast({ title: 'Success', description: 'Professional profile updated.' })
+      }
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to save changes.', variant: 'destructive' })
     } finally {
       setIsSaving(false)
     }
   }
 
-  const profileCompletion = (() => {
-    if (!profile) return 0
-    let filled = 0
-    const total = 8
-    if (profile.name) filled++
-    if (profile.bio) filled++
-    if (profile.specialization) filled++
-    if (profile.skills.length) filled++
-    if (profile.avatar) filled++
-    if (profile.hourlyRate > 0) filled++
-    if (profile.timezone) filled++
-    if (Object.values(profile.availability).some(Boolean)) filled++
-    return Math.round((filled / total) * 100)
-  })()
+  const addSkill = () => {
+    if (!newSkill.trim() || !profile) return
+    if (profile.skills.includes(newSkill.trim())) return
+    setProfile({ ...profile, skills: [...profile.skills, newSkill.trim()] })
+    setNewSkill('')
+  }
 
-  if (isLoading || !profile)
+  const removeSkill = (skillToRemove: string) => {
+    if (!profile) return
+    setProfile({ ...profile, skills: profile.skills.filter(s => s !== skillToRemove) })
+  }
+
+  if (isLoading || !profile) {
     return (
       <DashboardLayout userRole="MENTOR">
-        <div className="p-6 space-y-4">
-          <div className="animate-pulse h-6 w-48 bg-white/10 rounded" />
-          <div className="animate-pulse h-60 bg-white/10 rounded" />
+        <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          <Loader2 className="h-10 w-10 animate-spin text-[#6B5844]" />
+          <p className="mt-4 text-[#9B8B7E] font-bold">Fetching your profile...</p>
         </div>
       </DashboardLayout>
     )
+  }
 
   return (
     <DashboardLayout userRole="MENTOR">
-      <div className="p-6 space-y-8 text-white">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+      <div className="p-8 space-y-8 max-w-5xl mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Profile</h1>
-            <p className="text-purple-300">Manage your public mentor profile and preferences</p>
+            <h1 className="text-4xl font-black text-[#4A3F33] tracking-tight">Professional Profile</h1>
+            <p className="text-[#9B8B7E] font-medium mt-1">This information is visible to students looking for mentors.</p>
           </div>
-          <div className="text-right">
-            <p className="text-sm text-purple-200 mb-1">Profile completion</p>
-            <Progress value={profileCompletion} className="w-40" />
+          <div className="bg-[#6B5844] rounded-2xl px-6 py-3 text-white shadow-lg">
+            <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Hourly Rate</p>
+            <p className="text-2xl font-black">${profile.hourlyRate}<span className="text-sm opacity-60">/hr</span></p>
           </div>
         </div>
 
-        {/* Summary Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Card className="bg-white/10 border-white/20">
-            <CardContent className="flex items-center justify-between p-4">
-              <div>
-                <p className="text-purple-300 text-sm">Average Rating</p>
-                <h2 className="text-2xl font-semibold">4.8 / 5</h2>
-              </div>
-              <Star className="text-yellow-400" />
-            </CardContent>
-          </Card>
-          <Card className="bg-white/10 border-white/20">
-            <CardContent className="flex items-center justify-between p-4">
-              <div>
-                <p className="text-purple-300 text-sm">Total Students</p>
-                <h2 className="text-2xl font-semibold">128</h2>
-              </div>
-              <Users className="text-blue-400" />
-            </CardContent>
-          </Card>
-          <Card className="bg-white/10 border-white/20">
-            <CardContent className="flex items-center justify-between p-4">
-              <div>
-                <p className="text-purple-300 text-sm">Avg. Response Time</p>
-                <h2 className="text-2xl font-semibold">2 hrs</h2>
-              </div>
-              <Clock className="text-green-400" />
-            </CardContent>
-          </Card>
-        </div>
+        <form onSubmit={handleSave} className="space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column: Summary & Avatar */}
+            <div className="space-y-8">
+              <Card className="bg-white border-[#E8DFD3] rounded-[32px] overflow-hidden shadow-sm border-none">
+                <CardContent className="p-8 text-center flex flex-col items-center">
+                  <div className="relative group">
+                    <Avatar className="h-32 w-32 border-4 border-[#F8F3EE] shadow-xl">
+                      <AvatarImage src={profile.avatar} />
+                      <AvatarFallback className="bg-[#E8DFD3] text-[#6B5844] text-3xl font-black">
+                        {profile.name[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <h2 className="mt-6 text-xl font-black text-[#4A3F33]">{profile.name}</h2>
+                  <p className="text-[#9B8B7E] text-sm font-bold uppercase tracking-widest mt-1">{profile.specialization || 'Mentor'}</p>
 
-        <form onSubmit={handleSave} className="space-y-6">
-          {/* Basic Info */}
-          <Card className="bg-white/10 backdrop-blur-md border-white/20">
-            <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-24 w-24">
-                  {profile.avatar ? (
-                    <AvatarImage src={profile.avatar} />
-                  ) : (
-                    <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
-                  )}
-                </Avatar>
-                <div>
-                  <Label className="block mb-1">Upload Photo</Label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoChange}
-                    disabled={isUploadingPhoto}
-                    className="text-sm"
-                  />
+                  <div className="w-full mt-8 pt-8 border-t border-[#F5F0EA] grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <p className="text-xl font-black text-[#6B5844]">4.8</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-[#9B8B7E]">Rating</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xl font-black text-blue-600">128</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-[#9B8B7E]">Sessions</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-zinc-900 border-none rounded-[32px] text-zinc-400 p-8">
+                <h3 className="text-white font-black uppercase text-xs tracking-[0.2em] mb-6">Profile Completion</h3>
+                <div className="space-y-4">
+                  <Progress value={85} className="h-2 bg-zinc-800" />
+                  <p className="text-xs font-bold">85% Complete — Add social links to reach 100%.</p>
                 </div>
-              </div>
+              </Card>
+            </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Name</Label>
-                  <Input
-                    value={profile.name}
-                    onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                    className="bg-transparent text-white"
-                  />
-                </div>
-                <div>
-                  <Label>Email</Label>
-                  <Input
-                    type="email"
-                    value={profile.email}
-                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                    className="bg-transparent text-white"
-                  />
-                </div>
-              </div>
+            {/* Middle/Right Column: Form Details */}
+            <div className="lg:col-span-2 space-y-8">
+              <Card className="bg-white border-[#E8DFD3] rounded-[40px] shadow-sm border-none">
+                <CardHeader className="p-8 pb-4">
+                  <CardTitle className="text-2xl font-black text-[#4A3F33]">Professional Information</CardTitle>
+                  <CardDescription className="font-medium">Define your expertise and background.</CardDescription>
+                </CardHeader>
+                <CardContent className="p-8 mt-2 space-y-6">
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label className="text-[#9B8B7E] font-black uppercase text-[10px] tracking-widest pl-1">Primary Specialization</Label>
+                        <Input
+                          value={profile.specialization}
+                          onChange={(e) => setProfile({ ...profile, specialization: e.target.value })}
+                          className="h-12 border-[#E8DFD3] rounded-xl focus:ring-[#6B5844]"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-[#9B8B7E] font-black uppercase text-[10px] tracking-widest pl-1">Hourly Rate ($)</Label>
+                        <Input
+                          type="number"
+                          value={profile.hourlyRate}
+                          onChange={(e) => setProfile({ ...profile, hourlyRate: Number(e.target.value) })}
+                          className="h-12 border-[#E8DFD3] rounded-xl"
+                        />
+                      </div>
+                    </div>
 
-              <div>
-                <Label>Bio</Label>
-                <Textarea
-                  value={profile.bio}
-                  onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                  className="bg-transparent text-white"
-                />
-              </div>
-            </CardContent>
-          </Card>
+                    <div className="space-y-2">
+                      <Label className="text-[#9B8B7E] font-black uppercase text-[10px] tracking-widest pl-1">Bio / About Me</Label>
+                      <Textarea
+                        value={profile.bio}
+                        onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
+                        className="min-h-[150px] border-[#E8DFD3] rounded-2xl p-4 focus:ring-[#6B5844]"
+                        placeholder="Introduce yourself to potential students..."
+                      />
+                    </div>
 
-          {/* Professional */}
-          <Card className="bg-white/10 border-white/20 backdrop-blur-md">
-            <CardHeader>
-              <CardTitle>Professional Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Specialization</Label>
-                  <Input
-                    value={profile.specialization}
-                    onChange={(e) => setProfile({ ...profile, specialization: e.target.value })}
-                    className="bg-transparent text-white"
-                  />
-                </div>
-                <div>
-                  <Label>Experience (years)</Label>
-                  <Input
-                    type="number"
-                    value={profile.experience}
-                    onChange={(e) => setProfile({ ...profile, experience: Number(e.target.value) })}
-                    className="bg-transparent text-white"
-                  />
-                </div>
-              </div>
+                    <div className="space-y-4 pt-4">
+                      <Label className="text-[#9B8B7E] font-black uppercase text-[10px] tracking-widest pl-1">Skills & Expertise</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {profile.skills.map((skill) => (
+                          <div key={skill} className="flex items-center gap-2 bg-[#F5F0EA] text-[#6B5844] px-4 py-2 rounded-xl font-bold text-sm">
+                            {skill}
+                            <button type="button" onClick={() => removeSkill(skill)} className="hover:text-red-500 transition-colors">
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex gap-2 max-w-md">
+                        <Input
+                          placeholder="Add a skill..."
+                          value={newSkill}
+                          onChange={(e) => setNewSkill(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
+                          className="h-12 border-[#E8DFD3] rounded-xl"
+                        />
+                        <Button
+                          type="button"
+                          onClick={addSkill}
+                          className="bg-[#6B5844] rounded-xl h-12 w-12"
+                        >
+                          <PlusCircle size={20} />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
 
-              <div>
-                <Label>Hourly Rate ($)</Label>
-                <Input
-                  type="number"
-                  value={profile.hourlyRate}
-                  onChange={(e) => setProfile({ ...profile, hourlyRate: Number(e.target.value) })}
-                  className="bg-transparent text-white"
-                />
-              </div>
-
-              {/* Skills */}
-              <div>
-                <Label>Skills</Label>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {profile.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="px-2 py-1 bg-purple-600/20 text-purple-200 rounded-full text-xs"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                  <div className="flex items-center space-x-1">
-                    <Input
-                      placeholder="Add skill"
-                      value={newSkill}
-                      onChange={(e) => setNewSkill(e.target.value)}
-                      className="w-28 h-7 text-xs bg-transparent text-white"
-                    />
+                  <div className="pt-8 border-t border-[#F5F0EA] flex justify-end">
                     <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => {
-                        if (!newSkill.trim()) return
-                        setProfile({
-                          ...profile,
-                          skills: [...profile.skills, newSkill.trim()],
-                        })
-                        setNewSkill('')
-                      }}
+                      type="submit"
+                      disabled={isSaving}
+                      className="bg-[#4A3F33] hover:bg-black text-white rounded-xl px-10 h-14 font-black shadow-lg transition-all"
                     >
-                      <PlusCircle size={16} />
+                      {isSaving ? <Loader2 className="animate-spin h-5 w-5" /> : <Save className="mr-2 h-5 w-5" />}
+                      Save Changes
                     </Button>
                   </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
 
-          {/* Availability & Preferences */}
-          <Card className="bg-white/10 border-white/20 backdrop-blur-md">
-            <CardHeader>
-              <CardTitle>Availability & Preferences</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {Object.entries(profile.availability).map(([day, value]) => (
-                  <div key={day} className="flex items-center space-x-2">
-                    <Switch
-                      checked={value}
-                      onCheckedChange={(checked) =>
-                        setProfile({
-                          ...profile,
-                          availability: { ...profile.availability, [day]: checked },
-                        })
-                      }
-                    />
-                    <Label>{day[0].toUpperCase() + day.slice(1)}</Label>
-                  </div>
-                ))}
-              </div>
-
-              <div>
-                <Label>Timezone</Label>
-                <Input
-                  value={profile.timezone}
-                  onChange={(e) => setProfile({ ...profile, timezone: e.target.value })}
-                  className="bg-transparent text-white"
-                />
-              </div>
-
-              <div className="space-y-2">
-                {(['notifications', 'emailUpdates', 'publicProfile'] as const).map((pref) => (
-                  <div key={pref} className="flex items-center space-x-2">
-                    <Switch
-                      checked={profile.preferences[pref]}
-                      onCheckedChange={(checked) =>
-                        setProfile({
-                          ...profile,
-                          preferences: { ...profile.preferences, [pref]: checked },
-                        })
-                      }
-                    />
-                    <Label className="capitalize">{pref.replace(/([A-Z])/g, ' $1')}</Label>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Social Links */}
-          <Card className="bg-white/10 border-white/20 backdrop-blur-md">
-            <CardHeader>
-              <CardTitle>Social Links</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {(['linkedin', 'github', 'twitter'] as const).map((social) => (
-                <div key={social}>
-                  <Label className="capitalize">{social}</Label>
-                  <Input
-                    placeholder={`Enter ${social} URL`}
-                    value={profile.socials[social] ?? ''}
-                    onChange={(e) =>
-                      setProfile({
-                        ...profile,
-                        socials: { ...profile.socials, [social]: e.target.value },
-                      })
-                    }
-                    className="bg-transparent text-white"
-                  />
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          <div className="flex justify-end space-x-3">
-            <Button
-              variant="outline"
-              type="button"
-              onClick={() => window.location.reload()}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSaving}>
-              {isSaving ? 'Saving...' : 'Save Changes'}
-            </Button>
+              <Card className="bg-[#6B5844]/5 border-2 border-dashed border-[#6B5844]/20 rounded-[32px] p-8 text-center">
+                <Clock className="mx-auto h-8 w-8 text-[#6B5844] mb-4" />
+                <h4 className="text-[#4A3F33] font-black">Looking for Availability Settings?</h4>
+                <p className="text-[#9B8B7E] text-sm mt-1">Calendar and availability management is coming soon to your workspace.</p>
+              </Card>
+            </div>
           </div>
         </form>
       </div>

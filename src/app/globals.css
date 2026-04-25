@@ -116,6 +116,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -127,26 +128,26 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: linear-gradient(180deg, rgba(30, 27, 75, 0.2) 0%, rgba(88, 28, 135, 0.2) 100%);
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.2) 0%, rgba(17, 24, 39, 0.2) 100%);
     border-radius: 10px;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(180deg, #06b6d4 0%, #3b82f6 100%);
     border-radius: 10px;
     border: 2px solid transparent;
     background-clip: padding-box;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #818cf8 0%, #a78bfa 100%);
+    background: linear-gradient(180deg, #22d3ee 0%, #60a5fa 100%);
     background-clip: padding-box;
     border: 2px solid transparent;
-    box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.5);
   }
 
   ::-webkit-scrollbar-thumb:active {
-    background: linear-gradient(180deg, #4f46e5 0%, #7c3aed 100%);
+    background: linear-gradient(180deg, #0891b2 0%, #2563eb 100%);
   }
 
   ::-webkit-scrollbar-corner {
@@ -155,37 +156,135 @@
 
   /* Light mode scrollbar */
   .light ::-webkit-scrollbar-track {
-    background: linear-gradient(180deg, rgba(238, 240, 250, 0.8) 0%, rgba(228, 232, 245, 0.8) 100%);
+    background: linear-gradient(180deg, rgba(240, 253, 250, 0.8) 0%, rgba(239, 246, 255, 0.8) 100%);
   }
 
   .light ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #4f46e5 0%, #7c3aed 100%);
+    background: linear-gradient(180deg, #0891b2 0%, #2563eb 100%);
   }
 
   .light ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(180deg, #06b6d4 0%, #3b82f6 100%);
   }
 
   .light ::-webkit-scrollbar-thumb:active {
-    background: linear-gradient(180deg, #3730a3 0%, #6d28d9 100%);
+    background: linear-gradient(180deg, #0e7490 0%, #1d4ed8 100%);
   }
 
   /* Dark mode scrollbar (default) */
   .dark ::-webkit-scrollbar-track {
-    background: linear-gradient(180deg, rgba(30, 27, 75, 0.3) 0%, rgba(88, 28, 135, 0.3) 100%);
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.3) 0%, rgba(17, 24, 39, 0.3) 100%);
   }
 
   .dark ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(180deg, #06b6d4 0%, #3b82f6 100%);
   }
 
   .dark ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #818cf8 0%, #a78bfa 100%);
-    box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+    background: linear-gradient(180deg, #22d3ee 0%, #60a5fa 100%);
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
   }
 
   .dark ::-webkit-scrollbar-thumb:active {
-    background: linear-gradient(180deg, #4f46e5 0%, #7c3aed 100%);
+    background: linear-gradient(180deg, #0891b2 0%, #2563eb 100%);
   }
 }
 
+/* Beige Aesthetic Color Variables */
+:root {
+  /* Warm Beige Gradients */
+  --gradient-primary: linear-gradient(135deg, #d4a574 0%, #c89666 100%);
+  --gradient-secondary: linear-gradient(135deg, #e8d5c4 0%, #d4a574 100%);
+  --gradient-tertiary: linear-gradient(135deg, #f5e6d3 0%, #e8d5c4 100%);
+  --gradient-warm: linear-gradient(135deg, #c89666 0%, #a67c52 100%);
+  --gradient-accent: linear-gradient(135deg, #b8956a 0%, #8b6f47 100%);
+  --gradient-soft: linear-gradient(135deg, #f9f3ec 0%, #e8d5c4 100%);
+
+  /* Animated Background Gradients */
+  --gradient-animated-1: linear-gradient(45deg, #f5e6d3, #e8d5c4, #d4a574, #c89666);
+  --gradient-animated-2: linear-gradient(45deg, #e8d5c4, #d4a574, #c89666, #a67c52);
+  --gradient-animated-3: linear-gradient(45deg, #f9f3ec, #e8d5c4, #d4a574, #b8956a);
+
+  /* Beige Accent Colors */
+  --color-cream: #f9f3ec;
+  --color-beige-light: #e8d5c4;
+  --color-beige: #d4a574;
+  --color-tan: #c89666;
+  --color-brown-light: #b8956a;
+  --color-brown: #a67c52;
+  --color-brown-dark: #8b6f47;
+  --color-espresso: #6b5444;
+
+  /* Soft Glow Effects */
+  --glow-beige: 0 0 30px rgba(212, 165, 116, 0.3);
+  --glow-tan: 0 0 30px rgba(200, 150, 102, 0.3);
+  --glow-brown: 0 0 30px rgba(184, 149, 106, 0.3);
+  --glow-warm: 0 0 40px rgba(212, 165, 116, 0.2);
+}
+
+/* Dynamic Gradient Animations */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes glow-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(102, 126, 234, 0.6);
+  }
+}
+
+@keyframes color-rotate {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+
+  100% {
+    filter: hue-rotate(360deg);
+  }
+}
+
+/* Utility Classes for Dynamic Colors */
+.gradient-animated {
+  background-size: 300% 300%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+.glow-effect {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+.color-shift {
+  animation: color-rotate 10s linear infinite;
+}

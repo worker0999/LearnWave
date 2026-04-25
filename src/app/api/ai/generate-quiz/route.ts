@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     const token = authHeader.substring(7)
-    const payload = verifyToken(token)
+    const payload = await verifyToken(token)
     if (!payload) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     // Create quiz generation prompt
     const difficultyLevel = difficulty === 'easy' ? 'basic' : difficulty === 'hard' ? 'advanced' : 'intermediate'
-    
+
     const prompt = `Generate ${questionCount} multiple-choice questions about "${topic}" for ${difficultyLevel} level students.
 
 For each question, provide:
@@ -64,7 +64,7 @@ Make sure the questions are educational, clear, and appropriate for VTU students
     })
 
     const response = completion.choices[0]?.message?.content || '[]'
-    
+
     // Parse the JSON response
     let questions
     try {

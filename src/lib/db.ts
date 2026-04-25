@@ -27,13 +27,14 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Provide convenient model aliases to handle common singular/plural mismatches
 // e.g., code expects `db.user` but schema defines `model users {}` so Prisma client has `db.users`.
-;(function ensureModelAliases() {
+; (function ensureModelAliases() {
   const clientAny = db as any
   const map: Record<string, string[]> = {
     // alias: [candidate names on generated client]
     user: ['users', 'User', 'Users'],
     userProfile: ['user_profiles', 'userProfiles', 'user_profile'],
-    mentorProfile: ['mentor_profiles', 'mentorProfiles', 'mentor_profile']
+    mentorProfile: ['mentor_profiles', 'mentorProfiles', 'mentor_profile'],
+    userSettings: ['user_settings', 'userSettings', 'user_setting']
   }
 
   for (const alias of Object.keys(map)) {

@@ -362,12 +362,12 @@ export default function MentorConnect() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">Mentor Connect</h1>
-            <p className="text-purple-200">
+            <p className="text-cyan-200">
               Connect with experienced mentors for personalized guidance
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            <Button onClick={refresh} variant="outline" className="border-purple-400 text-purple-200">
+            <Button onClick={refresh} variant="outline" className="border-cyan-400 text-cyan-200">
               <RefreshCw className="w-4 h-4 mr-2" />
               Refresh
             </Button>
@@ -385,12 +385,12 @@ export default function MentorConnect() {
               {/* Search */}
               <div className="lg:col-span-2">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-300 w-4 h-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-300 w-4 h-4" />
                   <Input
                     placeholder="Search mentors by name, expertise..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-purple-300 focus:border-purple-400"
+                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-cyan-300 focus:border-cyan-400"
                   />
                 </div>
               </div>
@@ -455,7 +455,7 @@ export default function MentorConnect() {
                     </Avatar>
                     <div>
                       <CardTitle className="text-white">{mentor.name}</CardTitle>
-                      <p className="text-purple-200 text-sm">{mentor.title}</p>
+                      <p className="text-cyan-200 text-sm">{mentor.title}</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-1">
@@ -471,17 +471,17 @@ export default function MentorConnect() {
               <CardContent>
                 <div className="space-y-4">
                   {/* Bio */}
-                  <p className="text-purple-200 text-sm line-clamp-2">{mentor.bio}</p>
+                  <p className="text-cyan-200 text-sm line-clamp-2">{mentor.bio}</p>
                   
                   {/* Expertise */}
                   <div className="flex flex-wrap gap-1">
                     {mentor.expertise.slice(0, 3).map((exp, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs bg-purple-500/20 text-purple-200">
+                      <Badge key={index} variant="secondary" className="text-xs bg-cyan-500/20 text-cyan-200">
                         {exp}
                       </Badge>
                     ))}
                     {mentor.expertise.length > 3 && (
-                      <Badge variant="secondary" className="text-xs bg-purple-500/20 text-purple-200">
+                      <Badge variant="secondary" className="text-xs bg-cyan-500/20 text-cyan-200">
                         +{mentor.expertise.length - 3}
                       </Badge>
                     )}
@@ -492,10 +492,10 @@ export default function MentorConnect() {
                     <div className="flex items-center space-x-1">
                       <Star className="w-4 h-4 text-yellow-400" />
                       <span className="text-white">{mentor.rating}</span>
-                      <span className="text-purple-300">({mentor.reviews})</span>
+                      <span className="text-cyan-300">({mentor.reviews})</span>
                     </div>
                     <div className="flex items-center space-x-1">
-                      <Award className="w-4 h-4 text-purple-300" />
+                      <Award className="w-4 h-4 text-cyan-300" />
                       <span className="text-white">{mentor.experience} years</span>
                     </div>
                     <div className="flex items-center space-x-1">
@@ -510,11 +510,11 @@ export default function MentorConnect() {
 
                   {/* Availability */}
                   <div className="text-sm">
-                    <div className="flex items-center space-x-1 text-purple-300 mb-1">
+                    <div className="flex items-center space-x-1 text-cyan-300 mb-1">
                       <CalendarIcon className="w-4 h-4" />
                       <span>Available: {mentor.availability.join(', ')}</span>
                     </div>
-                    <div className="flex items-center space-x-1 text-purple-300">
+                    <div className="flex items-center space-x-1 text-cyan-300">
                       <Clock className="w-4 h-4" />
                       <span>Response: {mentor.responseTime}</span>
                     </div>
@@ -526,7 +526,7 @@ export default function MentorConnect() {
                       <DialogTrigger asChild>
                         <Button
                           onClick={() => setSelectedMentor(mentor)}
-                          className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                          className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
                         >
                           <CalendarIcon className="w-4 h-4 mr-2" />
                           Book Session
@@ -535,7 +535,7 @@ export default function MentorConnect() {
                       <DialogContent className="bg-slate-900 border-white/20 text-white max-w-2xl">
                         <DialogHeader>
                           <DialogTitle>Book a Session with {selectedMentor?.name}</DialogTitle>
-                          <DialogDescription className="text-purple-200">
+                          <DialogDescription className="text-cyan-200">
                             Select your preferred date and time for the mentoring session
                           </DialogDescription>
                         </DialogHeader>
@@ -569,7 +569,7 @@ export default function MentorConnect() {
                                     size="sm"
                                     onClick={() => setSelectedTime(time)}
                                     disabled={!selectedDate}
-                                    className={selectedTime === time ? "bg-purple-500" : "border-white/20 text-white hover:bg-white/10"}
+                                    className={selectedTime === time ? "bg-cyan-500" : "border-white/20 text-white hover:bg-white/10"}
                                   >
                                     {time}
                                   </Button>
@@ -583,12 +583,12 @@ export default function MentorConnect() {
                                 placeholder="What would you like to discuss in this session?"
                                 value={sessionNotes}
                                 onChange={(e) => setSessionNotes(e.target.value)}
-                                className="bg-slate-800 border-white/20 text-white placeholder-purple-300"
+                                className="bg-slate-800 border-white/20 text-white placeholder-cyan-300"
                                 rows={3}
                               />
                             </div>
 
-                            <div className="bg-purple-500/20 rounded-lg p-4">
+                            <div className="bg-cyan-500/20 rounded-lg p-4">
                               <div className="flex justify-between items-center mb-2">
                                 <span className="text-sm">Session Duration:</span>
                                 <span className="text-sm font-medium">60 minutes</span>
@@ -612,7 +612,7 @@ export default function MentorConnect() {
                           <Button
                             onClick={handleBookSession}
                             disabled={!selectedDate || !selectedTime || bookingLoading}
-                            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                            className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
                           >
                             {bookingLoading ? 'Booking...' : 'Confirm Booking'}
                           </Button>
@@ -620,7 +620,7 @@ export default function MentorConnect() {
                       </DialogContent>
                     </Dialog>
                     
-                    <Button variant="outline" size="sm" className="border-purple-400 text-purple-200 hover:bg-purple-500 hover:text-white">
+                    <Button variant="outline" size="sm" className="border-cyan-400 text-cyan-200 hover:bg-cyan-500 hover:text-white">
                       <MessageSquare className="w-4 h-4 mr-1" />
                       Chat
                     </Button>
@@ -634,9 +634,9 @@ export default function MentorConnect() {
         {filteredMentors.length === 0 && (
           <Card className="bg-white/10 backdrop-blur-md border-white/20">
             <CardContent className="p-12 text-center">
-              <Users className="w-16 h-16 text-purple-300 mx-auto mb-4" />
+              <Users className="w-16 h-16 text-cyan-300 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-white mb-2">No mentors found</h3>
-              <p className="text-purple-200">
+              <p className="text-cyan-200">
                 Try adjusting your filters or search terms to find available mentors.
               </p>
             </CardContent>
@@ -652,11 +652,11 @@ export default function MentorConnect() {
                   <Calendar className="w-5 h-5 mr-2" />
                   Booked Mentor Sessions
                 </div>
-                <Badge className="bg-purple-500 text-white">
+                <Badge className="bg-cyan-500 text-white">
                   {sessions.length} {sessions.length === 1 ? 'Session' : 'Sessions'}
                 </Badge>
               </CardTitle>
-              <CardDescription className="text-purple-200">
+              <CardDescription className="text-cyan-200">
                 Manage and track your upcoming mentorship sessions
               </CardDescription>
             </CardHeader>
@@ -668,7 +668,7 @@ export default function MentorConnect() {
                       <div className="flex items-center space-x-3 flex-1">
                         <Avatar className="w-12 h-12">
                           <AvatarImage src={session.mentor.user.avatar} />
-                          <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold">
+                          <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold">
                             {session.mentor.user.name.split(' ').map(n => n[0]).join('')}
                           </AvatarFallback>
                         </Avatar>
@@ -687,7 +687,7 @@ export default function MentorConnect() {
                               {session.status}
                             </Badge>
                           </div>
-                          <div className="flex items-center space-x-4 text-sm text-purple-200 mb-2">
+                          <div className="flex items-center space-x-4 text-sm text-cyan-200 mb-2">
                             <span className="flex items-center">
                               <Calendar className="w-4 h-4 mr-1" />
                               {new Date(session.date).toLocaleDateString('en-US', { 
@@ -707,13 +707,13 @@ export default function MentorConnect() {
                             </span>
                           </div>
                           {session.notes && (
-                            <div className="bg-purple-500/10 rounded p-2 mb-2">
-                              <p className="text-purple-300 text-sm">
+                            <div className="bg-cyan-500/10 rounded p-2 mb-2">
+                              <p className="text-cyan-300 text-sm">
                                 <span className="font-medium">Notes:</span> {session.notes}
                               </p>
                             </div>
                           )}
-                          <div className="flex items-center space-x-4 text-xs text-purple-300">
+                          <div className="flex items-center space-x-4 text-xs text-cyan-300">
                             <span>Session ID: {session.id.slice(0, 8)}...</span>
                             <span>Booked on: {new Date(session.createdAt).toLocaleDateString()}</span>
                           </div>
@@ -721,7 +721,7 @@ export default function MentorConnect() {
                       </div>
                       <div className="flex flex-col items-end space-y-3 ml-4">
                         <div className="text-right">
-                          <p className="text-purple-300 text-xs">Amount</p>
+                          <p className="text-cyan-300 text-xs">Amount</p>
                           <p className="text-white font-bold text-lg">₹{session.amount}</p>
                         </div>
                         {session.meetingLink && (
@@ -737,7 +737,7 @@ export default function MentorConnect() {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="border-purple-400 text-purple-200 hover:bg-purple-500 hover:text-white text-xs"
+                              className="border-cyan-400 text-cyan-200 hover:bg-cyan-500 hover:text-white text-xs"
                               onClick={() => navigator.clipboard.writeText(session.meetingLink!)}
                             >
                               Copy Link
@@ -768,19 +768,19 @@ export default function MentorConnect() {
               <div className="mt-6 pt-4 border-t border-white/10">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="text-center">
-                    <p className="text-purple-300 text-sm">Total Spent</p>
+                    <p className="text-cyan-300 text-sm">Total Spent</p>
                     <p className="text-white font-bold text-lg">
                       ₹{sessions.reduce((total, session) => total + session.amount, 0)}
                     </p>
                   </div>
                   <div className="text-center">
-                    <p className="text-purple-300 text-sm">Completed Sessions</p>
+                    <p className="text-cyan-300 text-sm">Completed Sessions</p>
                     <p className="text-white font-bold text-lg">
                       {sessions.filter(s => s.status === 'COMPLETED').length}
                     </p>
                   </div>
                   <div className="text-center">
-                    <p className="text-purple-300 text-sm">Upcoming Sessions</p>
+                    <p className="text-cyan-300 text-sm">Upcoming Sessions</p>
                     <p className="text-white font-bold text-lg">
                       {sessions.filter(s => s.status === 'PENDING' || s.status === 'CONFIRMED').length}
                     </p>
@@ -795,13 +795,13 @@ export default function MentorConnect() {
         {sessions.length === 0 && (
           <Card className="bg-white/10 backdrop-blur-md border-white/20 mt-8">
             <CardContent className="p-12 text-center">
-              <Calendar className="w-16 h-16 text-purple-300 mx-auto mb-4" />
+              <Calendar className="w-16 h-16 text-cyan-300 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-white mb-2">No Booked Sessions Yet</h3>
-              <p className="text-purple-200 mb-6">
+              <p className="text-cyan-200 mb-6">
                 You haven't booked any mentor sessions yet. Browse available mentors and book your first session!
               </p>
               <Button 
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
                 onClick={() => {
                   // Scroll to mentors section
                   document.getElementById('mentors-grid')?.scrollIntoView({ behavior: 'smooth' })

@@ -1,69 +1,50 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { getTokenFromHeaders, verifyToken } from '@/lib/auth'
+import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import jwt from 'jsonwebtoken';
 
-export async function GET(request: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
-    const token = getTokenFromHeaders(request.headers)
-    
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const decoded = verifyToken(token)
-    if (!decoded || decoded.role !== 'STUDENT') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
-
-    const { searchParams } = new URL(request.url)
-    const search = searchParams.get('search')
-    const type = searchParams.get('type')
-    const priority = searchParams.get('priority')
-
-    let whereClause: any = {}
-    
-    if (search) {
-      whereClause.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { content: { contains: search, mode: 'insensitive' } }
-      ]
-    }
-    
-    if (type && type !== 'all') {
-      whereClause.type = type
-    }
-    
-    if (priority && priority !== 'all') {
-      whereClause.priority = priority
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const announcements = await db.announcements.findMany({
-      where: whereClause,
+      where: {
+        is_active: true,
+        target_roles: {
+          has: 'STUDENT'
+        }
+      },
       orderBy: {
         created_at: 'desc'
+      },
+      take: 10,
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        priority: true,
+        created_at: true,
       }
-    })
+    });
 
-    return NextResponse.json({
-      success: true,
-      announcements: announcements.map(announcement => ({
-        id: announcement.id,
-        title: announcement.title,
-        content: announcement.content,
-        priority: announcement.priority,
-        source: 'LearnWave Admin',
-        publishedAt: announcement.created_at.toISOString(),
-        expiresAt: null, // Can be enhanced
-        attachments: announcement.attachment_url ? [announcement.attachment_url] : [], // Can be enhanced
-        read: false // Can be enhanced with read status tracking
-      }))
-    })
+    // Format for consistent UI
+    const formattedAnnouncements = announcements.map((a: any) => ({
+      id: a.id,
+      title: a.title,
+      content: a.content,
+      type: a.priority,
+      createdAt: a.created_at,
+      author: {
+        name: 'Admin',
+        role: 'ADMIN'
+      }
+    }));
 
+    return NextResponse.json({ announcements: formattedAnnouncements });
   } catch (error) {
-    console.error('Error fetching student announcements:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch announcements' },
-      { status: 500 }
-    )
+    console.error('Announcements fetch error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

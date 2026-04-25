@@ -1,73 +1,76 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { verifyToken } from '@/lib/auth'
-import { aiManager } from '@/lib/ai-config'
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyToken } from '@/lib/auth';
+import { aiManager } from '@/lib/ai-config';
+import { cookies } from 'next/headers';
 
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    // Verify authentication
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const cookieStore = await cookies();
+    const tokenCookie = cookieStore.get('token');
+    const authHeader = req.headers.get('authorization');
+
+    let token: string | undefined;
+
+    if (tokenCookie) {
+      token = tokenCookie.value;
+    } else if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
     }
 
-    const token = authHeader.substring(7)
-    const payload = verifyToken(token)
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized: No token provided' }, { status: 401 });
+    }
+
+    const payload = await verifyToken(token);
+
     if (!payload) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
     }
 
-    const { message, context } = await request.json()
+    const { messages, feature } = await req.json();
 
-    if (!message) {
-      return NextResponse.json({ error: 'Message is required' }, { status: 400 })
+    if (!messages || messages.length === 0) {
+      return NextResponse.json({ error: 'No messages provided' }, { status: 400 });
     }
 
-    // Create system prompt based on context
-    let systemPrompt = `You are an AI academic assistant for VTU students. You are helpful, knowledgeable, and provide accurate educational information. `
-    
-    switch (context) {
-      case 'academic_help':
-        systemPrompt += `You specialize in helping students with their studies, homework, and exam preparation. Provide clear, step-by-step explanations and be encouraging.`
-        break
-      case 'doubt_solver':
-        systemPrompt += `You are a doubt solver. Help students understand concepts, solve problems, and clarify their questions. Be patient and thorough.`
-        break
-      default:
-        systemPrompt += `You help students with various academic tasks including learning, problem-solving, and assignment guidance.`
-    }
+    // Get system prompt based on feature
+    const systemPrompts: Record<string, string> = {
+      'smart-tutor': 'You are a helpful AI tutor for VTU (Visvesvaraya Technological University) students. Provide clear, educational explanations with examples. Focus on computer science and engineering topics. Be encouraging and patient.',
+      'content-generator': 'You are an AI that generates study materials, summaries, and notes for VTU students. Create well-structured, comprehensive content that helps students learn effectively.',
+      'qa-assistant': 'You are a Q&A assistant for VTU students. Provide concise, accurate answers to questions about computer science, engineering, and academic topics. Include relevant examples when helpful.',
+      'summarizer': 'You are a text summarizer for students. Create concise, well-organized summaries that capture the key points of provided content. Use bullet points and clear structure.'
+    };
 
-  // Use singleton aiManager (Gemini-only)
-    let response: string
+    const systemPrompt = systemPrompts[feature] || systemPrompts['smart-tutor'];
+
+    // Prepare messages for AI Manager
+    const aiMessages = [
+      { role: 'system', content: systemPrompt },
+      ...messages
+    ];
+
     try {
-      const result = await aiManager.generateWithFallback([
-        {
-          role: 'system',
-          content: systemPrompt
-        },
-        {
-          role: 'user',
-          content: message
-        }
-      ], {
+      const result = await aiManager.generateWithFallback(aiMessages, {
         temperature: 0.7,
-        max_tokens: 1000
-      })
-      response = result.response
-    } catch (aiError) {
-      console.error('AI generation failed with all providers:', aiError)
-      return NextResponse.json(
-        { error: 'AI service temporarily unavailable. Please ensure GEMINI_API_KEY is set or .z-ai-config is properly configured.' },
-        { status: 503 }
-      )
+        max_tokens: 1000,
+      });
+
+      return NextResponse.json({
+        response: result.response,
+        feature
+      });
+    } catch (error) {
+      console.error('AI Manager error:', error);
+      throw error;
     }
 
-    return NextResponse.json({ response })
+
 
   } catch (error) {
-    console.error('Chat API error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('AI chat error:', error);
+    return NextResponse.json({
+      error: 'Failed to generate response',
+      response: 'I apologize, but I encountered an error. Please try again or rephrase your question.'
+    }, { status: 500 });
   }
 }

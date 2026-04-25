@@ -234,7 +234,7 @@ export default function ResultsPortal() {
     const colors: { [key: string]: string } = {
       'S': 'bg-green-500 text-white',
       'A': 'bg-blue-500 text-white',
-      'B': 'bg-purple-500 text-white',
+      'B': 'bg-cyan-500 text-white',
       'C': 'bg-yellow-500 text-white',
       'D': 'bg-orange-500 text-white',
       'E': 'bg-red-500 text-white',
@@ -250,7 +250,7 @@ export default function ResultsPortal() {
   const getPerformanceColor = (cgpa: number) => {
     if (cgpa >= 9) return 'text-green-400'
     if (cgpa >= 8) return 'text-blue-400'
-    if (cgpa >= 7) return 'text-purple-400'
+    if (cgpa >= 7) return 'text-cyan-400'
     if (cgpa >= 6) return 'text-yellow-400'
     return 'text-red-400'
   }
@@ -274,7 +274,7 @@ export default function ResultsPortal() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">Results Portal</h1>
-            <p className="text-purple-200">
+            <p className="text-cyan-200">
               View your academic performance and track your progress
             </p>
           </div>
@@ -284,13 +284,13 @@ export default function ResultsPortal() {
                 placeholder="Enter USN"
                 value={usn}
                 onChange={(e) => setUsn(e.target.value)}
-                className="bg-white/10 border-white/20 text-white placeholder-purple-300 w-32"
+                className="bg-white/10 border-white/20 text-white placeholder-cyan-300 w-32"
               />
               <Button
                 onClick={refreshResults}
                 disabled={refreshing}
                 variant="outline"
-                className="border-purple-400 text-purple-200 hover:bg-purple-500 hover:text-white"
+                className="border-cyan-400 text-cyan-200 hover:bg-cyan-500 hover:text-white"
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
                 {refreshing ? 'Refreshing...' : 'Refresh'}
@@ -304,14 +304,14 @@ export default function ResultsPortal() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <Card className="bg-white/10 backdrop-blur-md border-white/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-purple-200">Current CGPA</CardTitle>
+                <CardTitle className="text-sm font-medium text-cyan-200">Current CGPA</CardTitle>
                 <TrendingUp className="h-4 w-4 text-green-400" />
               </CardHeader>
               <CardContent>
                 <div className={`text-2xl font-bold ${getPerformanceColor(analytics.overallCGPA)}`}>
                   {analytics.overallCGPA.toFixed(2)}
                 </div>
-                <p className="text-xs text-purple-300">
+                <p className="text-xs text-cyan-300">
                   {analytics.semesterTrend.length > 1 && (
                     <>+{(analytics.overallCGPA - analytics.semesterTrend[analytics.semesterTrend.length - 2]).toFixed(2)} from last semester</>
                   )}
@@ -321,14 +321,14 @@ export default function ResultsPortal() {
 
             <Card className="bg-white/10 backdrop-blur-md border-white/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-purple-200">Credits Cleared</CardTitle>
-                <Award className="h-4 w-4 text-purple-300" />
+                <CardTitle className="text-sm font-medium text-cyan-200">Credits Cleared</CardTitle>
+                <Award className="h-4 w-4 text-cyan-300" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-white">
                   {analytics.clearedCredits}/{analytics.totalCredits}
                 </div>
-                <p className="text-xs text-purple-300">
+                <p className="text-xs text-cyan-300">
                   {Math.round((analytics.clearedCredits / analytics.totalCredits) * 100)}% completed
                 </p>
               </CardContent>
@@ -336,14 +336,14 @@ export default function ResultsPortal() {
 
             <Card className="bg-white/10 backdrop-blur-md border-white/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-purple-200">Class Rank</CardTitle>
+                <CardTitle className="text-sm font-medium text-cyan-200">Class Rank</CardTitle>
                 <Star className="h-4 w-4 text-yellow-400" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-white">
                   {analytics.classRank}/{analytics.classStrength}
                 </div>
-                <p className="text-xs text-purple-300">
+                <p className="text-xs text-cyan-300">
                   Top {Math.round((analytics.classRank! / analytics.classStrength!) * 100)}%
                 </p>
               </CardContent>
@@ -351,12 +351,12 @@ export default function ResultsPortal() {
 
             <Card className="bg-white/10 backdrop-blur-md border-white/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-purple-200">Performance</CardTitle>
-                <BarChart3 className="h-4 w-4 text-purple-300" />
+                <CardTitle className="text-sm font-medium text-cyan-200">Performance</CardTitle>
+                <BarChart3 className="h-4 w-4 text-cyan-300" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-400">Excellent</div>
-                <p className="text-xs text-purple-300">
+                <p className="text-xs text-cyan-300">
                   {analytics.subjectPerformance.excellent} subjects with S grade
                 </p>
               </CardContent>
@@ -384,14 +384,14 @@ export default function ResultsPortal() {
                           key={result.semester}
                           variant={selectedSemester === result.semester ? "default" : "outline"}
                           onClick={() => setSelectedSemester(result.semester)}
-                          className={selectedSemester === result.semester ? "bg-purple-500" : "border-purple-400 text-purple-200 hover:bg-purple-500 hover:text-white"}
+                          className={selectedSemester === result.semester ? "bg-cyan-500" : "border-cyan-400 text-cyan-200 hover:bg-cyan-500 hover:text-white"}
                         >
                           Sem {result.semester}
                         </Button>
                       ))}
                     </div>
                   </div>
-                  <Button variant="outline" className="border-purple-400 text-purple-200 hover:bg-purple-500 hover:text-white">
+                  <Button variant="outline" className="border-cyan-400 text-cyan-200 hover:bg-cyan-500 hover:text-white">
                     <Download className="w-4 h-4 mr-2" />
                     Download PDF
                   </Button>
@@ -403,17 +403,17 @@ export default function ResultsPortal() {
             {currentSemesterResult && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* SGPA Card */}
-                <Card className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-md border-white/20">
+                <Card className="bg-gradient-to-br from-cyan-500/20 to-blue-500/20 backdrop-blur-md border-white/20">
                   <CardContent className="p-6 text-center">
                     <div className="text-4xl font-bold text-white mb-2">
                       {currentSemesterResult.sgpa.toFixed(2)}
                     </div>
-                    <div className="text-purple-200 mb-4">SGPA</div>
+                    <div className="text-cyan-200 mb-4">SGPA</div>
                     <div className="flex items-center justify-center space-x-2">
                       <Badge className={currentSemesterResult.status === 'PASS' ? 'bg-green-500' : 'bg-red-500'}>
                         {currentSemesterResult.status}
                       </Badge>
-                      <span className="text-purple-300 text-sm">
+                      <span className="text-cyan-300 text-sm">
                         {new Date(currentSemesterResult.resultDate).toLocaleDateString()}
                       </span>
                     </div>
@@ -425,7 +425,7 @@ export default function ResultsPortal() {
                   <Card className="bg-white/10 backdrop-blur-md border-white/20">
                     <CardHeader>
                       <CardTitle className="text-white">Subject Results</CardTitle>
-                      <CardDescription className="text-purple-200">
+                      <CardDescription className="text-cyan-200">
                         Detailed performance in each subject
                       </CardDescription>
                     </CardHeader>
@@ -436,7 +436,7 @@ export default function ResultsPortal() {
                             <div className="flex items-center justify-between mb-2">
                               <div>
                                 <h4 className="text-white font-medium">{subject.name}</h4>
-                                <p className="text-purple-300 text-sm">{subject.code} • {subject.credits} credits</p>
+                                <p className="text-cyan-300 text-sm">{subject.code} • {subject.credits} credits</p>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <Badge className={getGradeColor(subject.grade)}>
@@ -449,19 +449,19 @@ export default function ResultsPortal() {
                             </div>
                             <div className="grid grid-cols-4 gap-4 text-sm">
                               <div>
-                                <span className="text-purple-300">Internal:</span>
+                                <span className="text-cyan-300">Internal:</span>
                                 <span className="text-white ml-1">{subject.internalMarks}</span>
                               </div>
                               <div>
-                                <span className="text-purple-300">External:</span>
+                                <span className="text-cyan-300">External:</span>
                                 <span className="text-white ml-1">{subject.externalMarks}</span>
                               </div>
                               <div>
-                                <span className="text-purple-300">Total:</span>
+                                <span className="text-cyan-300">Total:</span>
                                 <span className="text-white ml-1">{subject.totalMarks}</span>
                               </div>
                               <div>
-                                <span className="text-purple-300">Points:</span>
+                                <span className="text-cyan-300">Points:</span>
                                 <span className="text-white ml-1">{subject.gradePoints}</span>
                               </div>
                             </div>
@@ -488,7 +488,7 @@ export default function ResultsPortal() {
                 <Card className="bg-white/10 backdrop-blur-md border-white/20">
                   <CardHeader>
                     <CardTitle className="text-white">Subject Performance</CardTitle>
-                    <CardDescription className="text-purple-200">
+                    <CardDescription className="text-cyan-200">
                       Distribution of grades across all subjects
                     </CardDescription>
                   </CardHeader>
@@ -503,7 +503,7 @@ export default function ResultsPortal() {
                         <span className="text-white">{analytics.subjectPerformance.good} subjects</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-purple-400">Average (B, C Grade)</span>
+                        <span className="text-cyan-400">Average (B, C Grade)</span>
                         <span className="text-white">{analytics.subjectPerformance.average} subjects</span>
                       </div>
                       <div className="flex items-center justify-between">
@@ -518,7 +518,7 @@ export default function ResultsPortal() {
                 <Card className="bg-white/10 backdrop-blur-md border-white/20">
                   <CardHeader>
                     <CardTitle className="text-white">CGPA Trend</CardTitle>
-                    <CardDescription className="text-purple-200">
+                    <CardDescription className="text-cyan-200">
                       Your academic performance over semesters
                     </CardDescription>
                   </CardHeader>
@@ -526,11 +526,11 @@ export default function ResultsPortal() {
                     <div className="space-y-4">
                       {analytics.semesterTrend.map((cgpa, index) => (
                         <div key={index} className="flex items-center justify-between">
-                          <span className="text-purple-200">Semester {index + 1}</span>
+                          <span className="text-cyan-200">Semester {index + 1}</span>
                           <div className="flex items-center space-x-2">
                             <div className="w-24 bg-white/20 rounded-full h-2">
                               <div 
-                                className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full"
+                                className="bg-gradient-to-r from-cyan-500 to-blue-500 h-2 rounded-full"
                                 style={{ width: `${(cgpa / 10) * 100}%` }}
                               />
                             </div>
@@ -551,15 +551,15 @@ export default function ResultsPortal() {
             <Card className="bg-white/10 backdrop-blur-md border-white/20">
               <CardHeader>
                 <CardTitle className="text-white">Progress Analysis</CardTitle>
-                <CardDescription className="text-purple-200">
+                <CardDescription className="text-cyan-200">
                   Track your academic journey and identify areas for improvement
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-8">
-                  <Activity className="w-16 h-16 text-purple-300 mx-auto mb-4" />
+                  <Activity className="w-16 h-16 text-cyan-300 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-white mb-2">Detailed Analytics Coming Soon</h3>
-                  <p className="text-purple-200">
+                  <p className="text-cyan-200">
                     Advanced performance analytics and prediction models will be available here.
                   </p>
                 </div>

@@ -1,13 +1,15 @@
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+import { SignJWT, jwtVerify } from 'jose'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
+const SECRET_KEY = new TextEncoder().encode(JWT_SECRET)
 
 export interface JWTPayload {
   userId: string
   email: string
   role: string
   name?: string
+  [key: string]: any
 }
 
 export async function hashPassword(password: string): Promise<string> {
@@ -18,14 +20,20 @@ export async function verifyPassword(password: string, hashedPassword: string): 
   return bcrypt.compare(password, hashedPassword)
 }
 
-export function generateToken(payload: JWTPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' })
+export async function generateToken(payload: JWTPayload): Promise<string> {
+  return new SignJWT(payload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('7d')
+    .sign(SECRET_KEY)
 }
 
-export function verifyToken(token: string): JWTPayload | null {
+export async function verifyToken(token: string): Promise<JWTPayload | null> {
   try {
-    return jwt.verify(token, JWT_SECRET) as JWTPayload
-  } catch {
+    const { payload } = await jwtVerify(token, SECRET_KEY)
+    return payload as unknown as JWTPayload
+  } catch (error) {
+    console.error('Verify Token Error:', error)
     return null
   }
 }

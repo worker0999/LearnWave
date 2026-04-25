@@ -1,15 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
-import { 
-  Users, 
+import { useAuth } from '@/contexts/AuthContext'
+import {
+  Users,
   Calendar,
   DollarSign,
   Star,
@@ -18,418 +17,212 @@ import {
   Video,
   MessageSquare,
   Award,
-  Zap,
   Play,
   Plus,
-  CheckCircle,
-  XCircle
+  RefreshCw,
+  ArrowUpRight
 } from 'lucide-react'
-
-interface MentorData {
-  name: string
-  email: string
-  bio: string
-  expertise: string[]
-  experience: string
-  rating: number
-  hourlyRate: number
-  totalSessions: number
-  totalEarnings: number
-  upcomingSessions: number
-}
-
-interface Session {
-  id: string
-  studentName: string
-  title: string
-  scheduledAt: string
-  duration: number
-  price: number
-  status: 'SCHEDULED' | 'COMPLETED' | 'CANCELLED'
-}
-
-interface EarningData {
-  month: string
-  earnings: number
-  sessions: number
-}
+import { format } from 'date-fns'
+import { useRouter } from 'next/navigation'
 
 export default function MentorDashboard() {
-  const [mentorData, setMentorData] = useState<MentorData | null>(null)
-  const [sessions, setSessions] = useState<Session[]>([])
-  const [earnings, setEarnings] = useState<EarningData[]>([])
+  const { user } = useAuth()
+  const router = useRouter()
+  const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Simulate data loading
-    const mockMentorData: MentorData = {
-      name: 'Dr. Jane Doe',
-      email: 'jane@example.com',
-      bio: 'Experienced professor with 10+ years in Computer Science',
-      expertise: ['Data Structures', 'Algorithms', 'Web Development'],
-      experience: '10+ years of industry and academic experience',
-      rating: 4.8,
-      hourlyRate: 50,
-      totalSessions: 156,
-      totalEarnings: 7800,
-      upcomingSessions: 8
+    const fetchDashboardData = async () => {
+      try {
+        const response = await fetch('/api/mentor/dashboard', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+        if (response.ok) {
+          const result = await response.json()
+          setData(result)
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard:', error)
+      } finally {
+        setLoading(false)
+      }
     }
 
-    const mockSessions: Session[] = [
-      {
-        id: '1',
-        studentName: 'John Smith',
-        title: 'Data Structures Doubt Clearing',
-        scheduledAt: '2024-01-25T14:00:00Z',
-        duration: 60,
-        price: 50,
-        status: 'SCHEDULED'
-      },
-      {
-        id: '2',
-        studentName: 'Emily Johnson',
-        title: 'Algorithm Analysis Help',
-        scheduledAt: '2024-01-25T16:00:00Z',
-        duration: 45,
-        price: 37.5,
-        status: 'SCHEDULED'
-      },
-      {
-        id: '3',
-        studentName: 'Michael Brown',
-        title: 'Web Development Guidance',
-        scheduledAt: '2024-01-24T10:00:00Z',
-        duration: 60,
-        price: 50,
-        status: 'COMPLETED'
-      }
-    ]
-
-    const mockEarnings: EarningData[] = [
-      { month: 'Jan', earnings: 1200, sessions: 24 },
-      { month: 'Feb', earnings: 950, sessions: 19 },
-      { month: 'Mar', earnings: 1400, sessions: 28 },
-      { month: 'Apr', earnings: 1100, sessions: 22 },
-      { month: 'May', earnings: 1350, sessions: 27 },
-      { month: 'Jun', earnings: 800, sessions: 16 }
-    ]
-
-    setTimeout(() => {
-      setMentorData(mockMentorData)
-      setSessions(mockSessions)
-      setEarnings(mockEarnings)
-      setLoading(false)
-    }, 1000)
+    fetchDashboardData()
   }, [])
-
-  const handleStartSession = (sessionId: string) => {
-    console.log('Starting session:', sessionId)
-    // Navigate to session or open meeting link
-  }
-
-  const handleCompleteSession = (sessionId: string) => {
-    console.log('Completing session:', sessionId)
-    // Update session status
-  }
 
   if (loading) {
     return (
       <DashboardLayout userRole="MENTOR">
-        <div className="flex items-center justify-center h-full">
-          <div className="text-white text-xl">Loading dashboard...</div>
+        <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          <RefreshCw className="w-10 h-10 text-[#6B5844] animate-spin mb-4" />
+          <p className="text-[#4A3F33] text-xl font-black tracking-tight">Syncing your desk...</p>
         </div>
       </DashboardLayout>
     )
   }
 
-  if (!mentorData) return null
+  const mentor = data?.mentorData
+  const recentSessions = data?.recentSessions || []
 
   return (
     <DashboardLayout userRole="MENTOR">
-      <div className="p-6">
+      <div className="p-8 space-y-8 max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">Welcome back, {mentorData.name}!</h1>
-            <p className="text-purple-200">Empower students with your expertise</p>
+            <h1 className="text-4xl font-black text-[#4A3F33] tracking-tighter">
+              Welcome, {mentor?.name?.split(' ')[0] || 'Mentor'}!
+            </h1>
+            <p className="text-[#9B8B7E] font-medium font-inter mt-1">Here's what's happening with your students today.</p>
           </div>
+          <Button
+            className="bg-[#6B5844] hover:bg-[#4A3F33] text-white rounded-2xl px-6 h-12 font-bold shadow-lg shadow-brown-200 transition-all active:scale-95"
+            onClick={() => router.push('/mentor/sessions')}
+          >
+            <Calendar className="mr-2 h-5 w-5" /> View Full Schedule
+          </Button>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 transition-all transform hover:scale-105">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Total Earnings</CardTitle>
-              <DollarSign className="h-4 w-4 text-green-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">${mentorData.totalEarnings.toLocaleString()}</div>
-              <p className="text-xs text-purple-300">+12% from last month</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 transition-all transform hover:scale-105">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Total Sessions</CardTitle>
-              <Users className="h-4 w-4 text-blue-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">{mentorData.totalSessions}</div>
-              <p className="text-xs text-purple-300">Lifetime sessions</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 transition-all transform hover:scale-105">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Rating</CardTitle>
-              <Star className="h-4 w-4 text-yellow-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">{mentorData.rating}</div>
-              <p className="text-xs text-purple-300">Excellent mentor</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 transition-all transform hover:scale-105">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Upcoming</CardTitle>
-              <Calendar className="h-4 w-4 text-purple-300" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">{mentorData.upcomingSessions}</div>
-              <p className="text-xs text-purple-300">Sessions this week</p>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[
+            { label: 'Total Earnings', value: `$${mentor?.totalEarnings || 0}`, icon: DollarSign, color: 'text-green-600', bg: 'bg-green-50' },
+            { label: 'Students', value: mentor?.totalStudents || 0, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
+            { label: 'Avg Rating', value: mentor?.rating || '4.5', icon: Star, color: 'text-yellow-600', bg: 'bg-yellow-50' },
+            { label: 'Total Sessions', value: mentor?.totalSessions || 0, icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-50' }
+          ].map((stat, i) => (
+            <Card key={i} className="bg-white border-[#E8DFD3] rounded-[32px] hover:shadow-xl transition-all duration-300 group overflow-hidden border-none shadow-sm">
+              <CardContent className="p-8">
+                <div className="flex items-center justify-between">
+                  <div className={`p-4 rounded-2xl ${stat.bg} ${stat.color} transition-colors`}>
+                    <stat.icon size={24} />
+                  </div>
+                  <ArrowUpRight className="text-[#D4C4B0] opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+                <div className="mt-6">
+                  <p className="text-3xl font-black text-[#4A3F33] tracking-tight">{stat.value}</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-[#9B8B7E] mt-1">{stat.label}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content - 2 columns */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Quick Actions */}
-            <Card className="bg-white/10 backdrop-blur-md border-white/20">
-              <CardHeader>
-                <CardTitle className="text-white">Quick Actions</CardTitle>
-                <CardDescription className="text-purple-200">
-                  Manage your mentorship activities
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Button className="h-20 flex flex-col space-y-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 transition-all transform hover:scale-105">
-                    <Plus className="w-6 h-6" />
-                    <span className="text-xs">New Session</span>
-                  </Button>
-                  <Button className="h-20 flex flex-col space-y-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all transform hover:scale-105">
-                    <Calendar className="w-6 h-6" />
-                    <span className="text-xs">Schedule</span>
-                  </Button>
-                  <Button className="h-20 flex flex-col space-y-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 transition-all transform hover:scale-105">
-                    <MessageSquare className="w-6 h-6" />
-                    <span className="text-xs">Messages</span>
-                  </Button>
-                  <Button className="h-20 flex flex-col space-y-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 transition-all transform hover:scale-105">
-                    <Award className="w-6 h-6" />
-                    <span className="text-xs">Profile</span>
-                  </Button>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Sessions Feed */}
+          <div className="lg:col-span-2 space-y-8">
+            <Card className="bg-white border-[#E8DFD3] rounded-[40px] shadow-sm overflow-hidden border-none">
+              <CardHeader className="p-8 pb-4">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-2xl font-black text-[#4A3F33]">Recent Activity</CardTitle>
+                  <Button variant="link" className="text-[#6B5844] font-bold" onClick={() => router.push('/mentor/sessions')}>View All</Button>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Sessions */}
-            <Card className="bg-white/10 backdrop-blur-md border-white/20">
-              <CardHeader>
-                <CardTitle className="text-white">Recent Sessions</CardTitle>
-                <CardDescription className="text-purple-200">
-                  Manage your mentoring sessions
-                </CardDescription>
+                <CardDescription className="text-[#9B8B7E] font-medium">Your latest student interactions and bookings.</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-8 pt-4">
                 <div className="space-y-4">
-                  {sessions.map((session) => (
-                    <div key={session.id} className="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-all">
-                      <div className="flex items-center justify-between mb-2">
-                        <div>
-                          <h3 className="text-white font-semibold">{session.title}</h3>
-                          <p className="text-purple-200 text-sm">with {session.studentName}</p>
-                        </div>
-                        <Badge 
-                          className={
-                            session.status === 'COMPLETED' ? 'bg-green-500' :
-                            session.status === 'SCHEDULED' ? 'bg-blue-500' : 'bg-red-500'
-                          }
-                        >
-                          {session.status}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4 text-sm text-purple-200">
-                          <span className="flex items-center">
-                            <Clock className="w-4 h-4 mr-1" />
-                            {new Date(session.scheduledAt).toLocaleDateString()} {new Date(session.scheduledAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                          </span>
-                          <span className="flex items-center">
-                            <DollarSign className="w-4 h-4 mr-1" />
-                            ${session.price}
-                          </span>
-                          <span>{session.duration} minutes</span>
-                        </div>
-                        <div className="flex space-x-2">
-                          {session.status === 'SCHEDULED' && (
-                            <>
-                              <Button
-                                size="sm"
-                                className="bg-green-500 hover:bg-green-600"
-                                onClick={() => handleStartSession(session.id)}
-                              >
-                                <Play className="w-4 h-4 mr-1" />
-                                Start
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="border-purple-400 text-purple-200"
-                              >
-                                <Video className="w-4 h-4 mr-1" />
-                                Join
-                              </Button>
-                            </>
-                          )}
-                          {session.status === 'COMPLETED' && (
-                            <CheckCircle className="w-5 h-5 text-green-400" />
-                          )}
-                        </div>
-                      </div>
+                  {recentSessions.length === 0 ? (
+                    <div className="text-center py-12 bg-[#F8F3EE]/50 rounded-3xl border-2 border-dashed border-[#E8DFD3]">
+                      <Users className="mx-auto h-12 w-12 text-[#D4C4B0] mb-4" />
+                      <p className="text-[#4A3F33] font-bold">No sessions yet</p>
+                      <p className="text-[#9B8B7E] text-sm">New bookings will appear here.</p>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Earnings Overview */}
-            <Card className="bg-white/10 backdrop-blur-md border-white/20">
-              <CardHeader>
-                <CardTitle className="text-white">Earnings Overview</CardTitle>
-                <CardDescription className="text-purple-200">
-                  Track your monthly earnings
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 flex items-center justify-center">
-                  <p className="text-purple-200">Earnings chart would go here</p>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-                  <div className="text-center">
-                    <p className="text-purple-200 text-sm">This Month</p>
-                    <p className="text-white font-bold text-lg">$1,200</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-purple-200 text-sm">Last Month</p>
-                    <p className="text-white font-bold text-lg">$950</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-purple-200 text-sm">Average</p>
-                    <p className="text-white font-bold text-lg">$1,150</p>
-                  </div>
+                  ) : (
+                    recentSessions.map((session: any) => (
+                      <div key={session.id} className="group p-6 bg-white rounded-3xl border border-[#F5F0EA] hover:border-[#6B5844] hover:shadow-md transition-all flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="w-14 h-14 rounded-2xl bg-[#E8DFD3] flex items-center justify-center text-[#6B5844] font-black text-xl">
+                            {session.studentName[0]}
+                          </div>
+                          <div>
+                            <h3 className="text-[#4A3F33] font-bold text-lg">{session.studentName}</h3>
+                            <div className="flex items-center gap-3 mt-1">
+                              <span className="flex items-center text-xs text-[#9B8B7E] font-bold">
+                                <Clock size={12} className="mr-1" /> {format(new Date(session.scheduledAt), 'MMM d, h:mm a')}
+                              </span>
+                              <Badge variant="outline" className="text-[10px] uppercase font-black tracking-tighter border-[#E8DFD3] text-[#6B5844]">
+                                {session.title}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Badge className={`${session.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
+                              session.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                            } border-none font-bold rounded-lg px-3`}>
+                            {session.status}
+                          </Badge>
+                          <Button size="icon" className="rounded-xl bg-[#F5F0EA] text-[#6B5844] hover:bg-[#6B5844] hover:text-white transition-colors">
+                            <Video size={18} />
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Sidebar - 1 column */}
-          <div className="space-y-6">
-            {/* Profile Overview */}
-            <Card className="bg-gradient-to-br from-purple-500 to-pink-500 border-none">
-              <CardHeader>
-                <CardTitle className="text-white">Profile Overview</CardTitle>
+          {/* Right Sidebar - Profile & Actions */}
+          <div className="space-y-8">
+            <Card className="bg-[#6B5844] text-white rounded-[40px] shadow-xl border-none overflow-hidden">
+              <CardHeader className="p-8 pb-4">
+                <CardTitle className="text-xl font-black">Quick Actions</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-purple-100 text-sm">Expertise</p>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {mentorData.expertise.map((skill, index) => (
-                        <Badge key={index} className="bg-white/20 text-white text-xs">
-                          {skill}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-purple-100 text-sm">Hourly Rate</p>
-                    <p className="text-white font-bold">${mentorData.hourlyRate}/hour</p>
-                  </div>
-                  <div>
-                    <p className="text-purple-100 text-sm">Experience</p>
-                    <p className="text-white text-sm">{mentorData.experience}</p>
-                  </div>
-                </div>
-                <Button className="w-full mt-4 bg-white text-purple-600 hover:bg-purple-50 transition-all">
-                  Edit Profile
-                </Button>
+              <CardContent className="p-8 pt-2 grid grid-cols-2 gap-4">
+                <button
+                  onClick={() => router.push('/mentor/sessions')}
+                  className="flex flex-col items-center justify-center p-6 bg-white/10 rounded-3xl hover:bg-white/20 transition-all border border-white/10 active:scale-95"
+                >
+                  <Plus size={24} className="mb-2" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Schedule</span>
+                </button>
+                <button
+                  onClick={() => router.push('/mentor/students')}
+                  className="flex flex-col items-center justify-center p-6 bg-white/10 rounded-3xl hover:bg-white/20 transition-all border border-white/10 active:scale-95"
+                >
+                  <Users size={24} className="mb-2" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Students</span>
+                </button>
+                <button
+                  onClick={() => router.push('/mentor/messages')}
+                  className="flex flex-col items-center justify-center p-6 bg-white/10 rounded-3xl hover:bg-white/20 transition-all border border-white/10 active:scale-95"
+                >
+                  <MessageSquare size={24} className="mb-2" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Chat</span>
+                </button>
+                <button
+                  onClick={() => router.push('/mentor/profile')}
+                  className="flex flex-col items-center justify-center p-6 bg-white/10 rounded-3xl hover:bg-white/20 transition-all border border-white/10 active:scale-95"
+                >
+                  <Award size={24} className="mb-2" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Profile</span>
+                </button>
               </CardContent>
             </Card>
 
-            {/* Performance Metrics */}
-            <Card className="bg-white/10 backdrop-blur-md border-white/20">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <TrendingUp className="w-5 h-5 mr-2" />
-                  Performance
-                </CardTitle>
+            <Card className="bg-white border-[#E8DFD3] rounded-[40px] shadow-sm border-none">
+              <CardHeader className="p-8 pb-4">
+                <CardTitle className="text-xl font-black text-[#4A3F33]">Performance</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-purple-200">Response Rate</span>
-                      <span className="text-white">95%</span>
-                    </div>
-                    <Progress value={95} className="h-2" />
+              <CardContent className="p-8 pt-2 space-y-6">
+                <div>
+                  <div className="flex justify-between text-xs font-black uppercase tracking-widest text-[#9B8B7E] mb-2">
+                    <span>Student Retention</span>
+                    <span className="text-[#6B5844]">88%</span>
                   </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-purple-200">On-time Rate</span>
-                      <span className="text-white">98%</span>
-                    </div>
-                    <Progress value={98} className="h-2" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-purple-200">Student Satisfaction</span>
-                      <span className="text-white">92%</span>
-                    </div>
-                    <Progress value={92} className="h-2" />
-                  </div>
+                  <Progress value={88} className="h-2 bg-[#F5F0EA]" />
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Upcoming Sessions */}
-            <Card className="bg-white/10 backdrop-blur-md border-white/20">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <Calendar className="w-5 h-5 mr-2" />
-                  Today's Schedule
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {sessions
-                    .filter(s => s.status === 'SCHEDULED' && new Date(s.scheduledAt).toDateString() === new Date().toDateString())
-                    .map((session) => (
-                      <div key={session.id} className="p-3 bg-white/5 rounded-lg border border-white/10">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-white font-medium text-sm">{session.studentName}</span>
-                          <span className="text-purple-200 text-xs">
-                            {new Date(session.scheduledAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                          </span>
-                        </div>
-                        <p className="text-purple-200 text-xs">{session.title}</p>
-                      </div>
-                    ))}
-                  {sessions.filter(s => s.status === 'SCHEDULED' && new Date(s.scheduledAt).toDateString() === new Date().toDateString()).length === 0 && (
-                    <p className="text-purple-200 text-center text-sm">No sessions today</p>
-                  )}
+                <div>
+                  <div className="flex justify-between text-xs font-black uppercase tracking-widest text-[#9B8B7E] mb-2">
+                    <span>Session Completion</span>
+                    <span className="text-[#6B5844]">96%</span>
+                  </div>
+                  <Progress value={96} className="h-2 bg-[#F5F0EA]" />
                 </div>
               </CardContent>
             </Card>

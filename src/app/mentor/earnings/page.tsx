@@ -90,10 +90,10 @@ export default function MentorEarnings() {
 
   return (
     <DashboardLayout userRole="MENTOR">
-      <div className="p-6 space-y-8 text-white">
+      <div className="p-6 space-y-8 text-[#4A3F33]">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">Earnings Overview</h1>
-          <p className="text-purple-300">Track income, payments, and performance</p>
+          <p className="text-[#6B5844]">Track income, payments, and performance</p>
         </div>
 
         {/* Stats Cards */}
@@ -104,9 +104,9 @@ export default function MentorEarnings() {
             { label: 'Completed Sessions', value: stats.completedSessions },
             { label: 'Average Rating', value: stats.averageRating },
           ].map((item, i) => (
-            <Card key={i} className="bg-white/10 backdrop-blur-md border-white/20">
+            <Card key={i} className="bg-white border-[#E8DFD3]">
               <CardHeader>
-                <CardTitle className="text-sm text-purple-200">{item.label}</CardTitle>
+                <CardTitle className="text-sm text-[#9B8B7E]">{item.label}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{item.value}</div>
@@ -116,11 +116,11 @@ export default function MentorEarnings() {
         </div>
 
         {/* Earnings Chart */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="bg-white border-[#E8DFD3]">
           <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <CardTitle className="text-white">Earnings Chart</CardTitle>
+            <CardTitle className="text-[#4A3F33]">Earnings Chart</CardTitle>
             <div className="flex items-center space-x-4">
-              <Label className="text-purple-300">Date Range</Label>
+              <Label className="text-[#6B5844]">Date Range</Label>
               <DateRangePicker value={dateRange} onChange={setDateRange} />
             </div>
           </CardHeader>
@@ -147,15 +147,15 @@ export default function MentorEarnings() {
         </Card>
 
         {/* Transactions Table */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="bg-white border-[#E8DFD3]">
           <CardHeader>
-            <CardTitle className="text-white">Recent Transactions</CardTitle>
+            <CardTitle className="text-[#4A3F33]">Recent Transactions</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border border-white/10">
+            <div className="rounded-md border border-[#E8DFD3]">
               <Table>
                 <thead>
-                  <tr className="border-b border-white/10 bg-white/5 text-purple-200">
+                  <tr className="border-b border-[#E8DFD3] bg-white text-[#9B8B7E]">
                     <th className="py-3 px-4 text-left">Date</th>
                     <th className="py-3 px-4 text-left">Student</th>
                     <th className="py-3 px-4 text-left">Session Type</th>
@@ -165,13 +165,13 @@ export default function MentorEarnings() {
                 </thead>
                 <tbody>
                   {transactions.map((transaction) => (
-                    <tr key={transaction.id} className="border-b border-white/10">
-                      <td className="py-3 px-4 text-white">
+                    <tr key={transaction.id} className="border-b border-[#E8DFD3]">
+                      <td className="py-3 px-4 text-[#4A3F33]">
                         {new Date(transaction.date).toLocaleDateString()}
                       </td>
-                      <td className="py-3 px-4 text-purple-200">{transaction.student}</td>
-                      <td className="py-3 px-4 text-purple-200">{transaction.sessionType}</td>
-                      <td className="py-3 px-4 text-white">${transaction.amount}</td>
+                      <td className="py-3 px-4 text-[#9B8B7E]">{transaction.student}</td>
+                      <td className="py-3 px-4 text-[#9B8B7E]">{transaction.sessionType}</td>
+                      <td className="py-3 px-4 text-[#4A3F33]">${transaction.amount}</td>
                       <td className="py-3 px-4">
                         <span
                           className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
@@ -196,3 +196,4 @@ export default function MentorEarnings() {
     </DashboardLayout>
   )
 }
+

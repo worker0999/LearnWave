@@ -246,7 +246,7 @@ export default function QuizGenerator() {
         <div className="p-6 max-w-4xl mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-white mb-2">AI Quiz Generator</h1>
-            <p className="text-purple-200">
+            <p className="text-cyan-200">
               Create personalized quizzes with AI-powered questions
             </p>
           </div>
@@ -257,7 +257,7 @@ export default function QuizGenerator() {
                 <Target className="w-5 h-5 mr-2" />
                 Quiz Configuration
               </CardTitle>
-              <CardDescription className="text-purple-200">
+              <CardDescription className="text-cyan-200">
                 Customize your quiz settings for the best learning experience
               </CardDescription>
             </CardHeader>
@@ -361,7 +361,7 @@ export default function QuizGenerator() {
                 <Button
                   onClick={generateQuiz}
                   disabled={!quizConfig.subject || !quizConfig.topic || isGenerating}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-lg px-8 py-3"
+                  className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-lg px-8 py-3"
                 >
                   {isGenerating ? (
                     <>
@@ -392,21 +392,21 @@ export default function QuizGenerator() {
                 <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                   <div>
                     <h4 className="text-white font-medium">Data Structures - Trees</h4>
-                    <p className="text-purple-200 text-sm">Completed 2 days ago</p>
+                    <p className="text-cyan-200 text-sm">Completed 2 days ago</p>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Badge className="bg-green-500 text-white">85%</Badge>
-                    <span className="text-purple-300 text-sm">5/5 correct</span>
+                    <span className="text-cyan-300 text-sm">5/5 correct</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                   <div>
                     <h4 className="text-white font-medium">Algorithm Analysis - Sorting</h4>
-                    <p className="text-purple-200 text-sm">Completed 5 days ago</p>
+                    <p className="text-cyan-200 text-sm">Completed 5 days ago</p>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Badge className="bg-yellow-500 text-white">70%</Badge>
-                    <span className="text-purple-300 text-sm">7/10 correct</span>
+                    <span className="text-cyan-300 text-sm">7/10 correct</span>
                   </div>
                 </div>
               </div>
@@ -441,7 +441,7 @@ export default function QuizGenerator() {
               </div>
             </div>
             <Progress value={progress} className="h-2" />
-            <div className="flex justify-between text-purple-200 text-sm mt-2">
+            <div className="flex justify-between text-cyan-200 text-sm mt-2">
               <span>Question {currentQuestion + 1} of {questions.length}</span>
               <span>{Math.round(progress)}% Complete</span>
             </div>
@@ -477,14 +477,14 @@ export default function QuizGenerator() {
               variant="outline"
               onClick={handlePreviousQuestion}
               disabled={currentQuestion === 0}
-              className="border-purple-400 text-purple-200 hover:bg-purple-500 hover:text-white"
+              className="border-cyan-400 text-cyan-200 hover:bg-cyan-500 hover:text-white"
             >
               Previous
             </Button>
             <Button
               onClick={handleNextQuestion}
               disabled={!selectedAnswers[question.id]}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
             >
               {currentQuestion === questions.length - 1 ? 'Submit Quiz' : 'Next Question'}
             </Button>
@@ -499,23 +499,23 @@ export default function QuizGenerator() {
       <DashboardLayout userRole="STUDENT">
         <div className="p-6 max-w-4xl mx-auto">
           <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-20 h-20 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
               <Award className="w-10 h-10 text-white" />
             </div>
             <h1 className="text-4xl font-bold text-white mb-2">Quiz Completed!</h1>
-            <p className="text-purple-200">
+            <p className="text-cyan-200">
               Great job! Here's how you performed
             </p>
           </div>
 
           {/* Score Card */}
-          <Card className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-md border-white/20 mb-6">
+          <Card className="bg-gradient-to-br from-cyan-500/20 to-blue-500/20 backdrop-blur-md border-white/20 mb-6">
             <CardContent className="p-8 text-center">
               <div className="text-6xl font-bold text-white mb-2">{quizResult.score}%</div>
-              <div className="text-xl text-purple-200 mb-4">
+              <div className="text-xl text-cyan-200 mb-4">
                 {quizResult.correctAnswers} out of {quizResult.totalQuestions} correct
               </div>
-              <div className="flex justify-center space-x-8 text-purple-300">
+              <div className="flex justify-center space-x-8 text-cyan-300">
                 <div className="flex items-center">
                   <Clock className="w-4 h-4 mr-1" />
                   {formatTime(quizResult.timeTaken)}
@@ -536,7 +536,7 @@ export default function QuizGenerator() {
           <Card className="bg-white/10 backdrop-blur-md border-white/20 mb-6">
             <CardHeader>
               <CardTitle className="text-white">Question Review</CardTitle>
-              <CardDescription className="text-purple-200">
+              <CardDescription className="text-cyan-200">
                 Review your answers and learn from explanations
               </CardDescription>
             </CardHeader>
@@ -559,19 +559,19 @@ export default function QuizGenerator() {
                         </div>
                       </div>
                       <div className="space-y-2 text-sm">
-                        <div className="text-purple-200">
+                        <div className="text-cyan-200">
                           Your answer: <span className={isCorrect ? 'text-green-400' : 'text-red-400'}>
                             {userAnswer !== undefined ? question.options[userAnswer] : 'Not answered'}
                           </span>
                         </div>
                         {!isCorrect && (
-                          <div className="text-purple-200">
+                          <div className="text-cyan-200">
                             Correct answer: <span className="text-green-400">
                               {question.options[question.correctAnswer]}
                             </span>
                           </div>
                         )}
-                        <div className="text-purple-300 italic">
+                        <div className="text-cyan-300 italic">
                           <Lightbulb className="w-4 h-4 inline mr-1" />
                           {question.explanation}
                         </div>
@@ -588,7 +588,7 @@ export default function QuizGenerator() {
             <Button
               onClick={resetQuiz}
               variant="outline"
-              className="border-purple-400 text-purple-200 hover:bg-purple-500 hover:text-white"
+              className="border-cyan-400 text-cyan-200 hover:bg-cyan-500 hover:text-white"
             >
               <RotateCcw className="w-4 h-4 mr-2" />
               New Quiz
@@ -598,7 +598,7 @@ export default function QuizGenerator() {
                 // Generate similar quiz
                 generateQuiz()
               }}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
             >
               <Brain className="w-4 h-4 mr-2" />
               Generate Similar Quiz

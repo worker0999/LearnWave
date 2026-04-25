@@ -1,102 +1,113 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { getTokenFromHeaders, verifyToken } from '@/lib/auth'
+import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import jwt from 'jsonwebtoken';
 
-export async function GET(request: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
-    const token = getTokenFromHeaders(request.headers)
-    
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const decoded = verifyToken(token)
-    if (!decoded || decoded.role !== 'STUDENT') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
+    const { searchParams } = new URL(req.url);
+    const semester = searchParams.get('semester');
+    const subject = searchParams.get('subject');
+    const type = searchParams.get('type'); // notes, model, previous
 
-    const { searchParams } = new URL(request.url)
-    const search = searchParams.get('search')
-    const subject = searchParams.get('subject')
-    const type = searchParams.get('type')
-    const semester = searchParams.get('semester')
+    // Build query filters
+    const where: any = {};
+    if (semester) where.semester = parseInt(semester);
+    if (subject) where.subject = { contains: subject, mode: 'insensitive' };
+    if (type) where.type = type.toUpperCase();
 
-    let whereClause: any = {}
-    
-    if (search) {
-      whereClause.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } }
-      ]
-    }
-    
-    if (subject && subject !== 'all') {
-      whereClause.subject = subject
-    }
-    
-    if (type && type !== 'all') {
-      whereClause.type = type.toUpperCase()
-    }
-    
-    if (semester && semester !== 'all') {
-      whereClause.semester = parseInt(semester)
-    }
-
-    const resources = await db.resources.findMany({
-      where: whereClause,
+    const resourcesList = await db.resources.findMany({
+      where,
+      orderBy: {
+        created_at: 'desc'
+      },
       include: {
         users: {
           select: {
-            id: true,
-            email: true,
             user_profiles: {
               select: {
                 first_name: true,
                 last_name: true
               }
-            }
+            },
+            role: true
           }
         }
       },
-      orderBy: {
-        created_at: 'desc'
-      }
-    })
+      take: 50
+    });
 
-    return NextResponse.json({
-      success: true,
-      resources: resources.map(resource => {
-        const profile = resource.users?.user_profiles
-        const uploaderName = profile
-          ? `${profile.first_name} ${profile.last_name}`
-          : resource.users?.email || 'Unknown'
+    const formattedResources = resourcesList.map((resource: any) => ({
+      id: resource.id,
+      title: resource.title,
+      description: resource.description,
+      fileUrl: resource.fileUrl,
+      fileSize: resource.fileSize,
+      resourceType: resource.type,
+      subject: {
+        code: resource.subject,
+        name: resource.subject,
+        semester: resource.semester,
+        credits: 4 // Mock credits as it's not in resources table
+      },
+      uploadedBy: resource.users?.user_profiles ? `${resource.users.user_profiles.first_name} ${resource.users.user_profiles.last_name}` : 'Staff',
+      uploadedByRole: resource.users?.role || 'STAFF',
+      downloads: 0, // Not available in current schema
+      rating: 0,
+      createdAt: resource.created_at
+    }));
 
-        return {
-          id: resource.id,
-          title: resource.title,
-          description: resource.description,
-          type: resource.type.toLowerCase(),
-          subject: resource.subject,
-          semester: resource.semester,
-          unit: resource.unit,
-          author: uploaderName,
-          uploadDate: new Date(resource.created_at).toISOString().split('T')[0],
-          downloads: 0,
-          rating: 4.5,
-          size: resource.fileSize ? `${(resource.fileSize / (1024 * 1024)).toFixed(1)} MB` : undefined,
-          fileUrl: resource.fileUrl,
-          fileName: resource.fileName,
-          tags: [],
-          uploadedBy: uploaderName
-        }
-      })
-    })
-
+    return NextResponse.json({ resources: formattedResources });
   } catch (error) {
-    console.error('Error fetching student resources:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch resources' },
-      { status: 500 }
-    )
+    console.error('Resources fetch error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+// Get subjects with resource counts
+export async function POST(req: NextRequest) {
+  try {
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { semester } = await req.json();
+
+    const resources = await db.resources.findMany({
+      where: semester ? { semester: parseInt(semester) } : {},
+      select: {
+        subject: true,
+        type: true
+      }
+    });
+
+    // Group by subject
+    const subjectMap: Record<string, any> = {};
+    resources.forEach((r: any) => {
+      if (!subjectMap[r.subject]) {
+        subjectMap[r.subject] = {
+          code: r.subject,
+          name: r.subject,
+          semester: semester || 0,
+          credits: 4,
+          resources: { notes: 0, modelPapers: 0, previousPapers: 0 }
+        };
+      }
+
+      const type = r.type.toLowerCase();
+      if (type === 'notes') subjectMap[r.subject].resources.notes++;
+      else if (type === 'model') subjectMap[r.subject].resources.modelPapers++;
+      else if (type === 'previous') subjectMap[r.subject].resources.previousPapers++;
+    });
+
+    return NextResponse.json({ subjects: Object.values(subjectMap) });
+  } catch (error) {
+    console.error('Subjects fetch error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

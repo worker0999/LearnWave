@@ -309,7 +309,7 @@ export default function TimetablePage() {
       case 'TUTORIAL':
         return 'bg-yellow-500'
       case 'SEMINAR':
-        return 'bg-purple-500'
+        return 'bg-cyan-500'
       default:
         return 'bg-gray-500'
     }
@@ -388,20 +388,20 @@ export default function TimetablePage() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">Class Timetable</h1>
-            <p className="text-purple-200">
+            <p className="text-cyan-200">
               {selectedDepartment} • Semester {selectedSemester}
             </p>
           </div>
           <div className="flex space-x-2">
-            <Button onClick={syncWithGoogleCalendar} variant="outline" className="border-purple-400 text-purple-200">
+            <Button onClick={syncWithGoogleCalendar} variant="outline" className="border-cyan-400 text-cyan-200">
               <Calendar className="w-4 h-4 mr-2" />
               Sync with Google
             </Button>
-            <Button onClick={downloadTimetable} variant="outline" className="border-purple-400 text-purple-200">
+            <Button onClick={downloadTimetable} variant="outline" className="border-cyan-400 text-cyan-200">
               <Download className="w-4 h-4 mr-2" />
               Download
             </Button>
-            <Button onClick={fetchTimetable} variant="outline" className="border-purple-400 text-purple-200">
+            <Button onClick={fetchTimetable} variant="outline" className="border-cyan-400 text-cyan-200">
               <RefreshCw className="w-4 h-4 mr-2" />
               Refresh
             </Button>
@@ -413,7 +413,7 @@ export default function TimetablePage() {
           <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="text-purple-200 text-sm mb-2 block">Department</label>
+                <label className="text-cyan-200 text-sm mb-2 block">Department</label>
                 <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
                   <SelectTrigger className="bg-white/10 border-white/20 text-white">
                     <SelectValue />
@@ -429,7 +429,7 @@ export default function TimetablePage() {
               </div>
 
               <div>
-                <label className="text-purple-200 text-sm mb-2 block">Semester</label>
+                <label className="text-cyan-200 text-sm mb-2 block">Semester</label>
                 <Select value={selectedSemester} onValueChange={setSelectedSemester}>
                   <SelectTrigger className="bg-white/10 border-white/20 text-white">
                     <SelectValue />
@@ -448,7 +448,7 @@ export default function TimetablePage() {
               </div>
 
               <div className="flex items-end">
-                <div className="flex items-center space-x-2 text-purple-200">
+                <div className="flex items-center space-x-2 text-cyan-200">
                   <Calendar className="w-4 h-4" />
                   <span className="text-sm">
                     Week of {new Date(weekDates[0]).toLocaleDateString()} - {new Date(weekDates[4]).toLocaleDateString()}
@@ -464,7 +464,7 @@ export default function TimetablePage() {
           <Button
             onClick={() => setCurrentWeek(currentWeek - 1)}
             variant="outline"
-            className="border-purple-400 text-purple-200"
+            className="border-cyan-400 text-cyan-200"
           >
             <ChevronLeft className="w-4 h-4 mr-2" />
             Previous Week
@@ -477,7 +477,7 @@ export default function TimetablePage() {
           <Button
             onClick={() => setCurrentWeek(currentWeek + 1)}
             variant="outline"
-            className="border-purple-400 text-purple-200"
+            className="border-cyan-400 text-cyan-200"
           >
             Next Week
             <ChevronRight className="w-4 h-4 ml-2" />
@@ -487,7 +487,7 @@ export default function TimetablePage() {
         {/* Timetable Grid */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <RefreshCw className="w-8 h-8 text-purple-300 animate-spin" />
+            <RefreshCw className="w-8 h-8 text-cyan-300 animate-spin" />
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
@@ -497,7 +497,7 @@ export default function TimetablePage() {
                   <CardTitle className="text-white text-center">
                     {day.day}
                   </CardTitle>
-                  <CardDescription className="text-purple-200 text-center">
+                  <CardDescription className="text-cyan-200 text-center">
                     {new Date(weekDates[dayIndex]).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric'
@@ -506,7 +506,7 @@ export default function TimetablePage() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {day.entries.length === 0 ? (
-                    <div className="text-center text-purple-300 py-8">
+                    <div className="text-center text-cyan-300 py-8">
                       <Clock className="w-8 h-8 mx-auto mb-2 opacity-50" />
                       <p className="text-sm">No classes</p>
                     </div>
@@ -524,7 +524,7 @@ export default function TimetablePage() {
                             onClick={() => setReminder(entry)}
                             variant="ghost"
                             size="sm"
-                            className="text-purple-300 hover:text-white p-1 h-auto"
+                            className="text-cyan-300 hover:text-white p-1 h-auto"
                           >
                             <Bell className="w-3 h-3" />
                           </Button>
@@ -533,20 +533,20 @@ export default function TimetablePage() {
                         <h4 className="text-white font-medium text-sm mb-1">
                           {entry.subject}
                         </h4>
-                        <p className="text-purple-300 text-xs mb-1">
+                        <p className="text-cyan-300 text-xs mb-1">
                           {entry.subjectCode}
                         </p>
                         
                         <div className="space-y-1">
-                          <div className="flex items-center text-purple-200 text-xs">
+                          <div className="flex items-center text-cyan-200 text-xs">
                             <Clock className="w-3 h-3 mr-1" />
                             {formatTime(entry.startTime)} - {formatTime(entry.endTime)}
                           </div>
-                          <div className="flex items-center text-purple-200 text-xs">
+                          <div className="flex items-center text-cyan-200 text-xs">
                             <User className="w-3 h-3 mr-1" />
                             {entry.faculty}
                           </div>
-                          <div className="flex items-center text-purple-200 text-xs">
+                          <div className="flex items-center text-cyan-200 text-xs">
                             <MapPin className="w-3 h-3 mr-1" />
                             {entry.room}
                           </div>
@@ -564,7 +564,7 @@ export default function TimetablePage() {
         <Card className="bg-white/10 backdrop-blur-md border-white/20 mt-6">
           <CardHeader>
             <CardTitle className="text-white">Today's Schedule</CardTitle>
-            <CardDescription className="text-purple-200">
+            <CardDescription className="text-cyan-200">
               Your classes for today
             </CardDescription>
           </CardHeader>
@@ -579,7 +579,7 @@ export default function TimetablePage() {
                       </div>
                       <div>
                         <h4 className="text-white font-medium">{entry.subject}</h4>
-                        <p className="text-purple-300 text-sm">
+                        <p className="text-cyan-300 text-sm">
                           {formatTime(entry.startTime)} - {formatTime(entry.endTime)} • {entry.room}
                         </p>
                       </div>
@@ -592,7 +592,7 @@ export default function TimetablePage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center text-purple-200 py-8">
+              <div className="text-center text-cyan-200 py-8">
                 <Clock className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p>No classes scheduled for today</p>
               </div>

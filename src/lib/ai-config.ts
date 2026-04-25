@@ -19,11 +19,9 @@ export class GeminiProvider implements AIProvider {
     this.genAI = new GoogleGenerativeAI(apiKey)
     // initialize candidate models and cache
     this._candidateModels = [
-      'gemini-2.0-flash',
-      'gemini-1.5-flash',
-      'gemini-1.5-pro',
-      'gemini-pro',
-      'gemini-1.0-pro'
+      'gemini-2.5-flash',
+      'gemini-2.5-flash-lite',
+      'gemini-2.0-flash-exp'
     ]
     this._currentCandidateIndex = 0
     this._cachedModelName = this._candidateModels[0]
@@ -32,9 +30,9 @@ export class GeminiProvider implements AIProvider {
   async generateResponse(messages: any[], options: any = {}): Promise<string> {
     try {
       // Use a known reliable Gemini model
-  const modelName: string = this._cachedModelName || this._candidateModels[0]
+      const modelName: string = this._cachedModelName || this._candidateModels[0]
       console.log('Using Gemini model:', modelName)
-      
+
       try {
         const model = this.genAI.getGenerativeModel({
           model: modelName,
@@ -59,13 +57,16 @@ export class GeminiProvider implements AIProvider {
         return response.text()
       } catch (modelError) {
         // If this model fails, try next candidate
-        const candidates = (this as any)._candidateModels || []
-        const index = ((this as any)._currentCandidateIndex || 0) + 1
-        
-        if (index < candidates.length) {
-          console.log(`✗ Model ${modelName} failed, trying next...`);
-          (this as any)._currentCandidateIndex = index
-          (this as any)._cachedModelName = candidates[index]
+        // If this model fails, try next candidate
+        const candidates = this._candidateModels || []
+        const nextIndex = (this._currentCandidateIndex || 0) + 1
+
+        if (nextIndex < candidates.length) {
+          const errMsg = modelError instanceof Error ? modelError.message : String(modelError);
+          console.log(`✗ Model ${modelName} failed: ${errMsg}`);
+          console.log(`Trying next model: ${candidates[nextIndex]}...`);
+          this._currentCandidateIndex = nextIndex
+          this._cachedModelName = candidates[nextIndex]
           // Retry with new model
           return this.generateResponse(messages, options)
         } else {
@@ -85,6 +86,13 @@ export class GeminiProvider implements AIProvider {
       } catch (e) {
         message = String(err)
       }
+
+      // Check if this is a quota error
+      if (message.includes('429') || message.includes('quota') || message.includes('Quota exceeded')) {
+        console.error('Gemini API Quota Exceeded:', message)
+        throw new Error('AI quota exceeded. Please wait a few minutes and try again, or check your API key billing settings at https://ai.google.dev/gemini-api/docs/rate-limits')
+      }
+
       console.error('Gemini API Error:', message, '\nRaw error:', err)
       throw new Error(`Gemini API Error: ${message}`)
     }
@@ -147,13 +155,13 @@ export class AIManager {
     if (!provider) {
       throw new Error(`No provider found: ${this.currentProvider}`)
     }
-    
+
     return provider.generateResponse(messages, options)
   }
 
   async generateWithFallback(messages: any[], options: any = {}): Promise<{ response: string; provider: string }> {
     const providers = this.getAvailableProviders()
-    
+
     for (const providerName of providers) {
       try {
         this.setProvider(providerName)
@@ -164,7 +172,7 @@ export class AIManager {
         continue
       }
     }
-    
+
     throw new Error('All AI providers failed')
   }
 }

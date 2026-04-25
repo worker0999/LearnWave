@@ -327,39 +327,39 @@ export default function AdminResourcesPage() {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">Resource Management</h1>
-            <p className="text-purple-200">Manage study materials and resources</p>
+            <h1 className="text-4xl font-bold text-[#4A3F33] mb-2">Resource Management</h1>
+            <p className="text-[#9B8B7E]">Manage study materials and resources</p>
           </div>
           <div className="flex space-x-2">
             <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+                <Button className="bg-[#6B5844] hover:bg-[#4A3F33] text-white">
                   <Upload className="w-4 h-4 mr-2" />
                   Upload Resource
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-slate-900 border-white/20 max-w-2xl">
+              <DialogContent className="bg-white border-[#E8DFD3] max-w-2xl">
                 <DialogHeader>
-                  <DialogTitle className="text-white">Upload New Resource</DialogTitle>
-                  <DialogDescription className="text-purple-200">
+                  <DialogTitle className="text-[#4A3F33]">Upload New Resource</DialogTitle>
+                  <DialogDescription className="text-[#9B8B7E]">
                     Add study materials for students
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-white text-sm font-medium mb-2 block">Title *</label>
+                      <label className="text-[#4A3F33] text-sm font-medium mb-2 block">Title *</label>
                       <Input
                         placeholder="Enter resource title"
                         value={uploadForm.title}
                         onChange={(e) => setUploadForm(prev => ({ ...prev, title: e.target.value }))}
-                        className="bg-white/10 border-white/20 text-white placeholder-purple-300"
+                        className="bg-white border-[#E8DFD3] text-[#4A3F33] placeholder-[#D4C4B0]"
                       />
                     </div>
                     <div>
-                      <label className="text-white text-sm font-medium mb-2 block">Subject *</label>
+                      <label className="text-[#4A3F33] text-sm font-medium mb-2 block">Subject *</label>
                       <Select value={uploadForm.subject} onValueChange={(value) => setUploadForm(prev => ({ ...prev, subject: value }))}>
-                        <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                        <SelectTrigger className="bg-white border-[#E8DFD3] text-[#4A3F33]">
                           <SelectValue placeholder="Select subject" />
                         </SelectTrigger>
                         <SelectContent>
@@ -373,9 +373,9 @@ export default function AdminResourcesPage() {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-white text-sm font-medium mb-2 block">Semester</label>
+                      <label className="text-[#4A3F33] text-sm font-medium mb-2 block">Semester</label>
                       <Select value={uploadForm.semester.toString()} onValueChange={(value) => setUploadForm(prev => ({ ...prev, semester: parseInt(value) }))}>
-                        <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                        <SelectTrigger className="bg-white border-[#E8DFD3] text-[#4A3F33]">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -386,33 +386,33 @@ export default function AdminResourcesPage() {
                       </Select>
                     </div>
                     <div>
-                      <label className="text-white text-sm font-medium mb-2 block">Unit</label>
+                      <label className="text-[#4A3F33] text-sm font-medium mb-2 block">Unit</label>
                       <Input
                         placeholder="e.g., Unit 1"
                         value={uploadForm.unit}
                         onChange={(e) => setUploadForm(prev => ({ ...prev, unit: e.target.value }))}
-                        className="bg-white/10 border-white/20 text-white placeholder-purple-300"
+                        className="bg-white border-[#E8DFD3] text-[#4A3F33] placeholder-[#D4C4B0]"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-white text-sm font-medium mb-2 block">Description</label>
+                    <label className="text-[#4A3F33] text-sm font-medium mb-2 block">Description</label>
                     <Textarea
                       placeholder="Enter resource description"
                       value={uploadForm.description}
                       onChange={(e) => setUploadForm(prev => ({ ...prev, description: e.target.value }))}
-                      className="bg-white/10 border-white/20 text-white placeholder-purple-300 min-h-[80px]"
+                      className="bg-white border-[#E8DFD3] text-[#4A3F33] placeholder-[#D4C4B0] min-h-[80px]"
                     />
                   </div>
 
                   <div>
-                    <label className="text-white text-sm font-medium mb-2 block">File *</label>
+                    <label className="text-[#4A3F33] text-sm font-medium mb-2 block">File *</label>
                     <Input
                       type="file"
                       accept=".pdf,.doc,.docx,.ppt,.pptx,.mp4,.avi,.mov,.jpg,.jpeg,.png,.zip"
                       onChange={(e) => setUploadForm(prev => ({ ...prev, file: e.target.files?.[0] || null }))}
-                      className="bg-white/10 border-white/20 text-white file:text-purple-300"
+                      className="bg-white border-[#E8DFD3] text-[#4A3F33] file:text-[#6B5844]"
                     />
                   </div>
 
@@ -420,14 +420,14 @@ export default function AdminResourcesPage() {
                     <Button
                       variant="outline"
                       onClick={() => setUploadDialogOpen(false)}
-                      className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                      className="bg-white border-[#E8DFD3] text-[#4A3F33] hover:bg-[#F5F0EA]"
                     >
                       Cancel
                     </Button>
                     <Button
                       onClick={handleFileUpload}
                       disabled={actionLoading === 'upload'}
-                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                      className="bg-[#6B5844] hover:bg-[#4A3F33] text-white"
                     >
                       {actionLoading === 'upload' ? (
                         <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
@@ -444,7 +444,7 @@ export default function AdminResourcesPage() {
             <Button
               onClick={() => fetchResources()}
               variant="outline"
-              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              className="bg-white border-[#E8DFD3] text-[#4A3F33] hover:bg-[#F5F0EA]"
             >
               <RefreshCw className="w-4 h-4 mr-2" />
               Refresh
@@ -454,75 +454,75 @@ export default function AdminResourcesPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+          <Card className="bg-white border-[#E8DFD3]">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Total Resources</CardTitle>
-              <BookOpen className="h-4 w-4 text-purple-300" />
+              <CardTitle className="text-sm font-medium text-[#9B8B7E]">Total Resources</CardTitle>
+              <BookOpen className="h-4 w-4 text-[#6B5844]" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{resources.length}</div>
-              <p className="text-xs text-purple-300">Study materials</p>
+              <div className="text-2xl font-bold text-[#4A3F33]">{resources.length}</div>
+              <p className="text-xs text-[#6B5844]">Study materials</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+          <Card className="bg-white border-[#E8DFD3]">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">PDFs</CardTitle>
+              <CardTitle className="text-sm font-medium text-[#9B8B7E]">PDFs</CardTitle>
               <FileText className="h-4 w-4 text-red-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-[#4A3F33]">
                 {resources.filter(r => r.type === 'PDF').length}
               </div>
-              <p className="text-xs text-purple-300">Documents</p>
+              <p className="text-xs text-[#6B5844]">Documents</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+          <Card className="bg-white border-[#E8DFD3]">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Videos</CardTitle>
+              <CardTitle className="text-sm font-medium text-[#9B8B7E]">Videos</CardTitle>
               <Video className="h-4 w-4 text-blue-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-[#4A3F33]">
                 {resources.filter(r => r.type === 'VIDEO').length}
               </div>
-              <p className="text-xs text-purple-300">Video content</p>
+              <p className="text-xs text-[#6B5844]">Video content</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+          <Card className="bg-white border-[#E8DFD3]">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Total Downloads</CardTitle>
+              <CardTitle className="text-sm font-medium text-[#9B8B7E]">Total Downloads</CardTitle>
               <Download className="h-4 w-4 text-green-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-[#4A3F33]">
                 {resources.reduce((sum, r) => sum + r.downloadCount, 0)}
               </div>
-              <p className="text-xs text-purple-300">Resource downloads</p>
+              <p className="text-xs text-[#6B5844]">Resource downloads</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Filters */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 mb-6">
+        <Card className="bg-white border-[#E8DFD3] mb-6">
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-300 w-4 h-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6B5844] w-4 h-4" />
                   <Input
                     placeholder="Search resources..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-purple-300"
+                    className="pl-10 bg-white border-[#E8DFD3] text-[#4A3F33] placeholder-[#D4C4B0]"
                   />
                 </div>
               </div>
               <div className="w-full md:w-40">
                 <Select value={subjectFilter} onValueChange={setSubjectFilter}>
-                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                  <SelectTrigger className="bg-white border-[#E8DFD3] text-[#4A3F33]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -535,7 +535,7 @@ export default function AdminResourcesPage() {
               </div>
               <div className="w-full md:w-32">
                 <Select value={typeFilter} onValueChange={setTypeFilter}>
-                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                  <SelectTrigger className="bg-white border-[#E8DFD3] text-[#4A3F33]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -549,7 +549,7 @@ export default function AdminResourcesPage() {
               </div>
               <div className="w-full md:w-32">
                 <Select value={semesterFilter} onValueChange={setSemesterFilter}>
-                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                  <SelectTrigger className="bg-white border-[#E8DFD3] text-[#4A3F33]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -565,23 +565,23 @@ export default function AdminResourcesPage() {
         </Card>
 
         {/* Resources Table */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="bg-white border-[#E8DFD3]">
           <CardHeader>
-            <CardTitle className="text-white">All Resources</CardTitle>
-            <CardDescription className="text-purple-200">
+            <CardTitle className="text-[#4A3F33]">All Resources</CardTitle>
+            <CardDescription className="text-[#9B8B7E]">
               Manage and organize study materials
             </CardDescription>
           </CardHeader>
           <CardContent>
             {loading ? (
               <div className="flex items-center justify-center py-8">
-                <RefreshCw className="w-6 h-6 text-purple-300 animate-spin" />
+                <RefreshCw className="w-6 h-6 text-[#6B5844] animate-spin" />
               </div>
             ) : resources.length === 0 ? (
               <div className="text-center py-8">
-                <BookOpen className="w-12 h-12 text-purple-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-2">No resources found</h3>
-                <p className="text-purple-200 mb-6">
+                <BookOpen className="w-12 h-12 text-[#6B5844] mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-[#4A3F33] mb-2">No resources found</h3>
+                <p className="text-[#9B8B7E] mb-6">
                   {searchTerm || subjectFilter !== 'ALL' || typeFilter !== 'ALL' || semesterFilter !== 'ALL'
                     ? 'Try adjusting your filters' 
                     : 'Upload your first resource to get started'
@@ -589,7 +589,7 @@ export default function AdminResourcesPage() {
                 </p>
                 <Button
                   onClick={() => setUploadDialogOpen(true)}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                  className="bg-[#6B5844] hover:bg-[#4A3F33] text-white"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Upload Resource
@@ -599,39 +599,39 @@ export default function AdminResourcesPage() {
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-white/10">
-                      <TableHead className="text-purple-200">Resource</TableHead>
-                      <TableHead className="text-purple-200">Subject</TableHead>
-                      <TableHead className="text-purple-200">Semester</TableHead>
-                      <TableHead className="text-purple-200">Type</TableHead>
-                      <TableHead className="text-purple-200">Size</TableHead>
-                      <TableHead className="text-purple-200">Downloads</TableHead>
-                      <TableHead className="text-purple-200">Uploaded</TableHead>
-                      <TableHead className="text-purple-200">Actions</TableHead>
+                    <TableRow className="border-[#E8DFD3]">
+                      <TableHead className="text-[#9B8B7E]">Resource</TableHead>
+                      <TableHead className="text-[#9B8B7E]">Subject</TableHead>
+                      <TableHead className="text-[#9B8B7E]">Semester</TableHead>
+                      <TableHead className="text-[#9B8B7E]">Type</TableHead>
+                      <TableHead className="text-[#9B8B7E]">Size</TableHead>
+                      <TableHead className="text-[#9B8B7E]">Downloads</TableHead>
+                      <TableHead className="text-[#9B8B7E]">Uploaded</TableHead>
+                      <TableHead className="text-[#9B8B7E]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {resources.map((resource) => (
-                      <TableRow key={resource.id} className="border-white/10">
+                      <TableRow key={resource.id} className="border-[#E8DFD3]">
                         <TableCell>
                           <div className="flex items-center space-x-3">
                             {getFileIcon(resource.type)}
                             <div>
-                              <p className="text-white font-medium">{resource.title}</p>
-                              <p className="text-purple-300 text-sm">{resource.fileName}</p>
+                              <p className="text-[#4A3F33] font-medium">{resource.title}</p>
+                              <p className="text-[#6B5844] text-sm">{resource.fileName}</p>
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="text-purple-200">{resource.subject}</TableCell>
-                        <TableCell className="text-purple-200">Semester {resource.semester}</TableCell>
+                        <TableCell className="text-[#9B8B7E]">{resource.subject}</TableCell>
+                        <TableCell className="text-[#9B8B7E]">Semester {resource.semester}</TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className="bg-purple-500/20 text-purple-200">
+                          <Badge variant="secondary" className="bg-cyan-500/20 text-[#9B8B7E]">
                             {resource.type}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-purple-200">{formatFileSize(resource.fileSize)}</TableCell>
-                        <TableCell className="text-purple-200">{resource.downloadCount}</TableCell>
-                        <TableCell className="text-purple-200">
+                        <TableCell className="text-[#9B8B7E]">{formatFileSize(resource.fileSize)}</TableCell>
+                        <TableCell className="text-[#9B8B7E]">{resource.downloadCount}</TableCell>
+                        <TableCell className="text-[#9B8B7E]">
                           {new Date(resource.createdAt).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
@@ -639,7 +639,7 @@ export default function AdminResourcesPage() {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="border-purple-400 text-purple-200"
+                              className="border-cyan-400 text-[#9B8B7E]"
                               onClick={() => handlePreviewResource(resource)}
                             >
                               <Eye className="w-4 h-4" />
@@ -647,7 +647,7 @@ export default function AdminResourcesPage() {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="border-purple-400 text-purple-200"
+                              className="border-cyan-400 text-[#9B8B7E]"
                               onClick={() => handleDownloadResource(resource)}
                             >
                               <Download className="w-4 h-4" />
@@ -678,3 +678,4 @@ export default function AdminResourcesPage() {
     </DashboardLayout>
   )
 }
+

@@ -206,7 +206,7 @@ export default function StudentSessionsPage() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">Booked Mentor Sessions</h1>
-            <p className="text-purple-200">
+            <p className="text-cyan-200">
               Manage and track your upcoming mentorship sessions
             </p>
           </div>
@@ -224,34 +224,34 @@ export default function StudentSessionsPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <Card className="bg-white/10 backdrop-blur-md border-white/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-purple-200">Total Spent</CardTitle>
+                <CardTitle className="text-sm font-medium text-cyan-200">Total Spent</CardTitle>
                 <IndianRupee className="h-4 w-4 text-green-400" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-white">₹{totalSpent}</div>
-                <p className="text-xs text-purple-300">On mentorship sessions</p>
+                <p className="text-xs text-cyan-300">On mentorship sessions</p>
               </CardContent>
             </Card>
 
             <Card className="bg-white/10 backdrop-blur-md border-white/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-purple-200">Completed</CardTitle>
+                <CardTitle className="text-sm font-medium text-cyan-200">Completed</CardTitle>
                 <CheckCircle className="h-4 w-4 text-blue-400" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-white">{completedSessions}</div>
-                <p className="text-xs text-purple-300">Sessions finished</p>
+                <p className="text-xs text-cyan-300">Sessions finished</p>
               </CardContent>
             </Card>
 
             <Card className="bg-white/10 backdrop-blur-md border-white/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-purple-200">Upcoming</CardTitle>
+                <CardTitle className="text-sm font-medium text-cyan-200">Upcoming</CardTitle>
                 <Calendar className="h-4 w-4 text-orange-400" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-white">{upcomingSessions}</div>
-                <p className="text-xs text-purple-300">Sessions scheduled</p>
+                <p className="text-xs text-cyan-300">Sessions scheduled</p>
               </CardContent>
             </Card>
           </div>
@@ -264,21 +264,21 @@ export default function StudentSessionsPage() {
               <Calendar className="w-5 h-5 mr-2" />
               Your Sessions
             </CardTitle>
-            <CardDescription className="text-purple-200">
+            <CardDescription className="text-cyan-200">
               {sessions.length} {sessions.length === 1 ? 'Session' : 'Sessions'} Booked
             </CardDescription>
           </CardHeader>
           <CardContent>
             {sessions.length === 0 ? (
               <div className="text-center py-12">
-                <Calendar className="w-16 h-16 text-purple-300 mx-auto mb-4" />
+                <Calendar className="w-16 h-16 text-cyan-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-white mb-2">No sessions booked yet</h3>
-                <p className="text-purple-200 mb-6">
+                <p className="text-cyan-200 mb-6">
                   You haven't booked any mentor sessions yet. Browse available mentors and book your first session!
                 </p>
                 <Button
                   onClick={() => window.location.href = '/student/mentors'}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                  className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
                 >
                   <Users className="w-4 h-4 mr-2" />
                   Find Mentors
@@ -318,7 +318,7 @@ export default function StudentSessionsPage() {
                             {getStatusIcon(session.status)}
                           </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-purple-200">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-cyan-200">
                             <div className="flex items-center space-x-2">
                               <Calendar className="w-4 h-4" />
                               <span>
@@ -351,7 +351,7 @@ export default function StudentSessionsPage() {
 
                           {session.notes && (
                             <div className="mt-3 p-3 bg-white/5 rounded-lg">
-                              <p className="text-sm text-purple-200">
+                              <p className="text-sm text-cyan-200">
                                 <strong>Notes:</strong> {session.notes}
                               </p>
                             </div>
@@ -373,7 +373,7 @@ export default function StudentSessionsPage() {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => handleCopyLink(session.meetLink!)}
-                                className="h-6 px-2 text-purple-300 hover:text-white"
+                                className="h-6 px-2 text-cyan-300 hover:text-white"
                               >
                                 <Copy className="w-3 h-3" />
                               </Button>

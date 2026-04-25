@@ -7,6 +7,7 @@ interface User {
   email: string
   name: string
   role: string
+  phone?: string
   usn?: string
   branch?: string
   semester?: number
@@ -53,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(newUser)
     localStorage.setItem('token', newToken)
     localStorage.setItem('user', JSON.stringify(newUser))
-    
+
     // Set cookie for middleware (remove secure flag for localhost)
     const isProduction = process.env.NODE_ENV === 'production'
     document.cookie = `token=${newToken}; path=/; max-age=604800${isProduction ? '; secure' : ''}; samesite=strict`
@@ -64,9 +65,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null)
     localStorage.removeItem('token')
     localStorage.removeItem('user')
-    
+
     // Remove cookie
     document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT'
+
+    // Redirect to landing page
+    window.location.href = '/'
   }
 
   const isAuthenticated = !!user && !!token

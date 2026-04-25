@@ -300,7 +300,7 @@ export default function CommunityForum() {
     const colors: { [key: string]: string } = {
       general: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
       doubts: 'bg-green-500/20 text-green-300 border-green-500/30',
-      resources: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+      resources: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
       exams: 'bg-red-500/20 text-red-300 border-red-500/30',
       placements: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
       projects: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
@@ -336,13 +336,13 @@ export default function CommunityForum() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">Community Forum</h1>
-            <p className="text-purple-200">
+            <p className="text-cyan-200">
               Connect with peers, share knowledge, and solve doubts together
             </p>
           </div>
           <Dialog open={newPostDialogOpen} onOpenChange={setNewPostDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+              <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600">
                 <Plus className="w-4 h-4 mr-2" />
                 New Post
               </Button>
@@ -350,7 +350,7 @@ export default function CommunityForum() {
             <DialogContent className="bg-slate-900 border-white/20 text-white max-w-2xl">
               <DialogHeader>
                 <DialogTitle>Create New Post</DialogTitle>
-                <DialogDescription className="text-purple-200">
+                <DialogDescription className="text-cyan-200">
                   Share your thoughts, questions, or resources with the community
                 </DialogDescription>
               </DialogHeader>
@@ -362,7 +362,7 @@ export default function CommunityForum() {
                     placeholder="Enter post title..."
                     value={newPost.title}
                     onChange={(e) => setNewPost(prev => ({ ...prev, title: e.target.value }))}
-                    className="bg-slate-800 border-white/20 text-white placeholder-purple-300"
+                    className="bg-slate-800 border-white/20 text-white placeholder-cyan-300"
                   />
                 </div>
 
@@ -388,7 +388,7 @@ export default function CommunityForum() {
                     placeholder="Write your post content..."
                     value={newPost.content}
                     onChange={(e) => setNewPost(prev => ({ ...prev, content: e.target.value }))}
-                    className="bg-slate-800 border-white/20 text-white placeholder-purple-300"
+                    className="bg-slate-800 border-white/20 text-white placeholder-cyan-300"
                     rows={6}
                   />
                 </div>
@@ -399,7 +399,7 @@ export default function CommunityForum() {
                     placeholder="e.g., data-structures, algorithms, help"
                     value={newPost.tags}
                     onChange={(e) => setNewPost(prev => ({ ...prev, tags: e.target.value }))}
-                    className="bg-slate-800 border-white/20 text-white placeholder-purple-300"
+                    className="bg-slate-800 border-white/20 text-white placeholder-cyan-300"
                   />
                 </div>
               </div>
@@ -415,7 +415,7 @@ export default function CommunityForum() {
                 <Button
                   onClick={handleCreatePost}
                   disabled={!newPost.title || !newPost.content}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                  className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
                 >
                   Create Post
                 </Button>
@@ -431,12 +431,12 @@ export default function CommunityForum() {
               {/* Search */}
               <div className="md:col-span-2">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-300 w-4 h-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-300 w-4 h-4" />
                   <Input
                     placeholder="Search posts..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-purple-300 focus:border-purple-400"
+                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-cyan-300 focus:border-cyan-400"
                   />
                 </div>
               </div>
@@ -477,7 +477,7 @@ export default function CommunityForum() {
           <Card className="bg-white/10 backdrop-blur-md border-white/20">
             <CardContent className="p-4 text-center">
               <div className="text-2xl font-bold text-white">{posts.length}</div>
-              <div className="text-sm text-purple-200">Total Posts</div>
+              <div className="text-sm text-cyan-200">Total Posts</div>
             </CardContent>
           </Card>
           <Card className="bg-white/10 backdrop-blur-md border-white/20">
@@ -485,7 +485,7 @@ export default function CommunityForum() {
               <div className="text-2xl font-bold text-white">
                 {posts.reduce((sum, post) => sum + post.replies, 0)}
               </div>
-              <div className="text-sm text-purple-200">Total Replies</div>
+              <div className="text-sm text-cyan-200">Total Replies</div>
             </CardContent>
           </Card>
           <Card className="bg-white/10 backdrop-blur-md border-white/20">
@@ -493,7 +493,7 @@ export default function CommunityForum() {
               <div className="text-2xl font-bold text-white">
                 {posts.filter(post => post.isSolved).length}
               </div>
-              <div className="text-sm text-purple-200">Solved</div>
+              <div className="text-sm text-cyan-200">Solved</div>
             </CardContent>
           </Card>
           <Card className="bg-white/10 backdrop-blur-md border-white/20">
@@ -501,7 +501,7 @@ export default function CommunityForum() {
               <div className="text-2xl font-bold text-white">
                 {posts.filter(post => post.isPinned).length}
               </div>
-              <div className="text-sm text-purple-200">Pinned</div>
+              <div className="text-sm text-cyan-200">Pinned</div>
             </CardContent>
           </Card>
         </div>
@@ -522,16 +522,16 @@ export default function CommunityForum() {
                     <div>
                       <div className="flex items-center space-x-2">
                         <h3 className="text-white font-semibold">{post.author.name}</h3>
-                        <Badge variant="outline" className="border-purple-400 text-purple-200 text-xs">
+                        <Badge variant="outline" className="border-cyan-400 text-cyan-200 text-xs">
                           {post.author.role}
                         </Badge>
                         {post.author.semester && (
-                          <Badge variant="secondary" className="text-xs bg-purple-500/20 text-purple-200">
+                          <Badge variant="secondary" className="text-xs bg-cyan-500/20 text-cyan-200">
                             Sem {post.author.semester}
                           </Badge>
                         )}
                       </div>
-                      <div className="text-purple-300 text-sm">
+                      <div className="text-cyan-300 text-sm">
                         {formatTimeAgo(post.createdAt)}
                       </div>
                     </div>
@@ -548,18 +548,18 @@ export default function CommunityForum() {
                 </div>
 
                 <h2 className="text-xl font-semibold text-white mb-2">{post.title}</h2>
-                <p className="text-purple-200 mb-4 line-clamp-2">{post.content}</p>
+                <p className="text-cyan-200 mb-4 line-clamp-2">{post.content}</p>
 
                 <div className="flex flex-wrap gap-1 mb-4">
                   {post.tags.map((tag, index) => (
-                    <Badge key={index} variant="secondary" className="text-xs bg-purple-500/20 text-purple-200">
+                    <Badge key={index} variant="secondary" className="text-xs bg-cyan-500/20 text-cyan-200">
                       <Tag className="w-3 h-3 mr-1" />
                       {tag}
                     </Badge>
                   ))}
                 </div>
 
-                <div className="flex items-center justify-between text-sm text-purple-300">
+                <div className="flex items-center justify-between text-sm text-cyan-300">
                   <div className="flex items-center space-x-4">
                     <span className="flex items-center">
                       <Eye className="w-4 h-4 mr-1" />
@@ -581,7 +581,7 @@ export default function CommunityForum() {
                       e.stopPropagation()
                       handleLikePost(post.id)
                     }}
-                    className="text-purple-300 hover:text-white hover:bg-white/10"
+                    className="text-cyan-300 hover:text-white hover:bg-white/10"
                   >
                     <ThumbsUp className="w-4 h-4 mr-1" />
                     Like
@@ -595,9 +595,9 @@ export default function CommunityForum() {
         {filteredPosts.length === 0 && (
           <Card className="bg-white/10 backdrop-blur-md border-white/20">
             <CardContent className="p-12 text-center">
-              <MessageSquare className="w-16 h-16 text-purple-300 mx-auto mb-4" />
+              <MessageSquare className="w-16 h-16 text-cyan-300 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-white mb-2">No posts found</h3>
-              <p className="text-purple-200">
+              <p className="text-cyan-200">
                 Be the first to start a discussion or try adjusting your filters.
               </p>
             </CardContent>
@@ -613,7 +613,7 @@ export default function CommunityForum() {
                   <div className="flex items-start justify-between">
                     <div>
                       <DialogTitle className="text-xl mb-2">{selectedPost.title}</DialogTitle>
-                      <DialogDescription className="text-purple-200">
+                      <DialogDescription className="text-cyan-200">
                         Posted by {selectedPost.author.name} • {formatTimeAgo(selectedPost.createdAt)}
                       </DialogDescription>
                     </div>
@@ -628,11 +628,11 @@ export default function CommunityForum() {
                 <div className="space-y-6">
                   {/* Post Content */}
                   <div className="bg-white/5 rounded-lg p-4">
-                    <p className="text-purple-100 whitespace-pre-wrap">{selectedPost.content}</p>
+                    <p className="text-cyan-100 whitespace-pre-wrap">{selectedPost.content}</p>
                     
                     <div className="flex flex-wrap gap-1 mt-4">
                       {selectedPost.tags.map((tag, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs bg-purple-500/20 text-purple-200">
+                        <Badge key={index} variant="secondary" className="text-xs bg-cyan-500/20 text-cyan-200">
                           <Tag className="w-3 h-3 mr-1" />
                           {tag}
                         </Badge>
@@ -658,7 +658,7 @@ export default function CommunityForum() {
                             <div className="flex-1">
                               <div className="flex items-center space-x-2 mb-2">
                                 <span className="text-white font-medium">{reply.author.name}</span>
-                                <Badge variant="outline" className="border-purple-400 text-purple-200 text-xs">
+                                <Badge variant="outline" className="border-cyan-400 text-cyan-200 text-xs">
                                   {reply.author.role}
                                 </Badge>
                                 {reply.isAnswer && (
@@ -667,17 +667,17 @@ export default function CommunityForum() {
                                     Best Answer
                                   </Badge>
                                 )}
-                                <span className="text-purple-300 text-sm">
+                                <span className="text-cyan-300 text-sm">
                                   {formatTimeAgo(reply.createdAt)}
                                 </span>
                               </div>
-                              <p className="text-purple-100">{reply.content}</p>
+                              <p className="text-cyan-100">{reply.content}</p>
                               <div className="flex items-center space-x-4 mt-2">
-                                <Button variant="ghost" size="sm" className="text-purple-300 hover:text-white hover:bg-white/10">
+                                <Button variant="ghost" size="sm" className="text-cyan-300 hover:text-white hover:bg-white/10">
                                   <ThumbsUp className="w-4 h-4 mr-1" />
                                   {reply.likes}
                                 </Button>
-                                <Button variant="ghost" size="sm" className="text-purple-300 hover:text-white hover:bg-white/10">
+                                <Button variant="ghost" size="sm" className="text-cyan-300 hover:text-white hover:bg-white/10">
                                   Reply
                                 </Button>
                               </div>
@@ -693,11 +693,11 @@ export default function CommunityForum() {
                     <h3 className="text-lg font-semibold text-white mb-4">Add Reply</h3>
                     <Textarea
                       placeholder="Write your reply..."
-                      className="bg-slate-800 border-white/20 text-white placeholder-purple-300"
+                      className="bg-slate-800 border-white/20 text-white placeholder-cyan-300"
                       rows={4}
                     />
                     <div className="flex justify-end mt-2">
-                      <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+                      <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600">
                         Post Reply
                       </Button>
                     </div>

@@ -391,13 +391,13 @@ export default function AIAssistant() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">AI Academic Assistant</h1>
-            <p className="text-purple-200">Your intelligent learning companion for academic success</p>
+            <p className="text-cyan-200">Your intelligent learning companion for academic success</p>
           </div>
           <div className="flex items-center space-x-4">
             <Button
               onClick={toggleVoiceMode}
               variant={voiceMode ? "default" : "outline"}
-              className={voiceMode ? "bg-green-500 hover:bg-green-600" : "border-purple-400 text-purple-200"}
+              className={voiceMode ? "bg-green-500 hover:bg-green-600" : "border-cyan-400 text-cyan-200"}
             >
               {voiceMode ? <Volume2 className="w-4 h-4 mr-2" /> : <VolumeX className="w-4 h-4 mr-2" />}
               Voice Mode {voiceMode ? 'ON' : 'OFF'}
@@ -407,23 +407,23 @@ export default function AIAssistant() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-5 bg-white/10 border-white/20">
-            <TabsTrigger value="chat" className="text-white data-[state=active]:bg-purple-500">
+            <TabsTrigger value="chat" className="text-white data-[state=active]:bg-cyan-500">
               <MessageSquare className="w-4 h-4 mr-2" />
               Doubt Solver
             </TabsTrigger>
-            <TabsTrigger value="quiz" className="text-white data-[state=active]:bg-purple-500">
+            <TabsTrigger value="quiz" className="text-white data-[state=active]:bg-cyan-500">
               <Brain className="w-4 h-4 mr-2" />
               Quiz Generator
             </TabsTrigger>
-            <TabsTrigger value="summarize" className="text-white data-[state=active]:bg-purple-500">
+            <TabsTrigger value="summarize" className="text-white data-[state=active]:bg-cyan-500">
               <FileText className="w-4 h-4 mr-2" />
               Summarize Notes
             </TabsTrigger>
-            <TabsTrigger value="explain" className="text-white data-[state=active]:bg-purple-500">
+            <TabsTrigger value="explain" className="text-white data-[state=active]:bg-cyan-500">
               <Lightbulb className="w-4 h-4 mr-2" />
               Explain Problems
             </TabsTrigger>
-            <TabsTrigger value="assignment" className="text-white data-[state=active]:bg-purple-500">
+            <TabsTrigger value="assignment" className="text-white data-[state=active]:bg-cyan-500">
               <GraduationCap className="w-4 h-4 mr-2" />
               Assignment Helper
             </TabsTrigger>
@@ -437,7 +437,7 @@ export default function AIAssistant() {
                   <MessageSquare className="w-5 h-5 mr-2" />
                   AI Doubt Solver
                 </CardTitle>
-                <CardDescription className="text-purple-200">
+                <CardDescription className="text-cyan-200">
                   Ask any academic question and get instant help from our AI tutor
                 </CardDescription>
               </CardHeader>
@@ -446,7 +446,7 @@ export default function AIAssistant() {
                   {/* Chat Messages */}
                   <div className="h-96 overflow-y-auto space-y-4 p-4 bg-white/5 rounded-lg border border-white/10">
                     {messages.length === 0 && (
-                      <div className="text-center text-purple-200 py-8">
+                      <div className="text-center text-cyan-200 py-8">
                         <HelpCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
                         <p>Start a conversation with your AI tutor!</p>
                         <p className="text-sm mt-2">Ask questions about any subject, get explanations, or seek homework help.</p>
@@ -461,8 +461,8 @@ export default function AIAssistant() {
                         <div
                           className={`max-w-lg p-3 rounded-lg ${
                             message.role === 'user'
-                              ? 'bg-purple-500 text-white'
-                              : 'bg-white/10 text-purple-200 border border-white/20'
+                              ? 'bg-cyan-500 text-white'
+                              : 'bg-white/10 text-cyan-200 border border-white/20'
                           }`}
                         >
                           {message.role === 'assistant' ? (
@@ -503,7 +503,7 @@ export default function AIAssistant() {
                     
                     {loading && (
                       <div className="flex justify-start">
-                        <div className="bg-white/10 text-purple-200 border border-white/20 p-3 rounded-lg">
+                        <div className="bg-white/10 text-cyan-200 border border-white/20 p-3 rounded-lg">
                           <div className="flex items-center space-x-2">
                             <RefreshCw className="w-4 h-4 animate-spin" />
                             <span className="text-sm">AI is thinking...</span>
@@ -542,7 +542,7 @@ export default function AIAssistant() {
                       value={currentMessage}
                       onChange={(e) => setCurrentMessage(e.target.value)}
                       placeholder="Ask your academic question..."
-                      className="flex-1 bg-white/10 border-white/20 text-white placeholder-purple-300"
+                      className="flex-1 bg-white/10 border-white/20 text-white placeholder-cyan-300"
                       onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                       disabled={loading}
                     />
@@ -563,7 +563,7 @@ export default function AIAssistant() {
                   <Brain className="w-5 h-5 mr-2" />
                   AI Quiz Generator
                 </CardTitle>
-                <CardDescription className="text-purple-200">
+                <CardDescription className="text-cyan-200">
                   Generate custom quizzes based on any topic or subject
                 </CardDescription>
               </CardHeader>
@@ -572,18 +572,18 @@ export default function AIAssistant() {
                   {/* Quiz Generation */}
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="quiz-topic" className="text-purple-200">Topic/Subject</Label>
+                      <Label htmlFor="quiz-topic" className="text-cyan-200">Topic/Subject</Label>
                       <Input
                         id="quiz-topic"
                         value={quizTopic}
                         onChange={(e) => setQuizTopic(e.target.value)}
                         placeholder="e.g., Data Structures, Calculus, World History"
-                        className="bg-white/10 border-white/20 text-white placeholder-purple-300"
+                        className="bg-white/10 border-white/20 text-white placeholder-cyan-300"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="quiz-difficulty" className="text-purple-200">Difficulty Level</Label>
+                      <Label htmlFor="quiz-difficulty" className="text-cyan-200">Difficulty Level</Label>
                       <Select value={quizDifficulty} onValueChange={setQuizDifficulty}>
                         <SelectTrigger className="bg-white/10 border-white/20 text-white">
                           <SelectValue />
@@ -622,7 +622,7 @@ export default function AIAssistant() {
                         <h3 className="text-white font-semibold">
                           Question {currentQuizIndex + 1} of {quizQuestions.length}
                         </h3>
-                        <Badge variant="outline" className="border-purple-400 text-purple-200">
+                        <Badge variant="outline" className="border-cyan-400 text-cyan-200">
                           {quizDifficulty}
                         </Badge>
                       </div>
@@ -643,8 +643,8 @@ export default function AIAssistant() {
                                 variant="outline"
                                 className={`w-full justify-start text-left h-auto p-3 ${
                                   selectedAnswers[currentQuizIndex] === index
-                                    ? 'bg-purple-500 border-purple-500 text-white'
-                                    : 'border-white/20 text-purple-200 hover:bg-white/10'
+                                    ? 'bg-cyan-500 border-cyan-500 text-white'
+                                    : 'border-white/20 text-cyan-200 hover:bg-white/10'
                                 }`}
                               >
                                 {String.fromCharCode(65 + index)}. {option}
@@ -659,7 +659,7 @@ export default function AIAssistant() {
                   {/* Quiz Results */}
                   {showResults && (
                     <div className="space-y-4">
-                      <Card className="bg-gradient-to-r from-purple-500 to-pink-500 border-none">
+                      <Card className="bg-gradient-to-r from-cyan-500 to-blue-500 border-none">
                         <CardContent className="p-6 text-center">
                           <h3 className="text-white text-2xl font-bold mb-2">Quiz Complete!</h3>
                           <p className="text-white text-lg">
@@ -689,10 +689,10 @@ export default function AIAssistant() {
                                 </div>
                                 <div className="flex-1">
                                   <p className="text-white font-medium mb-2">{question.question}</p>
-                                  <p className="text-purple-200 text-sm">
+                                  <p className="text-cyan-200 text-sm">
                                     <strong>Correct Answer:</strong> {question.options[question.correctAnswer]}
                                   </p>
-                                  <p className="text-purple-300 text-sm mt-1">{question.explanation}</p>
+                                  <p className="text-cyan-300 text-sm mt-1">{question.explanation}</p>
                                 </div>
                               </div>
                             </CardContent>
@@ -718,7 +718,7 @@ export default function AIAssistant() {
                   <FileText className="w-5 h-5 mr-2" />
                   AI Note Summarizer
                 </CardTitle>
-                <CardDescription className="text-purple-200">
+                <CardDescription className="text-cyan-200">
                   Convert lengthy notes into concise, easy-to-understand summaries
                 </CardDescription>
               </CardHeader>
@@ -726,18 +726,18 @@ export default function AIAssistant() {
                 <div className="space-y-6">
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="note-text" className="text-purple-200">Paste your notes here</Label>
+                      <Label htmlFor="note-text" className="text-cyan-200">Paste your notes here</Label>
                       <Textarea
                         id="note-text"
                         value={noteText}
                         onChange={(e) => setNoteText(e.target.value)}
                         placeholder="Paste your lecture notes, textbook content, or any study material..."
-                        className="min-h-32 bg-white/10 border-white/20 text-white placeholder-purple-300"
+                        className="min-h-32 bg-white/10 border-white/20 text-white placeholder-cyan-300"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="summary-length" className="text-purple-200">Summary Length</Label>
+                      <Label htmlFor="summary-length" className="text-cyan-200">Summary Length</Label>
                       <Select value={summaryLength} onValueChange={setSummaryLength}>
                         <SelectTrigger className="bg-white/10 border-white/20 text-white">
                           <SelectValue />
@@ -788,7 +788,7 @@ export default function AIAssistant() {
                       
                       <Card className="bg-white/5 border-white/10">
                         <CardContent className="p-6">
-                          <p className="text-purple-200 leading-relaxed">{summary}</p>
+                          <p className="text-cyan-200 leading-relaxed">{summary}</p>
                         </CardContent>
                       </Card>
                     </div>
@@ -806,7 +806,7 @@ export default function AIAssistant() {
                   <Lightbulb className="w-5 h-5 mr-2" />
                   AI Problem Explainer
                 </CardTitle>
-                <CardDescription className="text-purple-200">
+                <CardDescription className="text-cyan-200">
                   Get detailed explanations for complex problems, formulas, and concepts
                 </CardDescription>
               </CardHeader>
@@ -814,18 +814,18 @@ export default function AIAssistant() {
                 <div className="space-y-6">
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="problem-text" className="text-purple-200">Problem or Concept</Label>
+                      <Label htmlFor="problem-text" className="text-cyan-200">Problem or Concept</Label>
                       <Textarea
                         id="problem-text"
                         value={problemText}
                         onChange={(e) => setProblemText(e.target.value)}
                         placeholder="Enter a problem, formula, or concept you want explained..."
-                        className="min-h-24 bg-white/10 border-white/20 text-white placeholder-purple-300"
+                        className="min-h-24 bg-white/10 border-white/20 text-white placeholder-cyan-300"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="explanation-type" className="text-purple-200">Explanation Type</Label>
+                      <Label htmlFor="explanation-type" className="text-cyan-200">Explanation Type</Label>
                       <Select value={explanationType} onValueChange={setExplanationType}>
                         <SelectTrigger className="bg-white/10 border-white/20 text-white">
                           <SelectValue />
@@ -876,7 +876,7 @@ export default function AIAssistant() {
                       
                       <Card className="bg-white/5 border-white/10">
                         <CardContent className="p-6">
-                          <div className="text-purple-200 leading-relaxed whitespace-pre-wrap">
+                          <div className="text-cyan-200 leading-relaxed whitespace-pre-wrap">
                             {explanation}
                           </div>
                         </CardContent>
@@ -896,7 +896,7 @@ export default function AIAssistant() {
                   <GraduationCap className="w-5 h-5 mr-2" />
                   AI Assignment Helper
                 </CardTitle>
-                <CardDescription className="text-purple-200">
+                <CardDescription className="text-cyan-200">
                   Get AI-generated suggestions, outlines, and guidance for your assignments
                 </CardDescription>
               </CardHeader>
@@ -904,18 +904,18 @@ export default function AIAssistant() {
                 <div className="space-y-6">
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="assignment-topic" className="text-purple-200">Assignment Topic</Label>
+                      <Label htmlFor="assignment-topic" className="text-cyan-200">Assignment Topic</Label>
                       <Input
                         id="assignment-topic"
                         value={assignmentTopic}
                         onChange={(e) => setAssignmentTopic(e.target.value)}
                         placeholder="e.g., Climate Change Impact, Shakespeare's Hamlet, Quantum Physics"
-                        className="bg-white/10 border-white/20 text-white placeholder-purple-300"
+                        className="bg-white/10 border-white/20 text-white placeholder-cyan-300"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="assignment-type" className="text-purple-200">Assignment Type</Label>
+                      <Label htmlFor="assignment-type" className="text-cyan-200">Assignment Type</Label>
                       <Select value={assignmentType} onValueChange={setAssignmentType}>
                         <SelectTrigger className="bg-white/10 border-white/20 text-white">
                           <SelectValue />
@@ -968,7 +968,7 @@ export default function AIAssistant() {
                       
                       <Card className="bg-white/5 border-white/10">
                         <CardContent className="p-6">
-                          <div className="text-purple-200 leading-relaxed whitespace-pre-wrap">
+                          <div className="text-cyan-200 leading-relaxed whitespace-pre-wrap">
                             {assignmentHelp}
                           </div>
                         </CardContent>

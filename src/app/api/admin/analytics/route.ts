@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const decoded = verifyToken(token)
+    const decoded = await verifyToken(token)
     if (!decoded || decoded.role !== 'ADMIN') {
       return NextResponse.json(
         { error: 'Forbidden - Admin access required' },
@@ -29,10 +29,10 @@ export async function GET(request: NextRequest) {
       totalAdmins,
       pendingMentors,
       approvedMentors,
-      totalSessions,
-      completedSessions,
-      pendingSessions,
-      confirmedSessions
+      totalBookings,
+      completedBookings,
+      pendingBookings,
+      confirmedBookings
     ] = await Promise.all([
       db.users.count(),
       db.users.count({ where: { role: 'STUDENT' } }),
@@ -40,103 +40,94 @@ export async function GET(request: NextRequest) {
       db.users.count({ where: { role: 'ADMIN' } }),
       db.mentors.count({ where: { approved: false } }),
       db.mentors.count({ where: { approved: true } }),
-      db.mentor_sessions.count(),
-      db.mentor_sessions.count({ where: { status: 'COMPLETED' } }),
-      db.mentor_sessions.count({ where: { status: 'PENDING' } }),
-      db.mentor_sessions.count({ where: { status: 'CONFIRMED' } })
+      db.bookings.count(),
+      db.bookings.count({ where: { status: 'COMPLETED' } }),
+      db.bookings.count({ where: { status: 'PENDING' } }),
+      db.bookings.count({ where: { status: 'CONFIRMED' } })
     ])
 
     // Get monthly user registration data (last 6 months)
     const sixMonthsAgo = new Date()
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
 
-    const monthlyRegistrations = await db.users.groupBy({
-      by: ['role'],
+    const registrationData = await db.users.findMany({
       where: {
         created_at: {
           gte: sixMonthsAgo
         }
       },
-      _count: {
-        id: true
-      }
-    })
-
-    // Get mentor sessions statistics
-    const sessionStats = await db.mentor_sessions.groupBy({
-      by: ['status'],
-      _count: {
-        id: true
-      }
-    })
-
-    // Get top mentors by session count
-    const topMentors = await db.users.findMany({
-      where: {
-        role: 'MENTOR',
-        mentors: {
-          approved: true
-        }
-      },
-      include: {
-        mentors: {
-          select: {
-            rating: true,
-            hourly_rate: true,
-            expertise_areas: true
-          }
-        }
-      },
-      orderBy: {
-        email: 'asc'
-      },
-      take: 10
-    })
-
-    // Get recent activity
-    const recentUsers = await db.users.findMany({
-      take: 5,
-      orderBy: {
-        created_at: 'desc'
-      },
       select: {
-        id: true,
-        email: true,
-        role: true,
-        created_at: true
+        created_at: true,
+        role: true
       }
     })
 
-    const recentSessions = await db.mentor_sessions.findMany({
-      take: 5,
-      orderBy: {
-        created_at: 'desc'
-      },
-      include: {
-        mentors: {
-          include: {
-            users: {
-              select: {
-                email: true
-              }
-            }
-          }
-        }
-      }
-    })
+    // Process monthly growth
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    const monthlyGrowth = Array.from({ length: 6 }).map((_, i) => {
+      const d = new Date()
+      d.setMonth(d.getMonth() - i)
+      const monthLabel = months[d.getMonth()]
+      const count = registrationData.filter(u =>
+        new Date(u.created_at).getMonth() === d.getMonth() &&
+        new Date(u.created_at).getFullYear() === d.getFullYear()
+      ).length
+      return { month: monthLabel, count }
+    }).reverse()
 
-    // Calculate revenue from completed sessions
-    const revenueData = await db.mentor_sessions.aggregate({
+    // Calculate revenue from completed bookings
+    const revenueData = await db.bookings.aggregate({
       where: {
         status: 'COMPLETED'
       },
       _sum: {
         price: true
-      },
-      _count: {
-        id: true
       }
     })
+
+    // Get top mentors by rating
+    const topMentors = await db.mentors.findMany({
+      where: {
+        approved: true
+      },
+      include: {
+        users: {
+          select: {
+            email: true,
+            user_profiles: {
+              select: {
+                first_name: true,
+                last_name: true,
+                avatar_url: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: {
+        rating: 'desc'
+      },
+      take: 5
+    })
+
+    // Get popular topics (from session tags)
+    const sessionsWithTags = await db.mentor_sessions.findMany({
+      select: {
+        tags: true
+      }
+    })
+
+    const tagCounts: Record<string, number> = {}
+    sessionsWithTags.forEach(s => {
+      s.tags.forEach(tag => {
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1
+      })
+    })
+
+    const popularTopics = Object.entries(tagCounts)
+      .map(([topic, count]) => ({ topic, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5)
 
     const analytics = {
       overview: {
@@ -148,26 +139,21 @@ export async function GET(request: NextRequest) {
         approvedMentors
       },
       sessions: {
-        totalSessions,
-        completedSessions,
-        pendingSessions,
-        confirmedSessions,
-        totalRevenue: revenueData._sum.amount || 0,
-        completedSessionsCount: revenueData._count.id || 0
+        totalSessions: totalBookings,
+        completedSessions: completedBookings,
+        pendingSessions: pendingBookings,
+        confirmedSessions: confirmedBookings,
+        totalRevenue: Number(revenueData._sum.price || 0)
       },
-      monthlyRegistrations,
-      sessionStats,
-      topMentors: topMentors.map(mentor => ({
-        id: mentor.id,
-        email: mentor.email,
-        rating: mentor.mentors?.rating || 0,
-        hourlyRate: mentor.mentors?.hourly_rate || 0,
-        expertise: mentor.mentors?.expertise_areas || []
-      })),
-      recentActivity: {
-        recentUsers,
-        recentSessions
-      }
+      growth: monthlyGrowth,
+      popularTopics,
+      topMentors: topMentors.map(m => ({
+        id: m.id,
+        name: m.users.user_profiles ? `${m.users.user_profiles.first_name} ${m.users.user_profiles.last_name}` : m.users.email,
+        rating: Number(m.rating),
+        sessions: m.total_sessions,
+        avatar: m.users.user_profiles?.avatar_url
+      }))
     }
 
     return NextResponse.json({

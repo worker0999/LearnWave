@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { db } from '@/lib/db'
 import { hashPassword, generateToken } from '@/lib/auth'
+import { v4 as uuidv4 } from 'uuid'
 
 // User registration endpoint
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { email, password, name, role = 'STUDENT', usn, branch, semester } = body
+    const { email, password, name, role = 'STUDENT', usn, branch, semester, bio, expertise } = body
 
     // Validate required fields
     if (!email || !password || !name) {
@@ -44,32 +46,84 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await hashPassword(password)
 
-    // Create user
+    // Split name into first and last name
+    const [firstName = '', ...lastNameParts] = name.split(' ')
+    const lastName = lastNameParts.join(' ')
+
+    // Generate random IDs for nested objects if needed
+    const mentorId = uuidv4()
+
+    // Create user with profile in a transaction or nested create
     const user = await db.users.create({
       data: {
         email,
         password_hash: hashedPassword,
         role,
-        usn
+        usn,
+        user_profiles: {
+          create: {
+            first_name: firstName,
+            last_name: lastName,
+            branch,
+            semester: semester ? parseInt(semester) : undefined,
+            bio: role === 'MENTOR' ? bio : undefined,
+            updated_at: new Date()
+          }
+        },
+        // If role is MENTOR, also create a mentor record for approval
+        ...(role === 'MENTOR' ? {
+          mentors: {
+            create: {
+              id: mentorId,
+              approved: false,
+              hourly_rate: 0,
+              expertise_areas: expertise || [],
+              updated_at: new Date(),
+              total_earnings: 0,
+              total_sessions: 0,
+              rating: 0
+            }
+          }
+        } : {})
       },
       select: {
         id: true,
         email: true,
         role: true,
-        usn: true
+        usn: true,
+        user_profiles: true
       }
     })
 
     // Generate token
-    const token = generateToken({
+    const token = await generateToken({
       userId: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
+      name: name
+    })
+
+    // Set cookie
+    const cookieStore = await cookies()
+    cookieStore.set('token', token, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: '/',
     })
 
     return NextResponse.json({
       message: 'User registered successfully',
-      user,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        usn: user.usn,
+        name: name,
+        branch: user.user_profiles?.branch,
+        semester: user.user_profiles?.semester
+      },
       token
     })
 

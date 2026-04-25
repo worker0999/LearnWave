@@ -192,7 +192,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6">
       {/* Header */}
       <div className="max-w-4xl mx-auto mb-8">
         <div className="flex items-center justify-between mb-6">
@@ -207,7 +207,7 @@ export default function ProfilePage() {
             </Button>
             <div>
               <h1 className="text-3xl font-bold text-white">Profile Settings</h1>
-              <p className="text-purple-300">Manage your account and preferences</p>
+              <p className="text-cyan-300">Manage your account and preferences</p>
             </div>
           </div>
         </div>
@@ -231,7 +231,7 @@ export default function ProfilePage() {
                   className={`w-full px-4 py-3 rounded-lg flex items-center space-x-3 transition-all text-left ${
                     activeTab === 'profile'
                       ? 'bg-indigo-500/30 text-white border border-indigo-500/50'
-                      : 'text-purple-300 hover:text-white hover:bg-white/5'
+                      : 'text-cyan-300 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   <User className="w-5 h-5" />
@@ -242,7 +242,7 @@ export default function ProfilePage() {
                   className={`w-full px-4 py-3 rounded-lg flex items-center space-x-3 transition-all text-left ${
                     activeTab === 'settings'
                       ? 'bg-indigo-500/30 text-white border border-indigo-500/50'
-                      : 'text-purple-300 hover:text-white hover:bg-white/5'
+                      : 'text-cyan-300 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   <Lock className="w-5 h-5" />
@@ -253,7 +253,7 @@ export default function ProfilePage() {
                   className={`w-full px-4 py-3 rounded-lg flex items-center space-x-3 transition-all text-left ${
                     activeTab === 'preferences'
                       ? 'bg-indigo-500/30 text-white border border-indigo-500/50'
-                      : 'text-purple-300 hover:text-white hover:bg-white/5'
+                      : 'text-cyan-300 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   <Palette className="w-5 h-5" />
@@ -282,7 +282,7 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle className="text-white">Profile Information</CardTitle>
-                      <CardDescription className="text-purple-300">
+                      <CardDescription className="text-cyan-300">
                         Update your personal information
                       </CardDescription>
                     </div>
@@ -325,7 +325,7 @@ export default function ProfilePage() {
                     />
                     <div className="text-center">
                       <h3 className="text-lg font-semibold text-white">{profile.name}</h3>
-                      <p className="text-purple-300 text-sm">{profile.email}</p>
+                      <p className="text-cyan-300 text-sm">{profile.email}</p>
                     </div>
                   </div>
 
@@ -546,7 +546,7 @@ export default function ProfilePage() {
               <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardHeader>
                   <CardTitle className="text-white">Account Settings</CardTitle>
-                  <CardDescription className="text-purple-300">
+                  <CardDescription className="text-cyan-300">
                     Manage your account security and preferences
                   </CardDescription>
                 </CardHeader>
@@ -560,7 +560,7 @@ export default function ProfilePage() {
                     <Button className="bg-indigo-500 hover:bg-indigo-600 text-white">
                       Change Password
                     </Button>
-                    <p className="text-purple-300 text-sm mt-3">
+                    <p className="text-cyan-300 text-sm mt-3">
                       Last changed 30 days ago
                     </p>
                   </div>
@@ -568,10 +568,10 @@ export default function ProfilePage() {
                   {/* Two-Factor Authentication */}
                   <div className="p-4 bg-white/5 rounded-lg border border-white/10">
                     <h3 className="text-white font-semibold mb-3">Two-Factor Authentication</h3>
-                    <p className="text-purple-300 text-sm mb-3">
+                    <p className="text-cyan-300 text-sm mb-3">
                       Add an extra layer of security to your account
                     </p>
-                    <Button variant="outline" className="text-purple-300 border-purple-500/30">
+                    <Button variant="outline" className="text-cyan-300 border-cyan-500/30">
                       Enable 2FA
                     </Button>
                   </div>
@@ -583,7 +583,7 @@ export default function ProfilePage() {
                       <div className="flex items-center justify-between p-3 bg-white/5 rounded border border-white/10">
                         <div>
                           <p className="text-white font-medium">Current Device</p>
-                          <p className="text-purple-300 text-sm">Windows • Chrome</p>
+                          <p className="text-cyan-300 text-sm">Windows • Chrome</p>
                         </div>
                         <Badge className="bg-green-500/30 text-green-300">Active</Badge>
                       </div>
@@ -597,7 +597,7 @@ export default function ProfilePage() {
                       <span>Data & Privacy</span>
                     </h3>
                     <div className="space-y-3">
-                      <Button variant="outline" className="w-full text-purple-300 border-purple-500/30 justify-start">
+                      <Button variant="outline" className="w-full text-cyan-300 border-cyan-500/30 justify-start">
                         Download Your Data
                       </Button>
                       <Button variant="outline" className="w-full text-red-300 border-red-500/30 justify-start">
@@ -616,7 +616,7 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle className="text-white">Preferences</CardTitle>
-                      <CardDescription className="text-purple-300">
+                      <CardDescription className="text-cyan-300">
                         Customize your experience
                       </CardDescription>
                     </div>
@@ -650,7 +650,7 @@ export default function ProfilePage() {
                         </SelectContent>
                       </Select>
                     ) : (
-                      <p className="text-purple-300">
+                      <p className="text-cyan-300">
                         {profile.theme === 'auto' ? 'Auto (System)' : profile.theme.charAt(0).toUpperCase() + profile.theme.slice(1)}
                       </p>
                     )}
@@ -673,7 +673,7 @@ export default function ProfilePage() {
                         <div key={key} className="flex items-center justify-between p-3 bg-white/5 rounded border border-white/10">
                           <div>
                             <p className="text-white font-medium">{label}</p>
-                            <p className="text-purple-300 text-sm">{description}</p>
+                            <p className="text-cyan-300 text-sm">{description}</p>
                           </div>
                           <div className="relative inline-block w-12 h-6 cursor-pointer" onClick={() => isEditing && handleNotificationChange(key as any)}>
                             <input

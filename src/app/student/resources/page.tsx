@@ -301,7 +301,7 @@ export default function ResourceHub() {
       case 'link':
         return <Link className="w-5 h-5 text-green-400" />
       default:
-        return <BookOpen className="w-5 h-5 text-purple-400" />
+        return <BookOpen className="w-5 h-5 text-cyan-400" />
     }
   }
 
@@ -314,7 +314,7 @@ export default function ResourceHub() {
       case 'link':
         return 'bg-green-500/20 text-green-300 border-green-500/30'
       default:
-        return 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+        return 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
     }
   }
 
@@ -418,7 +418,7 @@ export default function ResourceHub() {
       <DashboardLayout userRole="STUDENT">
         <div className="flex items-center justify-center h-full">
           <div className="flex items-center space-x-2">
-            <RefreshCw className="w-6 h-6 text-purple-300 animate-spin" />
+            <RefreshCw className="w-6 h-6 text-cyan-300 animate-spin" />
             <div className="text-white text-xl">Loading resources...</div>
           </div>
         </div>
@@ -466,7 +466,7 @@ export default function ResourceHub() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">Resource Hub</h1>
-            <p className="text-purple-200">
+            <p className="text-cyan-200">
               Access comprehensive study materials organized by semester and subject
             </p>
           </div>
@@ -498,12 +498,12 @@ export default function ResourceHub() {
               {/* Search */}
               <div className="lg:col-span-2">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-300 w-4 h-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-300 w-4 h-4" />
                   <Input
                     placeholder="Search resources..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-purple-300 focus:border-purple-400"
+                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-cyan-300 focus:border-cyan-400"
                   />
                 </div>
               </div>
@@ -568,7 +568,7 @@ export default function ResourceHub() {
               </Select>
             </div>
             
-            <div className="flex items-center space-x-2 text-purple-200 mt-4">
+            <div className="flex items-center space-x-2 text-cyan-200 mt-4">
               <Filter className="w-4 h-4" />
               <span className="text-sm">
                 {filteredResources.length} of {resources?.length || 0} resources
@@ -586,7 +586,7 @@ export default function ResourceHub() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredResources.filter(r => r.featured).map((resource) => (
-                <Card key={resource.id} className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-md border-white/20 hover:bg-white/30 transition-all transform hover:scale-105">
+                <Card key={resource.id} className="bg-gradient-to-br from-cyan-500/20 to-blue-500/20 backdrop-blur-md border-white/20 hover:bg-white/30 transition-all transform hover:scale-105">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex items-center space-x-2">
@@ -601,12 +601,12 @@ export default function ResourceHub() {
                       </Badge>
                     </div>
                     <CardTitle className="text-white text-lg">{resource.title}</CardTitle>
-                    <CardDescription className="text-purple-200">
+                    <CardDescription className="text-cyan-200">
                       {resource.description}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-between text-sm text-purple-300 mb-4">
+                    <div className="flex items-center justify-between text-sm text-cyan-300 mb-4">
                       <span className="flex items-center">
                         <User className="w-4 h-4 mr-1" />
                         {resource.author}
@@ -621,7 +621,7 @@ export default function ResourceHub() {
                       </span>
                     </div>
                     
-                    <div className="flex items-center justify-between text-sm text-purple-300 mb-4">
+                    <div className="flex items-center justify-between text-sm text-cyan-300 mb-4">
                       <span className="flex items-center">
                         <Calendar className="w-4 h-4 mr-1" />
                         {formatDate(resource.uploadDate)}
@@ -645,7 +645,7 @@ export default function ResourceHub() {
                           variant="outline"
                           onClick={() => handlePreview(resource)}
                           disabled={downloading === resource.id}
-                          className="border-purple-400 text-purple-200 hover:bg-purple-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="border-cyan-400 text-cyan-200 hover:bg-cyan-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <Eye className="w-4 h-4 mr-2" />
                           Preview
@@ -666,9 +666,9 @@ export default function ResourceHub() {
           {filteredResources.length === 0 ? (
             <Card className="bg-white/10 backdrop-blur-md border-white/20">
               <CardContent className="p-12 text-center">
-                <BookOpen className="w-16 h-16 text-purple-300/50 mx-auto mb-4" />
+                <BookOpen className="w-16 h-16 text-cyan-300/50 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-white mb-2">No Resources Found</h3>
-                <p className="text-purple-200 mb-6">
+                <p className="text-cyan-200 mb-6">
                   No resources match your current filters. Try adjusting your search criteria or check back later for new materials.
                 </p>
                 <Button
@@ -679,7 +679,7 @@ export default function ResourceHub() {
                     setSelectedType('all')
                     setSelectedUnit('all')
                   }}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                  className="bg-cyan-600 hover:bg-cyan-700 text-white"
                 >
                   Clear All Filters
                 </Button>
@@ -697,12 +697,12 @@ export default function ResourceHub() {
                       </Badge>
                     </div>
                     <CardTitle className="text-white text-lg">{resource.title}</CardTitle>
-                    <CardDescription className="text-purple-200">
+                    <CardDescription className="text-cyan-200">
                       {resource.description}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-between text-sm text-purple-300 mb-4">
+                    <div className="flex items-center justify-between text-sm text-cyan-300 mb-4">
                       <span className="flex items-center">
                         <User className="w-4 h-4 mr-1" />
                         {resource.author}
@@ -717,7 +717,7 @@ export default function ResourceHub() {
                       </span>
                     </div>
                     
-                    <div className="flex items-center justify-between text-sm text-purple-300 mb-4">
+                    <div className="flex items-center justify-between text-sm text-cyan-300 mb-4">
                       <span className="flex items-center">
                         <Calendar className="w-4 h-4 mr-1" />
                         {formatDate(resource.uploadDate)}
@@ -741,7 +741,7 @@ export default function ResourceHub() {
                           variant="outline"
                           onClick={() => handlePreview(resource)}
                           disabled={downloading === resource.id}
-                          className="border-purple-400 text-purple-200 hover:bg-purple-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="border-cyan-400 text-cyan-200 hover:bg-cyan-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <Eye className="w-4 h-4 mr-2" />
                           Preview
@@ -766,9 +766,9 @@ export default function ResourceHub() {
                           </Badge>
                           <h3 className="text-lg font-semibold text-white">{resource.title}</h3>
                         </div>
-                        <p className="text-purple-200 mb-3">{resource.description}</p>
+                        <p className="text-cyan-200 mb-3">{resource.description}</p>
                         
-                        <div className="flex items-center space-x-6 text-sm text-purple-300">
+                        <div className="flex items-center space-x-6 text-sm text-cyan-300">
                           <span className="flex items-center">
                             <User className="w-4 h-4 mr-1" />
                             {resource.author}
@@ -803,7 +803,7 @@ export default function ResourceHub() {
                           <Button
                             variant="outline"
                             onClick={() => handlePreview(resource)}
-                            className="border-purple-400 text-purple-200 hover:bg-purple-500 hover:text-white"
+                            className="border-cyan-400 text-cyan-200 hover:bg-cyan-500 hover:text-white"
                           >
                             <Eye className="w-4 h-4 mr-2" />
                             Preview

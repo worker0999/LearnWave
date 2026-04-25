@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { verifyToken } from '@/lib/auth'
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Public routes that don't require authentication
   const publicRoutes = ['/auth/login', '/auth/register', '/auth/mentor-success', '/']
-  
+
   // Protected routes
   const protectedRoutes = ['/admin', '/student', '/mentor']
   const adminRoutes = ['/admin']
@@ -15,7 +15,8 @@ export function middleware(request: NextRequest) {
   const studentRoutes = ['/student']
 
   // Check if the path is public
-  if (publicRoutes.some(route => pathname.startsWith(route))) {
+  const exactPublicRoutes = ['/', '/auth/login', '/auth/register', '/auth/mentor-success']
+  if (exactPublicRoutes.includes(pathname)) {
     return NextResponse.next()
   }
 
@@ -38,7 +39,7 @@ export function middleware(request: NextRequest) {
     }
 
     try {
-      const payload = verifyToken(token)
+      const payload = await verifyToken(token)
       if (!payload) {
         console.log('Invalid token in middleware, redirecting to login')
         return NextResponse.redirect(new URL('/auth/login', request.url))

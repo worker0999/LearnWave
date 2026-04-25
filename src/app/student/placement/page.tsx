@@ -248,13 +248,13 @@ export default function PlacementPortal() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">Placement Preparation</h1>
-            <p className="text-purple-200">
+            <p className="text-cyan-200">
               Comprehensive resources to help you ace your placements
             </p>
           </div>
           <Dialog open={mockInterviewDialogOpen} onOpenChange={setMockInterviewDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+              <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Mock Interview
               </Button>
@@ -262,7 +262,7 @@ export default function PlacementPortal() {
             <DialogContent className="bg-slate-900 border-white/20 text-white">
               <DialogHeader>
                 <DialogTitle>AI Mock Interview</DialogTitle>
-                <DialogDescription className="text-purple-200">
+                <DialogDescription className="text-cyan-200">
                   Practice your interview skills with our AI interviewer
                 </DialogDescription>
               </DialogHeader>
@@ -316,7 +316,7 @@ export default function PlacementPortal() {
               <div className="flex justify-end">
                 <Button
                   onClick={() => setMockInterviewDialogOpen(false)}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                  className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
                 >
                   Start Interview
                 </Button>
@@ -329,7 +329,7 @@ export default function PlacementPortal() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="bg-white/10 backdrop-blur-md border-white/20">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Overall Progress</CardTitle>
+              <CardTitle className="text-sm font-medium text-cyan-200">Overall Progress</CardTitle>
               <TrendingUp className="h-4 w-4 text-green-400" />
             </CardHeader>
             <CardContent>
@@ -340,14 +340,14 @@ export default function PlacementPortal() {
 
           <Card className="bg-white/10 backdrop-blur-md border-white/20">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Resources Completed</CardTitle>
-              <BookOpen className="h-4 w-4 text-purple-300" />
+              <CardTitle className="text-sm font-medium text-cyan-200">Resources Completed</CardTitle>
+              <BookOpen className="h-4 w-4 text-cyan-300" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">
                 {stats.resourcesCompleted}/{stats.resourcesTotal}
               </div>
-              <p className="text-xs text-purple-300">
+              <p className="text-xs text-cyan-300">
                 {Math.round((stats.resourcesCompleted / stats.resourcesTotal) * 100)}% done
               </p>
             </CardContent>
@@ -355,14 +355,14 @@ export default function PlacementPortal() {
 
           <Card className="bg-white/10 backdrop-blur-md border-white/20">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Problems Solved</CardTitle>
+              <CardTitle className="text-sm font-medium text-cyan-200">Problems Solved</CardTitle>
               <Code className="h-4 w-4 text-blue-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">
                 {stats.problemsSolved}/{stats.problemsTotal}
               </div>
-              <p className="text-xs text-purple-300">
+              <p className="text-xs text-cyan-300">
                 Keep practicing daily!
               </p>
             </CardContent>
@@ -370,12 +370,12 @@ export default function PlacementPortal() {
 
           <Card className="bg-white/10 backdrop-blur-md border-white/20">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-200">Interview Ready</CardTitle>
+              <CardTitle className="text-sm font-medium text-cyan-200">Interview Ready</CardTitle>
               <Award className="h-4 w-4 text-yellow-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-yellow-400">Soon</div>
-              <p className="text-xs text-purple-300">
+              <p className="text-xs text-cyan-300">
                 {Math.max(0, 100 - stats.overallProgress)}% to go
               </p>
             </CardContent>
@@ -435,14 +435,14 @@ export default function PlacementPortal() {
                       )}
                     </div>
                     <CardTitle className="text-white">{resource.title}</CardTitle>
-                    <CardDescription className="text-purple-200">
+                    <CardDescription className="text-cyan-200">
                       {resource.description}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-purple-300">Duration: {resource.duration}</span>
+                        <span className="text-cyan-300">Duration: {resource.duration}</span>
                         <div className="flex items-center">
                           <Star className="w-4 h-4 text-yellow-400 mr-1" />
                           <span className="text-white">{resource.rating}</span>
@@ -451,14 +451,14 @@ export default function PlacementPortal() {
                       
                       <div className="flex flex-wrap gap-1">
                         {resource.tags.map((tag, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs bg-purple-500/20 text-purple-200">
+                          <Badge key={index} variant="secondary" className="text-xs bg-cyan-500/20 text-cyan-200">
                             {tag}
                           </Badge>
                         ))}
                       </div>
 
                       <Button 
-                        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                        className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
                         onClick={() => window.open(resource.link, '_blank')}
                       >
                         {resource.completed ? 'Review' : 'Start Learning'}
@@ -475,7 +475,7 @@ export default function PlacementPortal() {
             <Card className="bg-white/10 backdrop-blur-md border-white/20">
               <CardHeader>
                 <CardTitle className="text-white">Coding Practice</CardTitle>
-                <CardDescription className="text-purple-200">
+                <CardDescription className="text-cyan-200">
                   Solve problems to improve your coding skills
                 </CardDescription>
               </CardHeader>
@@ -493,7 +493,7 @@ export default function PlacementPortal() {
                         </div>
                         <div>
                           <h4 className="text-white font-medium">{problem.title}</h4>
-                          <div className="flex items-center space-x-3 text-sm text-purple-300">
+                          <div className="flex items-center space-x-3 text-sm text-cyan-300">
                             <Badge className={getDifficultyColor(problem.difficulty)}>
                               {problem.difficulty}
                             </Badge>
@@ -504,7 +504,7 @@ export default function PlacementPortal() {
                           </div>
                         </div>
                       </div>
-                      <Button variant="outline" className="border-purple-400 text-purple-200 hover:bg-purple-500 hover:text-white">
+                      <Button variant="outline" className="border-cyan-400 text-cyan-200 hover:bg-cyan-500 hover:text-white">
                         {problem.solved ? 'Practice Again' : 'Solve'}
                       </Button>
                     </div>
@@ -525,7 +525,7 @@ export default function PlacementPortal() {
                       </div>
                       <div>
                         <CardTitle className="text-white">{company.name}</CardTitle>
-                        <p className="text-purple-200 text-sm">{company.industry}</p>
+                        <p className="text-cyan-200 text-sm">{company.industry}</p>
                       </div>
                     </div>
                   </CardHeader>
@@ -535,7 +535,7 @@ export default function PlacementPortal() {
                         <h4 className="text-white font-medium mb-1">Roles</h4>
                         <div className="flex flex-wrap gap-1">
                           {company.roles.map((role, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs bg-purple-500/20 text-purple-200">
+                            <Badge key={index} variant="secondary" className="text-xs bg-cyan-500/20 text-cyan-200">
                               {role}
                             </Badge>
                           ))}
@@ -549,7 +549,7 @@ export default function PlacementPortal() {
 
                       <div>
                         <h4 className="text-white font-medium mb-1">Key Requirements</h4>
-                        <ul className="text-purple-200 text-sm space-y-1">
+                        <ul className="text-cyan-200 text-sm space-y-1">
                           {company.requirements.map((req, index) => (
                             <li key={index} className="flex items-center">
                               <CheckCircle className="w-3 h-3 mr-2 text-green-400" />
@@ -563,7 +563,7 @@ export default function PlacementPortal() {
                         <Badge className={getDifficultyColor(company.difficulty)}>
                           {company.difficulty} to crack
                         </Badge>
-                        <Button variant="outline" size="sm" className="border-purple-400 text-purple-200 hover:bg-purple-500 hover:text-white">
+                        <Button variant="outline" size="sm" className="border-cyan-400 text-cyan-200 hover:bg-cyan-500 hover:text-white">
                           View Details
                         </Button>
                       </div>
@@ -577,12 +577,12 @@ export default function PlacementPortal() {
           <TabsContent value="resume" className="space-y-6">
             <Card className="bg-white/10 backdrop-blur-md border-white/20">
               <CardContent className="p-8 text-center">
-                <FileText className="w-16 h-16 text-purple-300 mx-auto mb-4" />
+                <FileText className="w-16 h-16 text-cyan-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-white mb-2">AI Resume Builder</h3>
-                <p className="text-purple-200 mb-6">
+                <p className="text-cyan-200 mb-6">
                   Create a professional resume optimized for Applicant Tracking Systems
                 </p>
-                <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+                <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600">
                   <Zap className="w-4 h-4 mr-2" />
                   Build Resume
                 </Button>
@@ -593,7 +593,7 @@ export default function PlacementPortal() {
               <Card className="bg-white/10 backdrop-blur-md border-white/20">
                 <CardHeader>
                   <CardTitle className="text-white">Resume Templates</CardTitle>
-                  <CardDescription className="text-purple-200">
+                  <CardDescription className="text-cyan-200">
                     Professional templates designed for tech roles
                   </CardDescription>
                 </CardHeader>
@@ -602,7 +602,7 @@ export default function PlacementPortal() {
                     {['Modern Professional', 'Clean Minimal', 'Creative Designer', 'Technical Engineer'].map((template, index) => (
                       <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                         <span className="text-white">{template}</span>
-                        <Button variant="outline" size="sm" className="border-purple-400 text-purple-200 hover:bg-purple-500 hover:text-white">
+                        <Button variant="outline" size="sm" className="border-cyan-400 text-cyan-200 hover:bg-cyan-500 hover:text-white">
                           Use Template
                         </Button>
                       </div>
@@ -614,7 +614,7 @@ export default function PlacementPortal() {
               <Card className="bg-white/10 backdrop-blur-md border-white/20">
                 <CardHeader>
                   <CardTitle className="text-white">Resume Tips</CardTitle>
-                  <CardDescription className="text-purple-200">
+                  <CardDescription className="text-cyan-200">
                     Expert advice to make your resume stand out
                   </CardDescription>
                 </CardHeader>
@@ -629,7 +629,7 @@ export default function PlacementPortal() {
                     ].map((tip, index) => (
                       <div key={index} className="flex items-start space-x-2">
                         <Lightbulb className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
-                        <span className="text-purple-200 text-sm">{tip}</span>
+                        <span className="text-cyan-200 text-sm">{tip}</span>
                       </div>
                     ))}
                   </div>
