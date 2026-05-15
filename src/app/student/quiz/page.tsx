@@ -11,6 +11,8 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
+import { useAuth } from '@/contexts/AuthContext'
+import { showXPToast, showLevelUpToast } from '@/lib/gamification-client'
 import { 
   Brain, 
   Target, 
@@ -190,7 +192,9 @@ export default function QuizGenerator() {
     }
   }
 
-  const handleSubmitQuiz = () => {
+  const { token } = useAuth()
+
+  const handleSubmitQuiz = async () => {
     const correctAnswers = Object.entries(selectedAnswers).filter(
       ([questionId, answerIndex]) => {
         const question = questions.find(q => q.id === questionId)
@@ -208,6 +212,61 @@ export default function QuizGenerator() {
       difficulty: quizConfig.difficulty,
       subject: quizConfig.subject,
       topic: quizConfig.topic
+    }
+
+    // Award XP
+    if (token) {
+      try {
+        // Base XP for completion
+        const xpRes = await fetch('/api/gamification/xp', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            action: 'QUIZ_COMPLETED',
+            metadata: { score: result.score, subject: result.subject }
+          })
+        });
+
+        if (xpRes.ok) {
+          const xpData = await xpRes.json();
+          if (xpData.success) {
+            showXPToast(xpData.xpGained, 'QUIZ_COMPLETED');
+            if (xpData.leveledUp) {
+              showLevelUpToast(xpData.level);
+            }
+          }
+        }
+
+        // Bonus XP for high score
+        if (result.score >= 90) {
+          const bonusRes = await fetch('/api/gamification/xp', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              action: 'QUIZ_SCORE_90',
+              metadata: { score: result.score }
+            })
+          });
+
+          if (bonusRes.ok) {
+            const bonusData = await bonusRes.json();
+            if (bonusData.success) {
+              showXPToast(bonusData.xpGained, 'QUIZ_SCORE_90');
+              if (bonusData.leveledUp) {
+                showLevelUpToast(bonusData.level);
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to award quiz XP:', error);
+      }
     }
 
     setQuizResult(result)

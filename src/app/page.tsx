@@ -1,9 +1,33 @@
 'use client'
 
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 
+function useReveal() {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<any>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return [ref, isVisible] as const;
+}
+
 export default function Home() {
+  const [featuresRef, featuresVisible] = useReveal();
+  const [rolesRef, rolesVisible] = useReveal();
+  const [ctaRef, ctaVisible] = useReveal();
   useEffect(() => {
     const cursor = document.getElementById('cursor');
     const ring = document.getElementById('cursorRing');
@@ -58,12 +82,6 @@ export default function Home() {
     };
     window.addEventListener('scroll', handleScroll);
 
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-    }, { threshold: 0.1 });
-    const reveals = document.querySelectorAll('.reveal');
-    reveals.forEach(el => observer.observe(el));
-
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('scroll', handleScroll);
@@ -72,8 +90,6 @@ export default function Home() {
         el.removeEventListener('mouseenter', handleMouseEnter);
         el.removeEventListener('mouseleave', handleMouseLeave);
       });
-      reveals.forEach(el => observer.unobserve(el));
-      observer.disconnect();
     };
   }, []);
 
@@ -748,7 +764,7 @@ export default function Home() {
       </div>
 
       {/* FEATURES */}
-      <section className="features reveal" id="features">
+      <section ref={featuresRef} className={`features reveal ${featuresVisible ? 'visible' : ''}`} id="features">
         <div className="section-label">What&apos;s inside</div>
         <h2 className="section-title">Everything you need, <em>nothing you don&apos;t</em></h2>
 
@@ -822,7 +838,7 @@ export default function Home() {
       </section>
 
       {/* ROLES */}
-      <section className="roles reveal" id="roles">
+      <section ref={rolesRef} className={`roles reveal ${rolesVisible ? 'visible' : ''}`} id="roles">
         <div className="roles-header">
           <div>
             <div className="section-label">Built for everyone</div>
@@ -885,7 +901,7 @@ export default function Home() {
       </section>
 
       {/* CTA BANNER */}
-      <div className="cta-banner reveal">
+      <div ref={ctaRef} className={`cta-banner reveal ${ctaVisible ? 'visible' : ''}`}>
         <div className="cta-banner-text">
           <div className="cta-banner-title">Ready to ride the wave?</div>
           <div className="cta-banner-sub">Join 12,000+ learners already on LearnWave. Free to start.</div>

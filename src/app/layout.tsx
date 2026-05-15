@@ -41,6 +41,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
+        suppressHydrationWarning
         className={`${urbanist.variable} font-sans antialiased bg-background text-foreground`}
         style={{ fontFamily: 'var(--font-urbanist), sans-serif' }}
       >

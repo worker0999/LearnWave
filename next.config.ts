@@ -13,10 +13,8 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [];
   },
-  eslint: {
-    // 构建时忽略ESLint错误
-    ignoreDuringBuilds: true,
-  },
+  // Allow local dev origin to suppress Next.js webpack-hmr warnings
+  allowedDevOrigins: ['127.0.0.1'],
   // Environment variables
   env: {
     DATABASE_URL: process.env.DATABASE_URL,

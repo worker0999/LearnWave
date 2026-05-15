@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { db } from '@/lib/db'
 import { verifyPassword, generateToken } from '@/lib/auth'
+import { awardXP } from '@/lib/xp-engine'
+import { updateStreak } from '@/lib/streak-engine'
 
 export async function POST(request: NextRequest) {
   try {
@@ -116,6 +118,16 @@ export async function POST(request: NextRequest) {
       usn: user.usn,
       branch: user.user_profiles?.branch,
       semester: user.user_profiles?.semester
+    }
+
+    // Gamification hooks
+    if (user.role === 'STUDENT') {
+      try {
+        await updateStreak(user.id);
+        await awardXP(user.id, 'LOGIN');
+      } catch (gamifyError) {
+        console.error('Gamification login hook error:', gamifyError);
+      }
     }
 
     return NextResponse.json({

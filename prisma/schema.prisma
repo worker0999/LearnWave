@@ -205,6 +205,17 @@ model users {
   results_snapshots results_snapshots[]
   user_profiles     user_profiles?
   user_settings     user_settings?
+
+  // Gamification relations
+  user_progress     user_progress?
+  user_streak       user_streak?
+  user_achievements user_achievement[]
+  user_avatars      user_avatar[]
+  user_missions     user_mission[]
+  user_rewards      user_reward[]
+  user_activities   user_activity_log[]
+  notifications     notification[]
+  leaderboard_entries leaderboard_entry[]
 }
 
 model user_settings {
@@ -234,6 +245,11 @@ model resources {
   type            String
   unit            String?
   processed       Boolean           @default(false)
+  branch          String?
+  downloadCount   Int               @default(0)
+  is_model_paper  Boolean           @default(false)
+  module_number   Int?
+  scheme          String?
   document_chunks document_chunks[]
   users           users             @relation(fields: [uploaded_by], references: [id], onDelete: Cascade)
 }
@@ -311,4 +327,195 @@ enum UserRole {
   STUDENT
   MENTOR
   ADMIN
+}
+
+model user_progress {
+  id                String   @id @default(cuid())
+  user_id           String   @unique
+  xp                Int      @default(0)
+  level             Int      @default(1)
+  total_xp_earned   Int      @default(0)
+  updated_at        DateTime @updatedAt
+  users             users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model user_streak {
+  id                String   @id @default(cuid())
+  user_id           String   @unique
+  current_streak    Int      @default(0)
+  best_streak       Int      @default(0)
+  last_login_date   DateTime?
+  streak_freezes    Int      @default(0)
+  updated_at        DateTime @updatedAt
+  users             users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model achievement {
+  id                String            @id @default(cuid())
+  title             String
+  description       String
+  icon              String?
+  type              AchievementType
+  requirement_value Int
+  rarity            Rarity            @default(COMMON)
+  created_at        DateTime          @default(now())
+  user_achievements user_achievement[]
+}
+
+model user_achievement {
+  id                String      @id @default(cuid())
+  user_id           String
+  achievement_id    String
+  unlocked_at       DateTime    @default(now())
+  users             users       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  achievements      achievement @relation(fields: [achievement_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, achievement_id])
+}
+
+model avatar {
+  id                String            @id @default(cuid())
+  name              String
+  image_url         String
+  rarity            Rarity            @default(COMMON)
+  unlock_type       AvatarUnlockType
+  unlock_value      Int
+  created_at        DateTime          @default(now())
+  user_avatars      user_avatar[]
+}
+
+model user_avatar {
+  id                String   @id @default(cuid())
+  user_id           String
+  avatar_id         String
+  unlocked_at       DateTime @default(now())
+  equipped          Boolean  @default(false)
+  users             users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  avatars           avatar   @relation(fields: [avatar_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, avatar_id])
+}
+
+model mission {
+  id                String         @id @default(cuid())
+  title             String
+  description       String?
+  xp_reward         Int
+  type              MissionType    @default(DAILY)
+  action_type       ActionType
+  target_value      Int
+  active_from       DateTime?
+  active_to         DateTime?
+  created_at        DateTime       @default(now())
+  user_missions     user_mission[]
+}
+
+model user_mission {
+  id                String   @id @default(cuid())
+  user_id           String
+  mission_id        String
+  progress          Int      @default(0)
+  completed         Boolean  @default(false)
+  updated_at        DateTime @updatedAt
+  users             users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  missions          mission  @relation(fields: [mission_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, mission_id])
+}
+
+model leaderboard_entry {
+  id                String   @id @default(cuid())
+  user_id           String
+  xp                Int
+  rank              Int
+  month             Int
+  year              Int
+  created_at        DateTime @default(now())
+  users             users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, month, year])
+}
+
+model reward {
+  id                String        @id @default(cuid())
+  name              String
+  description       String?
+  cost_xp           Int
+  reward_type       RewardType
+  created_at        DateTime      @default(now())
+  user_rewards      user_reward[]
+}
+
+model user_reward {
+  id                String       @id @default(cuid())
+  user_id           String
+  reward_id         String
+  redeemed_at       DateTime     @default(now())
+  status            String       @default("PENDING") // PENDING, USED
+  users             users        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  rewards           reward       @relation(fields: [reward_id], references: [id], onDelete: Cascade)
+}
+
+model user_activity_log {
+  id                String     @id @default(cuid())
+  user_id           String
+  action_type       ActionType
+  meta_data         Json?
+  created_at        DateTime   @default(now())
+  users             users      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model notification {
+  id                String   @id @default(cuid())
+  user_id           String
+  message           String
+  type              String   @default("INFO")
+  is_read           Boolean  @default(false)
+  created_at        DateTime @default(now())
+  users             users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+enum AchievementType {
+  QUIZ
+  STREAK
+  FORUM
+  ASSIGNMENT
+  LEVEL
+}
+
+enum Rarity {
+  COMMON
+  RARE
+  EPIC
+  LEGENDARY
+  MYTHIC
+}
+
+enum AvatarUnlockType {
+  XP
+  LEVEL
+  STREAK
+  LEADERBOARD
+  ADMIN
+}
+
+enum MissionType {
+  DAILY
+  WEEKLY
+}
+
+enum ActionType {
+  LOGIN
+  QUIZ_COMPLETED
+  WATCH_VIDEO
+  FORUM_POST
+  ANSWER_ACCEPTED
+  ASSIGNMENT_SUBMITTED
+}
+
+enum RewardType {
+  AI_TIME
+  DISCOUNT
+  PREMIUM_THEME
+  SESSION_MINUTES
 }

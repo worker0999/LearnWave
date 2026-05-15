@@ -16,7 +16,10 @@ import {
     MessageSquare,
     IndianRupee,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    Zap,
+    UserCircle,
+    Trophy
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useUI } from '@/contexts/UIContext'
@@ -66,11 +69,13 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
             default:
                 return [
                     { label: 'Dashboard', href: '/student', icon: <LayoutDashboard size={20} /> },
+                    { label: 'Quests', href: '/student/gamification', icon: <Zap size={20} /> },
+                    { label: 'Hall of Fame', href: '/student/leaderboard', icon: <Trophy size={20} /> },
                     { label: 'Mentors', href: '/student/mentors', icon: <Users size={20} /> },
                     { label: 'Resources', href: '/student/resources', icon: <BookOpen size={20} /> },
                     { label: 'Messages', href: '/student/messages', icon: <MessageSquare size={20} /> },
                     { label: 'Settings', href: '/student/settings', icon: <Settings size={20} /> },
-                    { label: 'Profile', href: '/student/profile', icon: <Users size={20} /> },
+                    { label: 'Profile', href: '/student/profile', icon: <UserCircle size={20} /> },
                 ]
         }
     }

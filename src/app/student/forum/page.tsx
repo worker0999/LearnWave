@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
+import { useAuth } from '@/contexts/AuthContext'
+import { showXPToast, showLevelUpToast } from '@/lib/gamification-client'
 import { 
   MessageSquare, 
   Search, 
@@ -250,7 +252,9 @@ export default function CommunityForum() {
     setFilteredPosts(filtered)
   }
 
-  const handleCreatePost = () => {
+  const { token } = useAuth()
+
+  const handleCreatePost = async () => {
     if (!newPost.title || !newPost.content) return
 
     const post: Post = {
@@ -272,6 +276,35 @@ export default function CommunityForum() {
       isPinned: false,
       isLocked: false,
       isSolved: false
+    }
+
+    // Award XP
+    if (token) {
+      try {
+        const xpRes = await fetch('/api/gamification/xp', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            action: 'FORUM_POST',
+            metadata: { title: post.title, category: post.category }
+          })
+        });
+
+        if (xpRes.ok) {
+          const xpData = await xpRes.json();
+          if (xpData.success) {
+            showXPToast(xpData.xpGained, 'FORUM_POST');
+            if (xpData.leveledUp) {
+              showLevelUpToast(xpData.level);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to award forum XP:', error);
+      }
     }
 
     setPosts(prev => [post, ...prev])
