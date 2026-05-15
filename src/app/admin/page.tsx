@@ -1,202 +1,171 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { DashboardLayout } from '@/components/layout/dashboard-layout'
+import { useRouter } from 'next/navigation'
+import { Sidebar } from '@/components/Sidebar'
 import { useAuth } from '@/contexts/AuthContext'
-import { useToast } from '@/hooks/use-toast'
-import {
-    Users,
-    IndianRupee,
-    Clock,
-    RefreshCw,
-    TrendingUp,
-    Award,
-    ChevronRight
-} from 'lucide-react'
-import Link from 'next/link'
+import { useUI } from '@/contexts/UIContext'
+import { DashboardView } from './components/DashboardView'
+import { UsersView } from './components/UsersView'
+import { MentorsView } from './components/MentorsView'
+import { SettingsView } from './components/SettingsView'
+import { AnnouncementsView } from './components/AnnouncementsView'
+import { SessionsView } from './components/SessionsView'
+import { ResourcesView } from './components/ResourcesView'
+import { AnalyticsView } from './components/AnalyticsView'
+import { Search, Bell, User, LogOut, Settings as SettingsIcon, UserCircle, ChevronDown, Moon, Sun } from 'lucide-react'
+import { useTheme } from 'next-themes'
 
-interface AnalyticsData {
-    overview: {
-        totalUsers: number
-        totalStudents: number
-        totalMentors: number
-        pendingMentors: number
-        approvedMentors: number
+export default function AdminPortal() {
+  const router = useRouter()
+  const { user, isAuthenticated, logout } = useAuth()
+  const { navType, isSideExpanded } = useUI()
+  const [expanded, setExpanded] = useState(true)
+  const [currentPage, setCurrentPage] = useState('dashboard')
+  const [showUserMenu, setShowUserMenu] = useState(false)
+  const { theme, setTheme } = useTheme()
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const pageParam = params.get('page')
+    if (pageParam) {
+      setCurrentPage(pageParam)
     }
-    sessions: {
-        totalSessions: number
-        totalRevenue: number
+  }, [])
+
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    if (currentPage === 'dashboard') {
+      url.searchParams.delete('page')
+    } else {
+      url.searchParams.set('page', currentPage)
     }
-}
+    window.history.pushState({}, '', url.toString())
+  }, [currentPage])
 
-interface User {
-    id: string
-    name: string
-    email: string
-    role: string
-    createdAt: string
-    mentorProfile?: {
-        approved: boolean
-        expertise?: string[]
-    }
-}
-
-export default function AdminDashboard() {
-    const { user } = useAuth()
-    const { toast } = useToast()
-    const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
-    const [pendingMentors, setPendingMentors] = useState<User[]>([])
-    const [loading, setLoading] = useState(true)
-
-    const fetchData = async () => {
-        setLoading(true)
-        try {
-            const token = localStorage.getItem('token')
-            const headers = { 'Authorization': `Bearer ${token}` }
-
-            const analRes = await fetch('/api/admin/analytics', { headers })
-            if (analRes.ok) {
-                const data = await analRes.json()
-                setAnalytics(data.analytics)
-            }
-
-            const usersRes = await fetch('/api/admin/users?role=MENTOR&limit=100', { headers })
-            if (usersRes.ok) {
-                const data = await usersRes.json()
-                setPendingMentors(data.users.filter((u: User) => u.mentorProfile && !u.mentorProfile.approved))
-            }
-        } catch (err) {
-            console.error(err)
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    useEffect(() => {
-        if (user) fetchData()
-    }, [user])
-
+  if (!isAuthenticated || !user) {
     return (
-        <DashboardLayout userRole="ADMIN">
-            <div className="p-8 space-y-8">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h1 className="text-4xl font-bold text-[#4A3F33]">Welcome, {user?.name || 'Admin'}</h1>
-                        <p className="text-[#9B8B7E]">Here's what's happening on LearnWave today.</p>
-                    </div>
-                    <Button onClick={fetchData} variant="outline" className="border-[#E8DFD3] text-[#6B5844]">
-                        <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Refresh
-                    </Button>
-                </div>
+      <div className="flex items-center justify-center h-screen bg-[#f4f4f0] dark:bg-[#1c1b19]">
+        <div className="text-[#42413b] dark:text-[#f4f4f0] text-xl font-medium">Please log in to access your dashboard</div>
+      </div>
+    )
+  }
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <StatCard title="Total Users" value={analytics?.overview.totalUsers || 0} icon={<Users />} link="/admin/users" />
-                    <StatCard title="Total Revenue" value={`₹${analytics?.sessions.totalRevenue.toLocaleString() || 0}`} icon={<IndianRupee />} link="/admin/analytics" />
-                    <StatCard title="Pending Mentors" value={analytics?.overview.pendingMentors || 0} icon={<Clock />} link="/admin/mentors" />
-                    <StatCard title="Total Students" value={analytics?.overview.totalStudents || 0} icon={<Award />} link="/admin/users" />
-                </div>
+  const renderContent = () => {
+    switch (currentPage) {
+      case 'dashboard':
+        return <DashboardView setView={setCurrentPage} />
+      case 'users':
+        return <UsersView />
+      case 'mentors':
+        return <MentorsView />
+      case 'settings':
+        return <SettingsView />
+      case 'announcements':
+        return <AnnouncementsView />
+      case 'sessions':
+        return <SessionsView />
+      case 'resources':
+        return <ResourcesView />
+      case 'analytics':
+        return <AnalyticsView />
+      default:
+        return <DashboardView setView={setCurrentPage} />
+    }
+  }
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Pending Approvals Table */}
-                    <Card className="lg:col-span-2 bg-white border-[#E8DFD3]">
-                        <CardHeader className="flex flex-row items-center justify-between">
-                            <div>
-                                <CardTitle className="text-[#4A3F33]">New Mentor Applications</CardTitle>
-                                <CardDescription>Awaiting your review and approval</CardDescription>
-                            </div>
-                            <Link href="/admin/mentors">
-                                <Button variant="ghost" className="text-[#6B5844]">View All <ChevronRight size={16} /></Button>
-                            </Link>
-                        </CardHeader>
-                        <CardContent>
-                            {pendingMentors.length === 0 ? (
-                                <div className="text-center py-8 text-[#9B8B7E]">No pending applications.</div>
-                            ) : (
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow className="border-[#E8DFD3]">
-                                            <TableHead>Mentor</TableHead>
-                                            <TableHead>Applied</TableHead>
-                                            <TableHead className="text-right">Action</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {pendingMentors.slice(0, 5).map(mentor => (
-                                            <TableRow key={mentor.id} className="border-[#E8DFD3]">
-                                                <TableCell className="font-medium">{mentor.name}</TableCell>
-                                                <TableCell className="text-[#9B8B7E] text-sm">{new Date(mentor.createdAt).toLocaleDateString()}</TableCell>
-                                                <TableCell className="text-right">
-                                                    <Link href="/admin/mentors">
-                                                        <Button size="sm" className="bg-[#6B5844] hover:bg-[#4A3F33] text-white">Review</Button>
-                                                    </Link>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            )}
-                        </CardContent>
-                    </Card>
+  return (
+    <div className={`min-h-screen bg-[#f4f4f0] dark:bg-[#1c1b19] transition-all duration-300 ${navType === 'bottom' ? 'pb-24' : ''}`}>
+      <Sidebar
+        expanded={expanded}
+        onToggle={() => setExpanded(!expanded)}
+        currentPage={currentPage}
+        onNavClick={(page) => {
+          setCurrentPage(page)
+        }}
+      />
 
-                    {/* Quick Stats Section */}
-                    <div className="space-y-6">
-                        <Card className="bg-white border-[#E8DFD3]">
-                            <CardHeader>
-                                <CardTitle className="text-sm font-medium text-[#4A3F33]">System Status</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <StatusItem label="API Status" status="Healthy" color="bg-green-500" />
-                                <StatusItem label="Database" status="Operational" color="bg-green-500" />
-                                <StatusItem label="Storage" status="92% Free" color="bg-green-500" />
-                            </CardContent>
-                        </Card>
-
-                        <Link href="/admin/announcements" className="block">
-                            <Card className="bg-[#6B5844] border-none text-white hover:bg-[#4A3F33] transition-colors cursor-pointer">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 text-lg">
-                                        <TrendingUp className="w-5 h-5" />
-                                        New Announcement
-                                    </CardTitle>
-                                    <CardDescription className="text-white/80">Broadcast an update to all platform users.</CardDescription>
-                                </CardHeader>
-                            </Card>
-                        </Link>
-                    </div>
-                </div>
+      <div
+        className={`transition-all duration-300 ease-in-out flex flex-col min-h-screen w-full ${
+          navType === 'side' 
+            ? (isSideExpanded ? 'pl-[280px]' : 'pl-[88px]') 
+            : ''
+        }`}
+      >
+        {/* Top Header Area */}
+        <header className="h-16 px-6 lg:px-8 flex items-center justify-between sticky top-0 z-40 bg-[#f4f4f0]/80 dark:bg-[#1c1b19]/80 backdrop-blur-md border-b border-[#dfd3c3] dark:border-[#42413b]">
+          <div className="flex items-center gap-4 w-80">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#a9a29e]" />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="w-full pl-10 pr-4 py-2 rounded-2xl bg-white dark:bg-[#2a2826] border border-[#dfd3c3] dark:border-[#42413b] focus:border-[#42413b] focus:ring-1 focus:ring-[#42413b]/10 text-[#42413b] dark:text-[#f4f4f0] placeholder-[#a9a29e] outline-none transition-all text-sm"
+              />
             </div>
-        </DashboardLayout>
-    )
-}
+          </div>
 
-function StatCard({ title, value, icon, link }: any) {
-    return (
-        <Link href={link}>
-            <Card className="bg-white border-[#E8DFD3] hover:shadow-md transition-all cursor-pointer group">
-                <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                    <CardTitle className="text-sm font-medium text-[#9B8B7E] group-hover:text-[#6B5844] transition-colors">{title}</CardTitle>
-                    <div className="p-2 bg-[#F5F0EA] rounded-lg text-[#6B5844]">{icon}</div>
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold text-[#4A3F33]">{value}</div>
-                </CardContent>
-            </Card>
-        </Link>
-    )
-}
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="p-2 text-[#a9a29e] hover:text-[#42413b] dark:hover:text-[#f4f4f0] hover:bg-white dark:hover:bg-[#2a2826] rounded-xl transition-all"
+            >
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+            <button className="p-2 text-[#a9a29e] hover:text-[#42413b] dark:hover:text-[#f4f4f0] hover:bg-white dark:hover:bg-[#2a2826] rounded-xl transition-all relative">
+              <Bell size={18} />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#c8ced8] border-2 border-[#f4f4f0] dark:border-[#1c1b19] rounded-full"></span>
+            </button>
+            <div className="flex items-center gap-3 pl-3 border-l border-[#dfd3c3] dark:border-[#42413b] relative">
+              <div className="text-right hidden md:block">
+                <p className="text-sm font-bold text-[#42413b] dark:text-[#f4f4f0]">{user.name}</p>
+                <p className="text-[10px] text-[#a9a29e] font-medium uppercase tracking-wider">{user.role}</p>
+              </div>
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center gap-1.5 hover:bg-white dark:hover:bg-[#2a2826] p-1.5 rounded-xl transition-colors"
+              >
+                <div className="w-9 h-9 rounded-2xl bg-[#c8ced8] flex items-center justify-center text-[#42413b]">
+                  <User size={16} />
+                </div>
+                <ChevronDown size={14} className="text-[#a9a29e]" />
+              </button>
 
-function StatusItem({ label, status, color }: any) {
-    return (
-        <div className="flex items-center justify-between">
-            <span className="text-sm text-[#6B5844]">{label}</span>
-            <div className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${color}`}></span>
-                <span className="text-xs font-medium text-[#9B8B7E]">{status}</span>
+              {/* Dropdown Menu */}
+              {showUserMenu && (
+                <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-[#2a2826] border border-[#dfd3c3] dark:border-[#42413b] rounded-2xl shadow-lg py-2 z-50">
+                  <button
+                    onClick={() => { setCurrentPage('profile'); setShowUserMenu(false); }}
+                    className="w-full px-4 py-2.5 text-left hover:bg-[#f4f4f0] dark:hover:bg-[#1c1b19] transition-colors flex items-center gap-3 text-[#42413b] dark:text-[#f4f4f0] text-sm"
+                  >
+                    <UserCircle size={16} className="text-[#a9a29e]" />
+                    <span className="font-medium">My Profile</span>
+                  </button>
+                  <button
+                    onClick={() => { setCurrentPage('settings'); setShowUserMenu(false); }}
+                    className="w-full px-4 py-2.5 text-left hover:bg-[#f4f4f0] dark:hover:bg-[#1c1b19] transition-colors flex items-center gap-3 text-[#42413b] dark:text-[#f4f4f0] text-sm"
+                  >
+                    <SettingsIcon size={16} className="text-[#a9a29e]" />
+                    <span className="font-medium">Settings</span>
+                  </button>
+                  <div className="my-2 border-t border-[#dfd3c3] dark:border-[#42413b]" />
+                  <button
+                    onClick={() => { logout(); setShowUserMenu(false); }}
+                    className="w-full px-4 py-2.5 text-left hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors flex items-center gap-3 text-red-500 text-sm"
+                  >
+                    <LogOut size={16} />
+                    <span className="font-medium">Logout</span>
+                  </button>
+                </div>
+              )}
             </div>
-        </div>
-    )
+          </div>
+        </header>
+
+        <main className="flex-1 p-6 lg:p-8">
+          {renderContent()}
+        </main>
+      </div>
+    </div>
+  )
 }

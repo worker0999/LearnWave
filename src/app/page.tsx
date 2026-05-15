@@ -669,7 +669,6 @@ export default function Home() {
         <ul className="nav-links">
           <li><Link href="#features">Features</Link></li>
           <li><Link href="#roles">For You</Link></li>
-          <li><Link href="#">Pricing</Link></li>
           <li><Link href="#">Docs</Link></li>
           <li><Link href="/auth/login" className="nav-cta">Get Started Free</Link></li>
         </ul>

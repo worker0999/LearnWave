@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Settings, User, MessageCircle, Library, Bot, Users, Bell, UserCircle, ChevronLeft, ChevronRight, LogOut, LayoutDashboard, Calendar, DollarSign, FileText } from 'lucide-react';
+import { Home, Settings, User, MessageCircle, Library, Bot, Users, Bell, UserCircle, ChevronLeft, ChevronRight, LogOut, LayoutDashboard, Calendar, DollarSign, FileText, UserCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUI } from '@/contexts/UIContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,6 +16,7 @@ export function Sidebar({ onNavClick, currentPage }: SidebarProps) {
   const { user, logout } = useAuth();
   
   const isMentor = user?.role === 'MENTOR';
+  const isAdmin = user?.role === 'ADMIN';
 
   const studentItems = [
     { id: 'home', label: 'Home', icon: <Home size={20} /> },
@@ -40,21 +41,35 @@ export function Sidebar({ onNavClick, currentPage }: SidebarProps) {
     { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
   ];
 
-  const allItems = isMentor ? mentorItems : studentItems;
+  const adminItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
+    { id: 'users', label: 'Users', icon: <Users size={20} /> },
+    { id: 'mentors', label: 'Approvals', icon: <UserCheck size={20} /> },
+    { id: 'resources', label: 'Resources', icon: <FileText size={20} /> },
+    { id: 'announcements', label: 'Notices', icon: <Bell size={20} /> },
+    { id: 'sessions', label: 'Sessions', icon: <Calendar size={20} /> },
+    { id: 'analytics', label: 'Analytics', icon: <Bot size={20} /> },
+    { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
+  ];
+
+  const allItems = isAdmin ? adminItems : (isMentor ? mentorItems : studentItems);
 
   // Theme colors
-  const activeBg = isMentor ? 'bg-[#DBE2DC]' : 'bg-[#E5F0A0]';
-  const activeText = isMentor ? 'text-[#335765]' : 'text-[#1E1E1E]';
-  const hoverBg = isMentor ? 'hover:bg-[#DBE2DC]/30' : 'hover:bg-[#F4F6F8]';
-  const defaultText = isMentor ? 'text-[#74A8A4]' : 'text-[#8A919B]';
-  const iconBg = isMentor ? 'bg-[#B6D9E0]' : 'bg-[#D4E4C8]';
+  const activeBg = isAdmin ? 'bg-[#c8ced8]' : (isMentor ? 'bg-[#DBE2DC]' : 'bg-[#E5F0A0]');
+  const activeText = isAdmin ? 'text-[#42413b]' : (isMentor ? 'text-[#335765]' : 'text-[#1E1E1E]');
+  const hoverBg = isAdmin ? 'hover:bg-[#dfd3c3]/30' : (isMentor ? 'hover:bg-[#DBE2DC]/30' : 'hover:bg-[#F4F6F8]');
+  const defaultText = isAdmin ? 'text-[#a9a29e]' : (isMentor ? 'text-[#74A8A4]' : 'text-[#8A919B]');
+  const iconBg = isAdmin ? 'bg-[#c8ced8]' : (isMentor ? 'bg-[#B6D9E0]' : 'bg-[#D4E4C8]');
+  const bgTheme = isAdmin ? 'bg-[#f4f4f0] border-[#dfd3c3]' : (isMentor ? 'bg-white border-[#B6D9E0]' : 'bg-white border-[#DDE3EA]');
+  const logoBg = isAdmin ? 'bg-[#42413b]' : (isMentor ? 'bg-[#335765]' : 'bg-[#1E1E1E]');
+  const logoText = isAdmin ? 'text-[#42413b]' : (isMentor ? 'text-[#335765]' : '');
 
   if (navType === 'side') {
     return (
       <motion.aside
         initial={false}
         animate={{ width: isSideExpanded ? 280 : 88 }}
-        className={`fixed left-0 top-0 h-screen ${isMentor ? 'bg-white border-[#B6D9E0]' : 'bg-white border-[#DDE3EA]'} text-[#1E1E1E] z-[999] flex flex-col shadow-sm border-r transition-all duration-300`}
+        className={`fixed left-0 top-0 h-screen ${bgTheme} text-[#1E1E1E] z-[999] flex flex-col shadow-sm border-r transition-all duration-300`}
       >
         {/* Logo Section */}
         <div className="p-6 mb-4 flex items-center justify-between">
@@ -67,8 +82,8 @@ export function Sidebar({ onNavClick, currentPage }: SidebarProps) {
                 exit={{ opacity: 0 }}
                 className="flex items-center gap-3"
               >
-                <div className={`w-8 h-8 ${isMentor ? 'bg-[#335765]' : 'bg-[#1E1E1E]'} rounded-xl flex items-center justify-center font-bold text-white text-sm`}>L</div>
-                <span className={`font-extrabold text-xl tracking-tight ${isMentor ? 'text-[#335765]' : ''}`}>LearnWave</span>
+                <div className={`w-8 h-8 ${logoBg} rounded-xl flex items-center justify-center font-bold text-white text-sm`}>L</div>
+                <span className={`font-extrabold text-xl tracking-tight ${logoText}`}>LearnWave</span>
               </motion.div>
             ) : (
               <motion.div
@@ -76,7 +91,7 @@ export function Sidebar({ onNavClick, currentPage }: SidebarProps) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className={`w-10 h-10 ${isMentor ? 'bg-[#335765]' : 'bg-[#1E1E1E]'} rounded-xl flex items-center justify-center font-extrabold text-white text-lg mx-auto`}
+                className={`w-10 h-10 ${logoBg} rounded-xl flex items-center justify-center font-extrabold text-white text-lg mx-auto`}
               >
                 L
               </motion.div>
@@ -95,7 +110,7 @@ export function Sidebar({ onNavClick, currentPage }: SidebarProps) {
         {!isSideExpanded && (
           <button 
             onClick={() => setIsSideExpanded(true)}
-            className={`absolute -right-3 top-20 w-6 h-6 ${isMentor ? 'bg-[#335765]' : 'bg-[#1E1E1E]'} rounded-full flex items-center justify-center text-white shadow-md z-50`}
+            className={`absolute -right-3 top-20 w-6 h-6 ${logoBg} rounded-full flex items-center justify-center text-white shadow-md z-50`}
           >
             <ChevronRight size={14} />
           </button>
@@ -110,7 +125,7 @@ export function Sidebar({ onNavClick, currentPage }: SidebarProps) {
               exit={{ opacity: 0, y: -10 }}
               className="px-5 mb-6"
             >
-              <div className={`rounded-2xl p-3.5 flex items-center gap-3 border ${isMentor ? 'bg-[#FDFBF9] border-[#B6D9E0]/50' : 'bg-[#F4F6F8] border-[#DDE3EA]'}`}>
+              <div className={`rounded-2xl p-3.5 flex items-center gap-3 border ${bgTheme}`}>
                 <div className={`w-10 h-10 rounded-2xl ${iconBg} flex items-center justify-center ${activeText} font-bold shrink-0`}>
                   {user?.name?.[0] || 'U'}
                 </div>
@@ -156,7 +171,7 @@ export function Sidebar({ onNavClick, currentPage }: SidebarProps) {
         </nav>
 
         {/* Footer / Logout */}
-        <div className={`p-3 mt-auto border-t ${isMentor ? 'border-[#B6D9E0]/50' : 'border-[#DDE3EA]'}`}>
+        <div className={`p-3 mt-auto border-t ${bgTheme.includes('border-') ? bgTheme.split(' ').find(c => c.startsWith('border-')) : 'border-[#DDE3EA]'}`}>
           <button
             onClick={() => logout()}
             className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all text-red-400 hover:bg-red-50 hover:text-red-500 ${!isSideExpanded ? 'justify-center' : ''}`}
@@ -175,7 +190,7 @@ export function Sidebar({ onNavClick, currentPage }: SidebarProps) {
       className="fixed bottom-5 left-1/2 -translate-x-1/2 z-[999] w-auto max-w-[95vw] pointer-events-auto"
       aria-label="Main Navigation"
     >
-      <div className={`bg-white/90 backdrop-blur-xl p-1.5 rounded-[2rem] shadow-[0_8px_32px_rgba(0,0,0,0.08)] border ${isMentor ? 'border-[#B6D9E0]' : 'border-[#DDE3EA]'} flex items-center gap-0.5 overflow-x-auto no-scrollbar px-2`}>
+      <div className={`bg-white/90 backdrop-blur-xl p-1.5 rounded-[2rem] shadow-[0_8px_32px_rgba(0,0,0,0.08)] border ${bgTheme.includes('border-') ? bgTheme.split(' ').find(c => c.startsWith('border-')) : 'border-[#DDE3EA]'} flex items-center gap-0.5 overflow-x-auto no-scrollbar px-2`}>
         {allItems.map((item) => {
           const isActive = currentPage === item.id;
           return (

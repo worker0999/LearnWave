@@ -46,14 +46,11 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
         switch (role) {
             case 'ADMIN':
                 return [
-                    { label: 'Dashboard', href: '/admin', icon: <LayoutDashboard size={20} /> },
-                    { label: 'Users', href: '/admin/users', icon: <Users size={20} /> },
-                    { label: 'Approvals', href: '/admin/mentors', icon: <UserCheck size={20} /> },
+                    { label: 'Admin Portal', href: '/admin', icon: <LayoutDashboard size={20} /> },
                     { label: 'Sessions', href: '/admin/sessions', icon: <Calendar size={20} /> },
                     { label: 'Resources', href: '/admin/resources', icon: <BookOpen size={20} /> },
                     { label: 'Analytics', href: '/admin/analytics', icon: <BarChart3 size={20} /> },
                     { label: 'Announcements', href: '/admin/announcements', icon: <Bell size={20} /> },
-                    { label: 'Settings', href: '/admin/settings', icon: <Settings size={20} /> },
                 ]
             case 'MENTOR':
                 return [
