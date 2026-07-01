@@ -46,6 +46,7 @@
     "@radix-ui/react-tooltip": "^1.2.7",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
+    "@vercel/analytics": "^2.0.1",
     "bcryptjs": "^3.0.2",
     "canvas": "^3.2.0",
     "class-variance-authority": "^0.7.1",

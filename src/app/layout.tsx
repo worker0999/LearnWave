@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { UIProvider } from "@/contexts/UIContext";
+import { Analytics } from "@vercel/analytics/next";
 
 const urbanist = Urbanist({
   variable: "--font-urbanist",
@@ -49,6 +50,7 @@ export default function RootLayout({
           <UIProvider>
             {children}
             <Toaster />
+            <Analytics />
           </UIProvider>
         </AuthProvider>
       </body>
