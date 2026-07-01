@@ -90,7 +90,7 @@ export function SettingsView() {
     try {
       const token = localStorage.getItem('token')
       const response = await fetch('/api/admin/settings', {
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`

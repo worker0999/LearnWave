@@ -58,7 +58,7 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
-  const { user, logout } = useAuth()
+  const { user, logout, token, updateUser } = useAuth()
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
   
@@ -71,13 +71,13 @@ export default function ProfilePage() {
     id: user?.id || '',
     name: user?.name || '',
     email: user?.email || '',
-    phone: '',
-    avatar: (user as any)?.avatar || '',
+    phone: user?.phone || '',
+    avatar: user?.avatarUrl || '',
     bio: '',
     location: '',
-    branch: (user as any)?.branch || '',
-    semester: (user as any)?.semester || 1,
-    usn: (user as any)?.usn || '',
+    branch: user?.branch || '',
+    semester: user?.semester || 1,
+    usn: user?.usn || '',
     skills: [],
     theme: 'dark',
     notifications: {
@@ -93,31 +93,105 @@ export default function ProfilePage() {
   const [newSkill, setNewSkill] = useState('')
 
   useEffect(() => {
-    // Load profile from localStorage
-    const savedProfile = localStorage.getItem(`user-profile-${user?.id}`)
-    if (savedProfile) {
-      const parsed = JSON.parse(savedProfile)
-      setProfile(parsed)
-      setEditForm(parsed)
+    if (user) {
+      const initialProfileState: UserProfile = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone || '',
+        avatar: user.avatarUrl || '',
+        bio: '',
+        location: '',
+        branch: user.branch || '',
+        semester: user.semester || 1,
+        usn: user.usn || '',
+        skills: [],
+        theme: 'dark',
+        notifications: {
+          email: true,
+          push: true,
+          announcements: true,
+          forums: true,
+          mentorUpdates: true
+        }
+      }
+
+      const savedProfile = localStorage.getItem(`user-profile-${user.id}`)
+      if (savedProfile) {
+        try {
+          const parsed = JSON.parse(savedProfile)
+          const merged = {
+            ...parsed,
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone || parsed.phone || '',
+            avatar: user.avatarUrl || parsed.avatar || '',
+            branch: user.branch || parsed.branch || '',
+            semester: user.semester || parsed.semester || 1,
+            usn: user.usn || parsed.usn || ''
+          }
+          setProfile(merged)
+          setEditForm(merged)
+        } catch (e) {
+          setProfile(initialProfileState)
+          setEditForm(initialProfileState)
+        }
+      } else {
+        setProfile(initialProfileState)
+        setEditForm(initialProfileState)
+      }
     }
-  }, [user?.id])
+  }, [user])
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click()
   }
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        const base64String = reader.result as string
-        setEditForm({
-          ...editForm,
-          avatar: base64String
-        })
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert('File size exceeds 2MB limit.')
+      return
+    }
+
+    const data = new FormData()
+    data.append('file', file)
+
+    try {
+      setIsSaving(true)
+      const response = await fetch('/api/student/profile/avatar', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: data
+      })
+
+      if (response.ok) {
+        const resData = await response.json()
+        setEditForm(prev => ({
+          ...prev,
+          avatar: resData.avatarUrl
+        }))
+        setProfile(prev => ({
+          ...prev,
+          avatar: resData.avatarUrl
+        }))
+        updateUser({ avatarUrl: resData.avatarUrl })
+        setSuccessMessage('Profile picture updated successfully!')
+        setTimeout(() => setSuccessMessage(''), 3000)
+      } else {
+        const err = await response.json()
+        alert(err.error || 'Failed to upload avatar')
       }
-      reader.readAsDataURL(file)
+    } catch (error) {
+      console.error('Failed to upload avatar:', error)
+      alert('An error occurred during upload.')
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -150,7 +224,7 @@ export default function ProfilePage() {
     if (newSkill.trim()) {
       setEditForm({
         ...editForm,
-        skills: [...editForm.skills, newSkill.trim()]
+        skills: [...(editForm.skills || []), newSkill.trim()]
       })
       setNewSkill('')
     }
@@ -159,24 +233,47 @@ export default function ProfilePage() {
   const handleRemoveSkill = (index: number) => {
     setEditForm({
       ...editForm,
-      skills: editForm.skills.filter((_, i) => i !== index)
+      skills: (editForm.skills || []).filter((_, i) => i !== index)
     })
   }
 
   const handleSaveProfile = async () => {
     setIsSaving(true)
     try {
-      // Save to localStorage
-      localStorage.setItem(`user-profile-${user?.id}`, JSON.stringify(editForm))
-      
-      // In a real app, you would send this to the backend
-      setProfile(editForm)
-      setIsEditing(false)
-      setSuccessMessage('Profile updated successfully!')
-      
-      setTimeout(() => setSuccessMessage(''), 3000)
+      const response = await fetch('/api/student/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: editForm.name,
+          email: editForm.email,
+          phone: editForm.phone
+        })
+      })
+
+      if (response.ok) {
+        const resData = await response.json()
+        localStorage.setItem(`user-profile-${user?.id}`, JSON.stringify(editForm))
+        
+        updateUser({
+          name: resData.user.name,
+          email: resData.user.email,
+          phone: resData.user.phone
+        })
+
+        setProfile(editForm)
+        setIsEditing(false)
+        setSuccessMessage('Profile updated successfully!')
+        setTimeout(() => setSuccessMessage(''), 3000)
+      } else {
+        const err = await response.json()
+        alert(err.error || 'Failed to update profile')
+      }
     } catch (error) {
       console.error('Failed to save profile:', error)
+      alert('An error occurred while saving profile.')
     } finally {
       setIsSaving(false)
     }
@@ -440,7 +537,7 @@ export default function ProfilePage() {
                         <span>Semester</span>
                       </label>
                       {isEditing ? (
-                        <Select value={editForm.semester.toString()} onValueChange={(value) => handleSelectChange('semester', value)}>
+                        <Select value={(editForm.semester ?? 1).toString()} onValueChange={(value) => handleSelectChange('semester', value)}>
                           <SelectTrigger className="bg-white/10 border-indigo-500/30 text-white">
                             <SelectValue />
                           </SelectTrigger>
@@ -501,7 +598,7 @@ export default function ProfilePage() {
                         </Button>
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        {editForm.skills.map((skill, index) => (
+                        {(editForm.skills || []).map((skill, index) => (
                           <Badge
                             key={index}
                             variant="secondary"

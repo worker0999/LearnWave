@@ -19,7 +19,9 @@ const Mentors = dynamic(() => import('@/components/Mentors').then(mod => mod.Men
 const BookedSessions = dynamic(() => import('@/components/BookedSessions').then(mod => mod.BookedSessions))
 const Settings = dynamic(() => import('@/components/Settings').then(mod => mod.Settings))
 const Profile = dynamic(() => import('@/components/Profile').then(mod => mod.Profile))
-import { Search, Bell, User, LogOut, Settings as SettingsIcon, UserCircle, ChevronDown } from 'lucide-react'
+import { Search, User, LogOut, Settings as SettingsIcon, UserCircle, ChevronDown } from 'lucide-react'
+import { NotificationBell } from '@/components/NotificationBell'
+import { AnnouncementBanner } from '@/components/AnnouncementBanner'
 
 export default function StudentHome() {
   const router = useRouter()
@@ -118,24 +120,36 @@ export default function StudentHome() {
             : ''
         }`}
       >
+        <AnnouncementBanner />
         {/* Top Header Area */}
         <header className="h-16 px-6 lg:px-8 flex items-center justify-between sticky top-0 z-40 bg-[#E8EDF3]/80 backdrop-blur-md">
-          <div className="flex items-center gap-4 w-80">
+          {/* Logo Area - Left */}
+          <div className="flex items-center gap-2.5 w-auto md:w-64 shrink-0">
+             {/* Icon matching the logo style */}
+             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#25559C] to-[#7DBA45] flex items-center justify-center text-white shadow-sm">
+                <span className="font-extrabold text-sm tracking-widest">LW</span>
+             </div>
+             {/* Text-based logo */}
+             <span className="text-2xl font-extrabold tracking-tight drop-shadow-sm">
+                <span className="text-[#25559C]">Learn</span>
+                <span className="text-[#7DBA45]">Wave</span>
+             </span>
+          </div>
+
+          {/* Search Area - Center */}
+          <div className="hidden md:flex items-center justify-center flex-1 px-8 max-w-2xl">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8A919B]" />
               <input
                 type="text"
-                placeholder="Search..."
-                className="w-full pl-10 pr-4 py-2 rounded-2xl bg-white border border-[#DDE3EA] focus:border-[#1E1E1E] focus:ring-1 focus:ring-[#1E1E1E]/10 text-[#1E1E1E] placeholder-[#B0B7BF] outline-none transition-all text-sm"
+                placeholder="Search resources, topics, or mentors..."
+                className="w-full pl-10 pr-4 py-2.5 rounded-full bg-white border border-[#DDE3EA] focus:border-[#1E1E1E] focus:ring-1 focus:ring-[#1E1E1E]/10 text-[#1E1E1E] placeholder-[#B0B7BF] outline-none transition-all text-sm shadow-sm"
               />
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <button className="p-2 text-[#8A919B] hover:text-[#1E1E1E] hover:bg-white rounded-xl transition-all relative">
-              <Bell size={18} />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#D4E4C8] border-2 border-[#E8EDF3] rounded-full"></span>
-            </button>
+            <NotificationBell />
             <div className="flex items-center gap-3 pl-3 border-l border-[#DDE3EA] relative">
               <div className="text-right hidden md:block">
                 <p className="text-sm font-bold text-[#1E1E1E]">{user.name}</p>
@@ -145,8 +159,12 @@ export default function StudentHome() {
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center gap-1.5 hover:bg-white p-1.5 rounded-xl transition-colors"
               >
-                <div className="w-9 h-9 rounded-2xl bg-[#D4E4C8] flex items-center justify-center text-[#1E1E1E]">
-                  <User size={16} />
+                <div className="w-9 h-9 rounded-2xl bg-[#D4E4C8] flex items-center justify-center text-[#1E1E1E] overflow-hidden">
+                  {user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <User size={16} />
+                  )}
                 </div>
                 <ChevronDown size={14} className="text-[#8A919B]" />
               </button>

@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
       await db.resources.update({
         where: { id: resourceId },
         data: {
-          downloads: {
+          downloadCount: {
             increment: 1
           }
         }

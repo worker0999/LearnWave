@@ -4,10 +4,10 @@ import { getTokenFromHeaders, verifyToken } from '@/lib/auth'
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { roomId: string } }
+    { params }: { params: Promise<{ roomId: string }> }
 ) {
     try {
-        const { roomId } = params
+        const { roomId } = await params
         const token = getTokenFromHeaders(request.headers)
         if (!token) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

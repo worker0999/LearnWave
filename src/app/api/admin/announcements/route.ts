@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { getTokenFromHeaders, verifyToken } from '@/lib/auth'
+import { v4 as uuidv4 } from 'uuid'
 
 export async function GET(request: NextRequest) {
   try {
@@ -32,7 +33,9 @@ export async function GET(request: NextRequest) {
     // Build where clause
     const where: any = {}
     if (type && type !== 'ALL') {
-      where.type = type
+      where.target_roles = {
+        has: type === 'STUDENTS' ? 'STUDENT' : (type === 'MENTORS' ? 'MENTOR' : type)
+      }
     }
 
     // Get announcements with pagination
@@ -96,13 +99,28 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Map type to target roles
+    let targetRoles: string[] = []
+    if (type === 'STUDENTS') targetRoles = ['STUDENT']
+    else if (type === 'MENTORS') targetRoles = ['MENTOR']
+    else if (type === 'ALL') targetRoles = ['STUDENT', 'MENTOR']
+    
+    // Default expiration is 7 days from now if not specified
+    const expiresAt = new Date()
+    expiresAt.setDate(expiresAt.getDate() + 7)
+
     // Create announcement
     const announcement = await db.announcements.create({
       data: {
+        id: uuidv4(),
         title,
         content,
-        target_roles: [],
-        created_by: decoded.userId
+        target_roles: targetRoles as any,
+        priority: priority || 'MEDIUM',
+        is_active: true,
+        expires_at: expiresAt,
+        created_by: decoded.userId,
+        updated_at: new Date()
       }
     })
 

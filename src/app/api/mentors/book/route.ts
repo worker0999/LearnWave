@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
+import { v4 as uuidv4 } from 'uuid'
 
 const bookingSchema = z.object({
   mentorId: z.string(),
@@ -49,73 +50,125 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // Check for existing booking at the same time
-    const existingBooking = await db.mentor_sessions.findFirst({
-      where: {
-        mentor_id: validatedData.mentorId
-      }
+    // Parse scheduled date and time
+    const scheduledAt = new Date(`${validatedData.date}T${validatedData.time}:00`)
+    
+    // Find or create a default mentor_session for this mentor
+    let session = await db.mentor_sessions.findFirst({
+      where: { mentor_id: mentor.id, is_active: true }
     })
     
-    if (existingBooking) {
-      return NextResponse.json(
-        { error: 'This time slot is already booked' },
-        { status: 409 }
-      )
+    if (!session) {
+      session = await db.mentor_sessions.create({
+        data: {
+          id: uuidv4(),
+          mentor_id: mentor.id,
+          title: 'General Mentorship Session',
+          description: 'One-on-one mentoring session',
+          duration_minutes: validatedData.duration,
+          price: mentor.hourly_rate,
+          session_type: 'ONE_ON_ONE',
+          updated_at: new Date()
+        }
+      })
     }
     
     // Create the booking
-    const booking = await db.mentor_sessions.create({
+    const booking = await db.bookings.create({
       data: {
-        mentor_id: validatedData.mentorId,
-        title: `Session with ${mentor.users.email}`,
-        description: validatedData.notes || '',
+        id: uuidv4(),
+        student_id: validatedData.studentId,
+        mentor_id: mentor.id,
+        mentor_session_id: session.id,
+        scheduled_at: scheduledAt,
         duration_minutes: validatedData.duration,
         price: validatedData.amount,
-        is_active: true
+        status: validatedData.status as any,
+        meeting_link: generateMeetingLink(),
+        updated_at: new Date()
       },
       include: {
         mentors: {
           include: {
-            users: true
+            users: {
+              include: {
+                user_profiles: true
+              }
+            }
+          }
+        },
+        users: {
+          include: {
+            user_profiles: true
           }
         }
       }
     })
     
-    // TODO: Send notification emails to both mentor and student
-    // TODO: Integrate with payment gateway
+    // Create or get existing chat room between student and mentor
+    const studentId = validatedData.studentId
+    const mentorUserId = mentor.user_id
+    
+    const existingRoom = await db.chat_rooms.findFirst({
+      where: {
+        participant_ids: {
+          hasEvery: [studentId, mentorUserId]
+        },
+        type: 'SESSION'
+      }
+    })
+    
+    if (!existingRoom) {
+      await db.chat_rooms.create({
+        data: {
+          id: uuidv4(),
+          name: `Chat with Mentor`,
+          type: 'SESSION',
+          participant_ids: [studentId, mentorUserId],
+          created_by: studentId,
+          created_at: new Date()
+        }
+      })
+    }
+    
+    const studentProfile = booking.users.user_profiles
+    const studentName = studentProfile ? `${studentProfile.first_name} ${studentProfile.last_name}` : booking.users.email
+    const mentorProfile = booking.mentors.users.user_profiles
+    const mentorName = mentorProfile ? `${mentorProfile.first_name} ${mentorProfile.last_name}` : booking.mentors.users.email
     
     return NextResponse.json({
       success: true,
       booking: {
         id: booking.id,
         mentor: {
-          name: booking.mentor.user.name,
-          email: booking.mentor.user.email
+          name: mentorName,
+          email: booking.mentors.users.email
         },
-        student: booking.student,
-        date: booking.date,
-        time: booking.time,
-        duration: booking.duration,
+        student: {
+          id: booking.student_id,
+          name: studentName
+        },
+        date: validatedData.date,
+        time: validatedData.time,
+        duration: booking.duration_minutes,
         status: booking.status,
-        amount: booking.amount,
-        meetingLink: booking.meetingLink
+        amount: Number(booking.price),
+        meetingLink: booking.meeting_link
       }
     })
     
   } catch (err) {
     console.error('Booking creation error:', err)
-
+    
     // Narrow error for Zod
     if (err && typeof err === 'object' && 'issues' in err) {
-      // z.ZodError has `issues` property; provide details if present
       const details = (err as any).issues || (err as any).errors || []
       return NextResponse.json(
         { error: 'Invalid request data', details },
         { status: 400 }
       )
     }
-
+    
     return NextResponse.json(
       { error: 'Failed to create booking' },
       { status: 500 }
@@ -133,11 +186,25 @@ export async function GET(request: NextRequest) {
     // Build where clause
     const where: any = {}
     
-    if (studentId) where.studentId = studentId
-    if (mentorId) where.mentorId = mentorId
-    if (status) where.status = status
+    if (studentId) where.student_id = studentId
+    if (mentorId) {
+      const mentor = await db.mentors.findFirst({
+        where: {
+          OR: [
+            { id: mentorId },
+            { user_id: mentorId }
+          ]
+        }
+      })
+      if (mentor) {
+        where.mentor_id = mentor.id
+      } else {
+        where.mentor_id = mentorId
+      }
+    }
+    if (status) where.status = status as any
     
-    const bookings = await db.mentor_sessions.findMany({
+    const bookings = await db.bookings.findMany({
       where,
       include: {
         mentors: {
@@ -145,9 +212,17 @@ export async function GET(request: NextRequest) {
             users: {
               select: {
                 id: true,
-                email: true
+                email: true,
+                user_profiles: true
               }
             }
+          }
+        },
+        users: {
+          select: {
+            id: true,
+            email: true,
+            user_profiles: true
           }
         }
       },
@@ -156,9 +231,35 @@ export async function GET(request: NextRequest) {
       }
     })
     
+    const transformedBookings = bookings.map(b => {
+      const mentorProfile = b.mentors.users.user_profiles
+      const mentorName = mentorProfile ? `${mentorProfile.first_name} ${mentorProfile.last_name}` : b.mentors.users.email
+      
+      const studentProfile = b.users.user_profiles
+      const studentName = studentProfile ? `${studentProfile.first_name} ${studentProfile.last_name}` : b.users.email
+      
+      return {
+        id: b.id,
+        mentor: {
+          name: mentorName,
+          email: b.mentors.users.email
+        },
+        student: {
+          id: b.student_id,
+          name: studentName
+        },
+        date: b.scheduled_at.toISOString().split('T')[0],
+        time: b.scheduled_at.toISOString().split('T')[1].substring(0, 5),
+        duration: b.duration_minutes,
+        status: b.status,
+        amount: Number(b.price),
+        meetingLink: b.meeting_link
+      }
+    })
+    
     return NextResponse.json({
       success: true,
-      bookings
+      bookings: transformedBookings
     })
     
   } catch (error) {
@@ -171,7 +272,6 @@ export async function GET(request: NextRequest) {
 }
 
 function generateMeetingLink(): string {
-  // Generate a unique meeting link (in production, integrate with Zoom/Google Meet)
   const meetingId = Math.random().toString(36).substring(2, 15)
   return `https://meet.learnwave.com/session/${meetingId}`
 }

@@ -17,13 +17,80 @@ import {
     ShieldCheck,
     Mail,
     Globe,
-    Save
+    Save,
+    Camera
 } from 'lucide-react'
 
 export function MentorSettings() {
-    const { user, token } = useAuth()
+    const { user, token, updateUser } = useAuth()
     const { toast } = useToast()
     const [isSaving, setIsSaving] = useState(false)
+    const [uploading, setUploading] = useState(false)
+
+    const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Size check (2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            toast({ title: 'Error', description: 'File size exceeds 2MB limit.', variant: 'destructive' })
+            return;
+        }
+
+        setUploading(true);
+        const data = new FormData();
+        data.append('file', file);
+
+        try {
+            const response = await fetch('/api/student/profile/avatar', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: data
+            });
+
+            if (response.ok) {
+                const resData = await response.json();
+                updateUser({ avatarUrl: resData.avatarUrl });
+                toast({ title: 'Success', description: 'Profile picture updated.' })
+            } else {
+                const err = await response.json();
+                toast({ title: 'Error', description: err.error || 'Failed to upload image.', variant: 'destructive' })
+            }
+        } catch (error) {
+            console.error('Error uploading avatar:', error);
+            toast({ title: 'Error', description: 'An error occurred during upload.', variant: 'destructive' })
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleAvatarRemove = async () => {
+        if (!confirm('Are you sure you want to remove your profile picture?')) return;
+
+        setUploading(true);
+        try {
+            const response = await fetch('/api/student/profile/avatar', {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                updateUser({ avatarUrl: undefined });
+                toast({ title: 'Success', description: 'Profile picture removed.' })
+            } else {
+                toast({ title: 'Error', description: 'Failed to remove profile picture.', variant: 'destructive' })
+            }
+        } catch (error) {
+            console.error('Error removing avatar:', error);
+            toast({ title: 'Error', description: 'An error occurred.', variant: 'destructive' })
+        } finally {
+            setUploading(false);
+        }
+    };
 
     // Profile State
     const [profileData, setProfileData] = useState({
@@ -175,6 +242,63 @@ export function MentorSettings() {
                         </CardHeader>
                         <CardContent className="p-8 space-y-6">
                             <form onSubmit={handleSaveProfile} className="space-y-6">
+                                {/* Avatar Upload Section */}
+                                <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 mb-6 border-b border-[#DBE2DC]/60">
+                                    <div className="relative group">
+                                        <div className="h-24 w-24 rounded-[24px] border-2 border-[#B6D9E0] bg-[#DBE2DC]/20 shadow-inner flex items-center justify-center text-[#335765] text-2xl font-black overflow-hidden z-10 shrink-0 transform hover:scale-102 transition-all">
+                                            {user?.avatarUrl ? (
+                                                <img src={user.avatarUrl} alt={user.name} className="h-full w-full object-cover" />
+                                            ) : (
+                                                user?.name
+                                                    ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+                                                    : '??'
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="flex-1 text-center sm:text-left space-y-2.5">
+                                        <h4 className="text-sm font-extrabold text-[#335765]">Profile Picture</h4>
+                                        <p className="text-xs text-[#74A8A4]">Upload a high-resolution PNG or JPEG. Max size 2MB.</p>
+                                        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                id="mentor-avatar-upload"
+                                                className="hidden"
+                                                onChange={handleAvatarUpload}
+                                            />
+                                            <Button
+                                                type="button"
+                                                onClick={() => document.getElementById('mentor-avatar-upload')?.click()}
+                                                disabled={uploading}
+                                                className="h-10 px-5 bg-[#335765] hover:bg-[#7F543D] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5"
+                                            >
+                                                {uploading ? (
+                                                    <>
+                                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                                        Uploading...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Camera size={14} />
+                                                        Upload Photo
+                                                    </>
+                                                )}
+                                            </Button>
+                                            {user?.avatarUrl && (
+                                                <Button
+                                                    type="button"
+                                                    onClick={handleAvatarRemove}
+                                                    disabled={uploading}
+                                                    variant="outline"
+                                                    className="h-10 px-5 border-[#B6D9E0] text-red-500 hover:bg-red-50 text-xs font-bold rounded-xl shadow-sm transition-all"
+                                                >
+                                                    Remove
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
                                         <Label className="text-[#74A8A4] font-black uppercase text-[10px] tracking-widest pl-1">Full Name</Label>

@@ -13,8 +13,10 @@ import { AnnouncementsView } from './components/AnnouncementsView'
 import { SessionsView } from './components/SessionsView'
 import { ResourcesView } from './components/ResourcesView'
 import { AnalyticsView } from './components/AnalyticsView'
-import { Search, Bell, User, LogOut, Settings as SettingsIcon, UserCircle, ChevronDown, Moon, Sun } from 'lucide-react'
+import { Search, User, LogOut, Settings as SettingsIcon, UserCircle, ChevronDown, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import { NotificationBell } from '@/components/NotificationBell'
+import { AnnouncementBanner } from '@/components/AnnouncementBanner'
 
 export default function AdminPortal() {
   const router = useRouter()
@@ -92,6 +94,7 @@ export default function AdminPortal() {
             : ''
         }`}
       >
+        <AnnouncementBanner />
         {/* Top Header Area */}
         <header className="h-16 px-6 lg:px-8 flex items-center justify-between sticky top-0 z-40 bg-[#f4f4f0]/80 dark:bg-[#1c1b19]/80 backdrop-blur-md border-b border-[#dfd3c3] dark:border-[#42413b]">
           <div className="flex items-center gap-4 w-80">
@@ -112,10 +115,7 @@ export default function AdminPortal() {
             >
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <button className="p-2 text-[#a9a29e] hover:text-[#42413b] dark:hover:text-[#f4f4f0] hover:bg-white dark:hover:bg-[#2a2826] rounded-xl transition-all relative">
-              <Bell size={18} />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#c8ced8] border-2 border-[#f4f4f0] dark:border-[#1c1b19] rounded-full"></span>
-            </button>
+            <NotificationBell isDark={theme === 'dark'} />
             <div className="flex items-center gap-3 pl-3 border-l border-[#dfd3c3] dark:border-[#42413b] relative">
               <div className="text-right hidden md:block">
                 <p className="text-sm font-bold text-[#42413b] dark:text-[#f4f4f0]">{user.name}</p>

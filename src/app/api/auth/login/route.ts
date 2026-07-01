@@ -117,7 +117,8 @@ export async function POST(request: NextRequest) {
       role: user.role,
       usn: user.usn,
       branch: user.user_profiles?.branch,
-      semester: user.user_profiles?.semester
+      semester: user.user_profiles?.semester,
+      avatarUrl: user.user_profiles?.avatar_url || null
     }
 
     // Gamification hooks

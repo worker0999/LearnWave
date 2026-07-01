@@ -94,10 +94,15 @@ export async function PATCH(request: NextRequest) {
             return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
         }
 
+        let dbStatus = status.toUpperCase()
+        if (dbStatus === 'REJECTED') {
+            dbStatus = 'CANCELLED'
+        }
+
         const updatedBooking = await db.bookings.update({
             where: { id: sessionId },
             data: {
-                status: status.toUpperCase(),
+                status: dbStatus as any,
                 meeting_link: meetingLink,
                 updated_at: new Date()
             }

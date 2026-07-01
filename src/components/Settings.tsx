@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Bell, Lock, Monitor, Loader2, PanelBottom, PanelLeft } from 'lucide-react';
+import { User, Bell, Lock, Monitor, Loader2, PanelBottom, PanelLeft, Camera } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -9,10 +9,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUI } from '@/contexts/UIContext';
 
 export function Settings() {
-    const { user, token } = useAuth();
+    const { user, token, updateUser } = useAuth();
     const { navType, setNavType } = useUI();
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     // Form states
     const [formData, setFormData] = useState({
@@ -21,6 +22,71 @@ export function Settings() {
         phone: '',
         usn: ''
     });
+
+    const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Size check (2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            alert('File size exceeds 2MB limit.');
+            return;
+        }
+
+        setUploading(true);
+        const data = new FormData();
+        data.append('file', file);
+
+        try {
+            const response = await fetch('/api/student/profile/avatar', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: data
+            });
+
+            if (response.ok) {
+                const resData = await response.json();
+                updateUser({ avatarUrl: resData.avatarUrl });
+                alert('Profile picture updated!');
+            } else {
+                const err = await response.json();
+                alert(err.error || 'Failed to upload image');
+            }
+        } catch (error) {
+            console.error('Error uploading avatar:', error);
+            alert('An error occurred during upload.');
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleAvatarRemove = async () => {
+        if (!confirm('Are you sure you want to remove your profile picture?')) return;
+
+        setUploading(true);
+        try {
+            const response = await fetch('/api/student/profile/avatar', {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                updateUser({ avatarUrl: undefined });
+                alert('Profile picture removed!');
+            } else {
+                alert('Failed to remove profile picture');
+            }
+        } catch (error) {
+            console.error('Error removing avatar:', error);
+            alert('An error occurred.');
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const [notifications, setNotifications] = useState({
         emailNotifs: true,
@@ -144,6 +210,63 @@ export function Settings() {
                         </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
+                        {/* Avatar Upload Section */}
+                        <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 mb-6 border-b border-[#DDE3EA]">
+                            <div className="relative group">
+                                <div className="h-24 w-24 rounded-[24px] border-2 border-[#DDE3EA] bg-[#F4F6F8] shadow-inner flex items-center justify-center text-[#1E1E1E] text-2xl font-black overflow-hidden z-10 shrink-0 transform hover:scale-102 transition-all">
+                                    {user?.avatarUrl ? (
+                                        <img src={user.avatarUrl} alt={user.name} className="h-full w-full object-cover" />
+                                    ) : (
+                                        user?.name
+                                            ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+                                            : '??'
+                                    )}
+                                </div>
+                            </div>
+                            <div className="flex-1 text-center sm:text-left space-y-2.5">
+                                <h4 className="text-sm font-extrabold text-[#1E1E1E]">Profile Picture</h4>
+                                <p className="text-xs text-[#8A919B]">Upload a high-resolution PNG or JPEG. Max size 2MB.</p>
+                                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        id="avatar-upload"
+                                        className="hidden"
+                                        onChange={handleAvatarUpload}
+                                    />
+                                    <Button
+                                        type="button"
+                                        onClick={() => document.getElementById('avatar-upload')?.click()}
+                                        disabled={uploading}
+                                        className="h-9 px-4 bg-[#1E1E1E] hover:bg-[#333] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5"
+                                    >
+                                        {uploading ? (
+                                            <>
+                                                <Loader2 className="h-3 w-3 animate-spin" />
+                                                Uploading...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Camera size={14} />
+                                                Upload Photo
+                                            </>
+                                        )}
+                                    </Button>
+                                    {user?.avatarUrl && (
+                                        <Button
+                                            type="button"
+                                            onClick={handleAvatarRemove}
+                                            disabled={uploading}
+                                            variant="outline"
+                                            className="h-9 px-4 border-[#DDE3EA] text-red-500 hover:bg-red-50 text-xs font-bold rounded-xl shadow-sm transition-all"
+                                        >
+                                            Remove
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="fullName" className="text-[#1E1E1E]">Full Name</Label>

@@ -31,6 +31,7 @@ model announcements {
   created_by      String
   created_at      DateTime   @default(now())
   updated_at      DateTime
+  expires_at      DateTime?
 }
 
 model bookings {
@@ -231,6 +232,19 @@ model user_settings {
   users                      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
+model platform_settings {
+  id                    String   @id @default("global")
+  platform_name         String   @default("LearnWave")
+  platform_description  String   @default("AI-Powered Academic Support Platform")
+  maintenance_mode      Boolean  @default(false)
+  ai_assistant_enabled  Boolean  @default(true)
+  forum_enabled         Boolean  @default(true)
+  resources_enabled     Boolean  @default(true)
+  mentorship_enabled    Boolean  @default(true)
+  announcements_enabled Boolean  @default(true)
+  updated_at            DateTime @updatedAt
+}
+
 model resources {
   id              String            @id @default(cuid())
   title           String
@@ -250,6 +264,8 @@ model resources {
   is_model_paper  Boolean           @default(false)
   module_number   Int?
   scheme          String?
+  is_approved     Boolean           @default(false)
+  is_library      Boolean           @default(false)
   document_chunks document_chunks[]
   users           users             @relation(fields: [uploaded_by], references: [id], onDelete: Cascade)
 }

@@ -6,7 +6,9 @@ import dynamic from 'next/dynamic'
 import { Sidebar } from '@/components/Sidebar'
 import { useAuth } from '@/contexts/AuthContext'
 import { useUI } from '@/contexts/UIContext'
-import { Search, Bell, User, LogOut, Settings as SettingsIcon, UserCircle, ChevronDown } from 'lucide-react'
+import { Search, User, LogOut, Settings as SettingsIcon, UserCircle, ChevronDown } from 'lucide-react'
+import { NotificationBell } from '@/components/NotificationBell'
+import { AnnouncementBanner } from '@/components/AnnouncementBanner'
 
 // Dynamic imports for components
 const MentorDashboard = dynamic(() => import('@/components/mentor/MentorDashboard').then(mod => mod.MentorDashboard))
@@ -103,6 +105,7 @@ export default function MentorHome() {
             : ''
         }`}
       >
+        <AnnouncementBanner />
         {/* Top Header Area */}
         <header className="h-16 px-6 lg:px-8 flex items-center justify-between sticky top-0 z-40 bg-[#F4F6F8]/80 backdrop-blur-md">
           <div className="flex items-center gap-4 w-80">
@@ -117,10 +120,7 @@ export default function MentorHome() {
           </div>
 
           <div className="flex items-center gap-3">
-            <button className="p-2 text-[#74A8A4] hover:text-[#335765] hover:bg-white rounded-xl transition-all relative">
-              <Bell size={18} />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#B6D9E0] border-2 border-[#F4F6F8] rounded-full"></span>
-            </button>
+            <NotificationBell />
             <div className="flex items-center gap-3 pl-3 border-l border-[#B6D9E0]/50 relative">
               <div className="text-right hidden md:block">
                 <p className="text-sm font-bold text-[#335765]">{user.name}</p>

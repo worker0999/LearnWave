@@ -4,15 +4,16 @@ import { join } from 'path'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
   try {
-    const filePath = join(process.cwd(), 'uploads', 'resources', ...params.path)
+    const { path } = await params
+    const filePath = join(process.cwd(), 'uploads', 'resources', ...path)
     
     const fileBuffer = await readFile(filePath)
     
     // Determine content type based on file extension
-    const ext = params.path[params.path.length - 1].split('.').pop()?.toLowerCase()
+    const ext = path[path.length - 1].split('.').pop()?.toLowerCase()
     let contentType = 'application/octet-stream'
     
     switch (ext) {

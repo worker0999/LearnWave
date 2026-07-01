@@ -20,7 +20,7 @@ export async function PUT(req: NextRequest) {
             return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
         }
 
-        const { name, email, phone } = await req.json();
+        const { name, email, phone, avatarUrl } = await req.json();
 
         // Split name into first and last name
         const [firstName = '', ...lastNameParts] = name.split(' ');
@@ -38,11 +38,13 @@ export async function PUT(req: NextRequest) {
                             first_name: firstName,
                             last_name: lastName,
                             phone: phone || null,
+                            ...(avatarUrl !== undefined && { avatar_url: avatarUrl }),
                         },
                         update: {
                             first_name: firstName,
                             last_name: lastName,
                             phone: phone || null,
+                            ...(avatarUrl !== undefined && { avatar_url: avatarUrl }),
                         }
                     }
                 }
@@ -59,7 +61,8 @@ export async function PUT(req: NextRequest) {
                 email: updatedUser.email,
                 phone: updatedUser.user_profiles?.phone,
                 usn: updatedUser.usn,
-                role: updatedUser.role
+                role: updatedUser.role,
+                avatarUrl: updatedUser.user_profiles?.avatar_url || null
             }
         });
     } catch (error) {

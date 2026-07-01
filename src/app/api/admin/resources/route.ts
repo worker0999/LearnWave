@@ -87,10 +87,22 @@ export async function POST(request: NextRequest) {
     const subject = formData.get('subject') as string
     const semester = formData.get('semester') as string
     const unit = formData.get('unit') as string
+    const scheme = formData.get('scheme') as string
+    const branch = formData.get('branch') as string
+    const moduleNumStr = formData.get('module_number') as string
+    const isModelPaperStr = formData.get('is_model_paper') as string
+    const isLibraryStr = formData.get('is_library') as string
     const file = formData.get('file') as File
 
-    if (!title || !subject || !file)
-      return NextResponse.json({ error: 'Title, subject, and file are required' }, { status: 400 })
+    if (!title || !file)
+      return NextResponse.json({ error: 'Title and file are required' }, { status: 400 })
+
+    const is_library = isLibraryStr === 'true'
+    const finalSemester = is_library ? 0 : (parseInt(semester) || 1)
+    const finalSubject = is_library ? 'Library Book' : (subject || 'General')
+    
+    const module_number = moduleNumStr ? parseInt(moduleNumStr) : null
+    const is_model_paper = isModelPaperStr === 'true'
 
     // 📁 Ensure upload folder exists
     const uploadsDir = join(process.cwd(), 'uploads', 'resources')
@@ -110,14 +122,20 @@ export async function POST(request: NextRequest) {
       data: {
         title,
         description: description || '',
-        type,
-        subject,
-        semester: parseInt(semester) || 1,
+        type: type || file.name.split('.').pop()?.toUpperCase() || 'UNKNOWN',
+        subject: finalSubject,
+        semester: finalSemester,
         unit: unit || '',
         fileName: file.name,
-        fileUrl: `/uploads/resources/${fileName}`,
+        fileUrl: `/api/uploads/resources/${fileName}`,
         fileSize: file.size,
-        uploaded_by: decoded.userId
+        uploaded_by: decoded.userId,
+        is_approved: true, // Admin uploads are auto-approved (verified batch)
+        is_library,
+        scheme: is_library ? null : (scheme || '2025'),
+        branch: is_library ? null : (branch || 'CSE'),
+        module_number,
+        is_model_paper
       },
       include: {
         users: {
@@ -196,5 +214,37 @@ export async function DELETE(request: NextRequest) {
   } catch (error) {
     console.error('Error deleting resource:', error)
     return NextResponse.json({ error: 'Failed to delete resource' }, { status: 500 })
+  }
+}
+
+// ✅ PATCH /api/admin/resources
+// Approve or reject resources
+export async function PATCH(request: NextRequest) {
+  try {
+    const token = request.headers.get('authorization')?.replace('Bearer ', '')
+    if (!token)
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    const decoded = await verifyToken(token)
+    if (!decoded || decoded.role !== 'ADMIN')
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+    const body = await request.json()
+    const { resourceId, approved } = body
+
+    if (!resourceId)
+      return NextResponse.json({ error: 'Resource ID is required' }, { status: 400 })
+
+    const updated = await db.resources.update({
+      where: { id: resourceId },
+      data: {
+        is_approved: approved !== undefined ? approved : true
+      }
+    })
+
+    return NextResponse.json({ success: true, resource: updated })
+  } catch (error) {
+    console.error('Error updating resource approval status:', error)
+    return NextResponse.json({ error: 'Failed to update resource status' }, { status: 500 })
   }
 }

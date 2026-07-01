@@ -11,6 +11,7 @@ interface User {
   usn?: string
   branch?: string
   semester?: number
+  avatarUrl?: string
   mentorProfile?: {
     approved: boolean
     rating?: number
@@ -21,6 +22,7 @@ interface AuthContextType {
   user: User | null
   token: string | null
   login: (token: string, user: User) => void
+  updateUser: (updatedFields: Partial<User>) => void
   logout: () => void
   isAuthenticated: boolean
 }
@@ -60,6 +62,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     document.cookie = `token=${newToken}; path=/; max-age=604800${isProduction ? '; secure' : ''}; samesite=strict`
   }
 
+  const updateUser = (updatedFields: Partial<User>) => {
+    setUser(prevUser => {
+      if (!prevUser) return null
+      const updated = { ...prevUser, ...updatedFields }
+      localStorage.setItem('user', JSON.stringify(updated))
+      return updated
+    })
+  }
+
   const logout = () => {
     setToken(null)
     setUser(null)
@@ -76,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAuthenticated = !!user && !!token
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, token, login, updateUser, logout, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   )

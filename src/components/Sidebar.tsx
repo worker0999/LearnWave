@@ -126,8 +126,12 @@ export function Sidebar({ onNavClick, currentPage }: SidebarProps) {
               className="px-5 mb-6"
             >
               <div className={`rounded-2xl p-3.5 flex items-center gap-3 border ${bgTheme}`}>
-                <div className={`w-10 h-10 rounded-2xl ${iconBg} flex items-center justify-center ${activeText} font-bold shrink-0`}>
-                  {user?.name?.[0] || 'U'}
+                <div className={`w-10 h-10 rounded-2xl ${iconBg} flex items-center justify-center ${activeText} font-bold shrink-0 overflow-hidden`}>
+                  {user?.avatarUrl ? (
+                    <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                  ) : (
+                    user?.name?.[0] || 'U'
+                  )}
                 </div>
                 <div className="overflow-hidden">
                   <p className={`font-bold text-sm truncate ${activeText}`}>{user?.name}</p>

@@ -4,7 +4,7 @@ import { verifyToken } from '@/lib/auth'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
@@ -18,10 +18,10 @@ export async function POST(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const resourceId = params.id
+    const { id: resourceId } = await params
 
     // Check if resource exists
-    const resource = await db.resource.findUnique({
+    const resource = await db.resources.findUnique({
       where: { id: resourceId }
     })
 
@@ -33,7 +33,7 @@ export async function POST(
     }
 
     // Increment download count
-    await db.resource.update({
+    await db.resources.update({
       where: { id: resourceId },
       data: {
         downloadCount: {

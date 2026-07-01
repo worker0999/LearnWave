@@ -184,6 +184,10 @@ export async function searchDocumentChunks(
 }>> {
     const queryTerms = query.toLowerCase().split(/\s+/).filter(term => term.length > 2)
 
+    if (queryTerms.length === 0) {
+        return []
+    }
+
     // Get all chunks (optionally filtered by resource IDs)
     const chunks = await prisma.document_chunks.findMany({
         where: resourceIds && resourceIds.length > 0 ? {

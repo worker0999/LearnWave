@@ -25,8 +25,12 @@ export function Profile() {
                 </div>
 
                 <div className="px-8 relative -mt-16 flex flex-col md:flex-row items-end gap-6">
-                    <div className="h-32 w-32 rounded-[32px] border-4 border-[#E8EDF3] bg-white shadow-2xl flex items-center justify-center text-[#1E1E1E] text-4xl font-black z-10 shrink-0 transform hover:scale-105 transition-transform duration-500">
-                        {initials}
+                    <div className="h-32 w-32 rounded-[32px] border-4 border-[#E8EDF3] bg-white shadow-2xl flex items-center justify-center text-[#1E1E1E] text-4xl font-black z-10 shrink-0 transform hover:scale-105 transition-transform duration-500 overflow-hidden">
+                        {user.avatarUrl ? (
+                            <img src={user.avatarUrl} alt={user.name} className="h-full w-full object-cover" />
+                        ) : (
+                            initials
+                        )}
                     </div>
 
                     <div className="flex-1 pb-2">
