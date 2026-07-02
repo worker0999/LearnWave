@@ -181,83 +181,147 @@ export function MentorSessions() {
                   <p className="text-sm">Enjoy your time off!</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-b border-[#B6D9E0] hover:bg-transparent">
-                        <TableHead className="text-[#74A8A4] uppercase font-black text-[10px] tracking-widest pl-6">Student</TableHead>
-                        <TableHead className="text-[#74A8A4] uppercase font-black text-[10px] tracking-widest">Time & Topic</TableHead>
-                        <TableHead className="text-[#74A8A4] uppercase font-black text-[10px] tracking-widest text-center">Status</TableHead>
-                        <TableHead className="text-[#74A8A4] uppercase font-black text-[10px] tracking-widest text-right pr-6">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredSessions.map((session) => (
-                        <TableRow key={session.id} className="border-b border-[#DBE2DC] last:border-0 hover:bg-white transition-colors">
-                          <TableCell className="pl-6 py-6">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-[#B6D9E0] flex items-center justify-center text-[#335765] font-bold text-sm">
-                                {session.studentName[0]}
-                              </div>
-                              <span className="font-bold text-[#335765]">{session.studentName}</span>
+                <>
+                  {/* Mobile Card Layout */}
+                  <div className="md:hidden space-y-4 p-4">
+                    {filteredSessions.map((session) => (
+                      <div key={session.id} className="bg-[#DBE2DC]/10 border border-[#B6D9E0] rounded-2xl p-4 space-y-3 shadow-sm hover:border-[#335765] transition-all">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-[#B6D9E0] flex items-center justify-center text-[#335765] font-bold text-xs">
+                              {session.studentName[0]}
                             </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2 text-[#335765] font-bold text-sm">
-                                <Clock size={14} className="text-[#335765]" />
-                                {format(session.time, 'hh:mm a')}
-                              </div>
-                              <div className="text-xs text-[#74A8A4] font-medium uppercase tracking-tight line-clamp-1 max-w-[150px]">
-                                {session.topic}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {getStatusBadge(session.status)}
-                          </TableCell>
-                          <TableCell className="pr-6 text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              {session.status === 'pending' ? (
-                                <>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 h-9 px-3 rounded-xl transition-all"
-                                    onClick={() => handleStatusUpdate(session.id, 'rejected')}
-                                    disabled={actionLoading === session.id}
-                                  >
-                                    {actionLoading === session.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <X size={16} />}
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    className="bg-green-600 hover:bg-green-700 text-white h-9 px-4 rounded-xl shadow-md transition-all font-bold"
-                                    onClick={() => handleStatusUpdate(session.id, 'confirmed')}
-                                    disabled={actionLoading === session.id}
-                                  >
-                                    {actionLoading === session.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check size={16} className="mr-2" />}
-                                    Approve
-                                  </Button>
-                                </>
-                              ) : session.status === 'confirmed' ? (
-                                <Button
-                                  size="sm"
-                                  className="bg-[#335765] hover:bg-[#7F543D] text-white h-9 px-4 rounded-xl shadow-md transition-all font-bold flex items-center gap-2"
-                                  onClick={() => session.meetingLink && window.open(session.meetingLink, '_blank')}
-                                >
-                                  <Video size={16} />
-                                  Join
-                                </Button>
-                              ) : (
-                                <span className="text-xs text-[#B6D9E0] font-bold uppercase italic">No actions</span>
-                              )}
-                            </div>
-                          </TableCell>
+                            <span className="font-bold text-sm text-[#335765]">{session.studentName}</span>
+                          </div>
+                          {getStatusBadge(session.status)}
+                        </div>
+                        <div className="text-xs text-[#74A8A4] font-medium space-y-1">
+                          <div className="flex items-center gap-2 font-bold text-[#335765]">
+                            <Clock size={12} />
+                            {format(session.time, 'hh:mm a')}
+                          </div>
+                          <div className="line-clamp-2 pl-4 text-xs font-semibold text-[#335765]">
+                            {session.topic}
+                          </div>
+                        </div>
+                        <div className="flex justify-end gap-2 pt-2 border-t border-[#B6D9E0]/50">
+                          {session.status === 'pending' ? (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 h-8 px-3 rounded-lg text-xs"
+                                onClick={() => handleStatusUpdate(session.id, 'rejected')}
+                                disabled={actionLoading === session.id}
+                              >
+                                {actionLoading === session.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <X size={14} />}
+                              </Button>
+                              <Button
+                                size="sm"
+                                className="bg-green-600 hover:bg-green-700 text-white h-8 px-3 rounded-lg text-xs font-bold"
+                                onClick={() => handleStatusUpdate(session.id, 'confirmed')}
+                                disabled={actionLoading === session.id}
+                              >
+                                {actionLoading === session.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check size={14} className="mr-1" />}
+                                Approve
+                              </Button>
+                            </>
+                          ) : session.status === 'confirmed' ? (
+                            <Button
+                              size="sm"
+                              className="bg-[#335765] hover:bg-[#7F543D] text-white h-8 px-3 rounded-lg text-xs font-bold flex items-center gap-1.5 w-full justify-center shadow-md"
+                              onClick={() => session.meetingLink && window.open(session.meetingLink, '_blank')}
+                            >
+                              <Video size={14} />
+                              Join Meeting
+                            </Button>
+                          ) : (
+                            <span className="text-[10px] text-[#B6D9E0] font-bold uppercase italic">No actions</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Desktop Table Layout */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-b border-[#B6D9E0] hover:bg-transparent">
+                          <TableHead className="text-[#74A8A4] uppercase font-black text-[10px] tracking-widest pl-6">Student</TableHead>
+                          <TableHead className="text-[#74A8A4] uppercase font-black text-[10px] tracking-widest">Time & Topic</TableHead>
+                          <TableHead className="text-[#74A8A4] uppercase font-black text-[10px] tracking-widest text-center">Status</TableHead>
+                          <TableHead className="text-[#74A8A4] uppercase font-black text-[10px] tracking-widest text-right pr-6">Actions</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredSessions.map((session) => (
+                          <TableRow key={session.id} className="border-b border-[#DBE2DC] last:border-0 hover:bg-white transition-colors">
+                            <TableCell className="pl-6 py-6">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-[#B6D9E0] flex items-center justify-center text-[#335765] font-bold text-sm">
+                                  {session.studentName[0]}
+                                </div>
+                                <span className="font-bold text-[#335765]">{session.studentName}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2 text-[#335765] font-bold text-sm">
+                                  <Clock size={14} className="text-[#335765]" />
+                                  {format(session.time, 'hh:mm a')}
+                                </div>
+                                <div className="text-xs text-[#74A8A4] font-medium uppercase tracking-tight line-clamp-1 max-w-[150px]">
+                                  {session.topic}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              {getStatusBadge(session.status)}
+                            </TableCell>
+                            <TableCell className="pr-6 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                {session.status === 'pending' ? (
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 h-9 px-3 rounded-xl transition-all"
+                                      onClick={() => handleStatusUpdate(session.id, 'rejected')}
+                                      disabled={actionLoading === session.id}
+                                    >
+                                      {actionLoading === session.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <X size={16} />}
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      className="bg-green-600 hover:bg-green-700 text-white h-9 px-4 rounded-xl shadow-md transition-all font-bold"
+                                      onClick={() => handleStatusUpdate(session.id, 'confirmed')}
+                                      disabled={actionLoading === session.id}
+                                    >
+                                      {actionLoading === session.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check size={16} className="mr-2" />}
+                                      Approve
+                                    </Button>
+                                  </>
+                                ) : session.status === 'confirmed' ? (
+                                  <Button
+                                    size="sm"
+                                    className="bg-[#335765] hover:bg-[#7F543D] text-white h-9 px-4 rounded-xl shadow-md transition-all font-bold flex items-center gap-2"
+                                    onClick={() => session.meetingLink && window.open(session.meetingLink, '_blank')}
+                                  >
+                                    <Video size={16} />
+                                    Join
+                                  </Button>
+                                ) : (
+                                  <span className="text-xs text-[#B6D9E0] font-bold uppercase italic">No actions</span>
+                                )}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>

@@ -81,11 +81,11 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
 
     return (
         <div className="min-h-screen bg-[#FDFBF9]">
-            {navType === 'side' ? (
+            {navType === 'side' && (
                 <motion.aside
                     initial={false}
                     animate={{ width: isSideExpanded ? 280 : 88 }}
-                    className="fixed left-0 top-0 h-screen bg-[#13131a] text-white z-[999] flex flex-col shadow-2xl transition-all duration-300"
+                    className="hidden md:flex fixed left-0 top-0 h-screen bg-[#13131a] text-white z-[999] flex-col shadow-2xl transition-all duration-300"
                 >
                     <div className="p-6 mb-8 flex items-center justify-between">
                         <AnimatePresence mode="wait">
@@ -131,43 +131,47 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
                         </button>
                     </div>
                 </motion.aside>
-            ) : (
-                <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[999] w-auto max-w-[95vw] pointer-events-auto">
-                    <div className="bg-[#FFF5EB]/95 backdrop-blur-md p-2 rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-orange-500/20 flex items-center gap-1 overflow-x-auto no-scrollbar px-3">
-                        {allItems.map((item) => {
-                            const isActive = pathname === item.href;
-                            return (
-                                <button
-                                    key={item.href}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        router.push(item.href);
-                                    }}
-                                    className={`relative flex items-center justify-center gap-2 px-4 py-3 rounded-full transition-all duration-300 shrink-0 z-50 group ${
-                                        isActive ? 'text-white' : 'text-[#E76F51] hover:bg-orange-500/10'
-                                    }`}
-                                >
-                                    {isActive && <motion.div layoutId="activePill-dashboard-final" className="absolute inset-0 bg-[#E76F51] rounded-full -z-10 shadow-lg shadow-orange-500/20" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />}
-                                    <span className="shrink-0 pointer-events-none">{item.icon}</span>
-                                    <AnimatePresence>
-                                        {isActive && (
-                                            <motion.span initial={{ width: 0, opacity: 0 }} animate={{ width: 'auto', opacity: 1 }} exit={{ width: 0, opacity: 0 }} className="font-bold text-sm whitespace-nowrap overflow-hidden pr-1 tracking-tight pointer-events-none">
-                                                {item.label}
-                                            </motion.span>
-                                        )}
-                                    </AnimatePresence>
-                                </button>
-                            );
-                        })}
-                        <button onClick={handleLogout} className="flex items-center justify-center p-3 rounded-full transition-all text-red-500 hover:bg-red-50 shrink-0 z-50" title="Logout">
-                            <LogOut size={20} />
-                        </button>
-                    </div>
-                </nav>
             )}
 
-            <main className={`transition-all duration-300 ease-in-out w-full ${navType === 'side' ? (isSideExpanded ? 'pl-[280px]' : 'pl-[88px]') : 'pb-32'}`}>
+            <nav className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[999] w-auto max-w-[95vw] pointer-events-auto ${navType === 'side' ? 'md:hidden' : ''}`}>
+                <div className="bg-[#FFF5EB]/95 backdrop-blur-md p-2 rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-orange-500/20 flex items-center gap-1 overflow-x-auto no-scrollbar px-3">
+                    {allItems.map((item) => {
+                        const isActive = pathname === item.href;
+                        return (
+                            <button
+                                key={item.href}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    router.push(item.href);
+                                }}
+                                className={`relative flex items-center justify-center gap-2 px-4 py-3 rounded-full transition-all duration-300 shrink-0 z-50 group ${
+                                    isActive ? 'text-white' : 'text-[#E76F51] hover:bg-orange-500/10'
+                                }`}
+                            >
+                                {isActive && <motion.div layoutId="activePill-dashboard-final" className="absolute inset-0 bg-[#E76F51] rounded-full -z-10 shadow-lg shadow-orange-500/20" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />}
+                                <span className="shrink-0 pointer-events-none">{item.icon}</span>
+                                <AnimatePresence>
+                                    {isActive && (
+                                        <motion.span initial={{ width: 0, opacity: 0 }} animate={{ width: 'auto', opacity: 1 }} exit={{ width: 0, opacity: 0 }} className="font-bold text-sm whitespace-nowrap overflow-hidden pr-1 tracking-tight pointer-events-none">
+                                            {item.label}
+                                        </motion.span>
+                                    )}
+                                </AnimatePresence>
+                            </button>
+                        );
+                    })}
+                    <button onClick={handleLogout} className="flex items-center justify-center p-3 rounded-full transition-all text-red-500 hover:bg-red-50 shrink-0 z-50" title="Logout">
+                        <LogOut size={20} />
+                    </button>
+                </div>
+            </nav>
+
+            <main className={`transition-all duration-300 ease-in-out w-full ${
+                navType === 'side'
+                    ? (isSideExpanded ? 'md:pl-[280px] pl-0' : 'md:pl-[88px] pl-0')
+                    : ''
+            } ${navType === 'side' ? 'pb-28 md:pb-0' : 'pb-32'}`}>
                 {children}
             </main>
 

@@ -24,7 +24,7 @@ export function Profile() {
                     </div>
                 </div>
 
-                <div className="px-8 relative -mt-16 flex flex-col md:flex-row items-end gap-6">
+                <div className="px-8 relative -mt-16 flex flex-col md:flex-row items-center md:items-end gap-6 text-center md:text-left">
                     <div className="h-32 w-32 rounded-[32px] border-4 border-[#E8EDF3] bg-white shadow-2xl flex items-center justify-center text-[#1E1E1E] text-4xl font-black z-10 shrink-0 transform hover:scale-105 transition-transform duration-500 overflow-hidden">
                         {user.avatarUrl ? (
                             <img src={user.avatarUrl} alt={user.name} className="h-full w-full object-cover" />
@@ -34,7 +34,7 @@ export function Profile() {
                     </div>
 
                     <div className="flex-1 pb-2">
-                        <div className="flex items-center gap-3 mb-1">
+                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-1">
                             <h2 className="text-3xl font-extrabold text-[#1E1E1E] tracking-tight">{user.name || 'Student Name'}</h2>
                             <div className="bg-[#D4E4C8] text-[#1E1E1E] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
                                 Premium Student
@@ -45,11 +45,11 @@ export function Profile() {
                         </p>
                     </div>
 
-                    <div className="flex gap-3 pb-2">
-                        <button className="h-11 px-6 bg-[#1E1E1E] hover:bg-[#333] text-white rounded-2xl shadow-xl transition-all font-extrabold text-sm flex items-center gap-2">
+                    <div className="flex gap-3 pb-2 w-full md:w-auto justify-center md:justify-end">
+                        <button className="flex-1 md:flex-none h-11 px-6 bg-[#1E1E1E] hover:bg-[#333] text-white rounded-2xl shadow-xl transition-all font-extrabold text-sm flex items-center justify-center gap-2">
                             <Edit3 size={16} /> Edit Profile
                         </button>
-                        <button className="h-11 w-11 flex items-center justify-center bg-white border border-[#DDE3EA] text-[#1E1E1E] rounded-2xl hover:bg-[#F4F6F8] transition-all shadow-sm">
+                        <button className="h-11 w-11 flex items-center justify-center bg-white border border-[#DDE3EA] text-[#1E1E1E] rounded-2xl hover:bg-[#F4F6F8] transition-all shadow-sm shrink-0">
                             <Share2 size={18} />
                         </button>
                     </div>

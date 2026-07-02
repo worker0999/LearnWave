@@ -650,6 +650,131 @@ export default function Home() {
 
         /* SVG icons */
         .icon-svg { width: 24px; height: 24px; }
+
+        @media (max-width: 768px), (pointer: coarse) {
+          .cursor, .cursor-ring {
+            display: none !important;
+          }
+          body {
+            cursor: auto !important;
+          }
+        }
+
+        @media (max-width: 768px) {
+          nav {
+            padding: 15px 20px !important;
+          }
+          .nav-links {
+            display: flex !important;
+            gap: 0 !important;
+          }
+          .nav-links li:not(:last-child) {
+            display: none !important;
+          }
+          .nav-cta {
+            padding: 8px 16px !important;
+            font-size: 13px !important;
+          }
+          .hero {
+            padding: 100px 20px 40px !important;
+            text-align: center;
+            align-items: center;
+            min-height: auto !important;
+          }
+          .hero-headline {
+            font-size: 42px !important;
+            text-align: center;
+            max-width: 100% !important;
+          }
+          .hero-sub {
+            text-align: center;
+            max-width: 100% !important;
+            font-size: 15px !important;
+          }
+          .hero-actions {
+            flex-direction: column;
+            width: 100%;
+            gap: 12px;
+            margin-top: 32px !important;
+          }
+          .hero-actions a, .hero-actions button {
+            width: 100%;
+            justify-content: center;
+          }
+          .hero-stats {
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            width: 100%;
+            margin-top: 40px !important;
+          }
+          .stat-divider {
+            display: none !important;
+          }
+          .features {
+            padding: 60px 20px !important;
+          }
+          .features-grid {
+            grid-template-columns: 1fr !important;
+            border: none !important;
+            border-radius: 0 !important;
+            gap: 16px;
+            margin-top: 40px !important;
+          }
+          .feature-card {
+            border: 1px solid var(--border) !important;
+            border-radius: 20px !important;
+            padding: 30px 24px !important;
+          }
+          .feature-card::after {
+            display: none !important;
+          }
+          .roles {
+            padding: 0 20px 60px !important;
+          }
+          .roles-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 32px !important;
+          }
+          .roles-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px;
+          }
+          .role-card {
+            padding: 30px 24px !important;
+          }
+          .cta-banner {
+            margin: 0 20px 60px !important;
+            padding: 40px 24px !important;
+            flex-direction: column;
+            gap: 24px;
+            text-align: center;
+          }
+          .cta-banner-title {
+            font-size: 32px !important;
+          }
+          .cta-banner-actions {
+            flex-direction: column;
+            width: 100%;
+          }
+          .cta-banner-actions button, .cta-banner-actions a {
+            width: 100%;
+            justify-content: center;
+          }
+          footer {
+            padding: 30px 20px !important;
+            flex-direction: column;
+            gap: 20px;
+            text-align: center;
+          }
+          .footer-links {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+          }
+        }
       `}} />
 
       <div className="cursor" id="cursor"></div>

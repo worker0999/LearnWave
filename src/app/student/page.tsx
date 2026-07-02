@@ -99,7 +99,7 @@ export default function StudentHome() {
   }
 
   return (
-    <div className={`min-h-screen bg-[#E8EDF3] transition-all duration-300 ${navType === 'bottom' ? 'pb-24' : ''}`}>
+    <div className={`min-h-screen bg-[#E8EDF3] transition-all duration-300 ${navType === 'bottom' ? 'pb-24' : 'pb-24 md:pb-0'}`}>
       <Sidebar
         expanded={expanded}
         onToggle={() => setExpanded(!expanded)}
@@ -116,7 +116,7 @@ export default function StudentHome() {
       <div
         className={`transition-all duration-300 ease-in-out flex flex-col min-h-screen w-full ${
           navType === 'side' 
-            ? (isSideExpanded ? 'pl-[280px]' : 'pl-[88px]') 
+            ? (isSideExpanded ? 'md:pl-[280px] pl-0' : 'md:pl-[88px] pl-0') 
             : ''
         }`}
       >
@@ -130,7 +130,7 @@ export default function StudentHome() {
                 <span className="font-extrabold text-sm tracking-widest">LW</span>
              </div>
              {/* Text-based logo */}
-             <span className="text-2xl font-extrabold tracking-tight drop-shadow-sm">
+             <span className="hidden sm:inline text-2xl font-extrabold tracking-tight drop-shadow-sm">
                 <span className="text-[#25559C]">Learn</span>
                 <span className="text-[#7DBA45]">Wave</span>
              </span>

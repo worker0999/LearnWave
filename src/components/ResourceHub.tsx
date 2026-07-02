@@ -275,7 +275,7 @@ export function ResourceHub() {
                                 ) : (
                                     <div className="grid gap-4">
                                         {resources.map((resource) => (
-                                            <div key={resource.id} className="flex items-center justify-between p-4 bg-white border border-[#DDE3EA] rounded-2xl hover:border-[#1E1E1E] hover:shadow-md transition-all group">
+                                            <div key={resource.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border border-[#DDE3EA] rounded-2xl hover:border-[#1E1E1E] hover:shadow-md transition-all group gap-4">
                                                 <div className="flex items-center gap-4 flex-1 min-w-0">
                                                     <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-[#F4F6F8] group-hover:bg-[#D4E4C8] transition-colors">
                                                         {getIconForType(resource.type)}
@@ -291,17 +291,17 @@ export function ResourceHub() {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center shrink-0 ml-4">
+                                                <div className="flex items-center gap-2 shrink-0 sm:ml-4 w-full sm:w-auto">
                                                     <button
                                                         onClick={() => {
                                                             setPreviewUrl(getCorrectFileUrl(resource.fileUrl))
                                                             setPreviewTitle(resource.title)
                                                         }}
-                                                        className="bg-[#F4F6F8] text-[#1E1E1E] text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-[#1E1E1E] hover:text-white transition-colors flex items-center gap-2 mr-2"
+                                                        className="flex-1 sm:flex-initial justify-center bg-[#F4F6F8] text-[#1E1E1E] text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-[#1E1E1E] hover:text-white transition-colors flex items-center gap-2"
                                                     >
                                                         <Eye size={14} /> View
                                                     </button>
-                                                    <a href={getCorrectFileUrl(resource.fileUrl)} target="_blank" rel="noreferrer" className="bg-[#F4F6F8] text-[#1E1E1E] text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-[#1E1E1E] hover:text-white transition-colors flex items-center gap-2">
+                                                    <a href={getCorrectFileUrl(resource.fileUrl)} target="_blank" rel="noreferrer" className="flex-1 sm:flex-initial justify-center bg-[#F4F6F8] text-[#1E1E1E] text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-[#1E1E1E] hover:text-white transition-colors flex items-center gap-2">
                                                         <Download size={14} /> Download
                                                     </a>
                                                 </div>

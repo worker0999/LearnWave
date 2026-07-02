@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/hooks/use-toast'
 import {
-    Send, Search, Mail, Bell, User, ChevronDown, UserCircle, LogOut,
+    Send, Search, Mail, Bell, User, ChevronDown, ChevronLeft, UserCircle, LogOut,
     Settings as SettingsIcon, MessageCircle, Paperclip, Smile, Video,
     Plus, Shield, Clock, MapPin, ExternalLink, Info
 } from 'lucide-react'
@@ -149,7 +149,7 @@ export default function StudentMessagesPage() {
     )
 
     const sideOffset = navType === 'side'
-        ? (isSideExpanded ? 'pl-[280px]' : 'pl-[88px]')
+        ? (isSideExpanded ? 'md:pl-[280px] pl-0 pb-[90px] md:pb-0' : 'md:pl-[88px] pl-0 pb-[90px] md:pb-0')
         : 'pb-[90px]'
 
     return (
@@ -233,7 +233,7 @@ export default function StudentMessagesPage() {
                     <div className="h-full flex gap-4 min-h-0 overflow-hidden">
 
                         {/* Chats List */}
-                        <div className="w-64 shrink-0 bg-white border border-[#DDE3EA] rounded-2xl flex flex-col overflow-hidden">
+                        <div className={`w-full md:w-64 shrink-0 bg-white border border-[#DDE3EA] rounded-2xl flex flex-col overflow-hidden ${selectedChat ? 'hidden md:flex' : 'flex'}`}>
                             <div className="p-3 border-b border-[#DDE3EA] flex items-center gap-2">
                                 <Search className="h-4 w-4 text-[#8A919B] shrink-0" />
                                 <input
@@ -292,12 +292,18 @@ export default function StudentMessagesPage() {
                         </div>
 
                         {/* Chat Area */}
-                        <div className="flex-1 bg-white border border-[#DDE3EA] rounded-2xl flex flex-col overflow-hidden">
+                        <div className={`flex-1 bg-white border border-[#DDE3EA] rounded-2xl flex flex-col overflow-hidden ${selectedChat ? 'flex' : 'hidden md:flex'}`}>
                             {selectedChat && selectedChatData ? (
                                 <>
                                     {/* Chat Header */}
                                     <div className="px-5 py-4 border-b border-[#DDE3EA] flex items-center justify-between shrink-0">
                                         <div className="flex items-center gap-3">
+                                            <button 
+                                                onClick={() => setSelectedChat(null)}
+                                                className="md:hidden p-2 rounded-xl text-[#8A919B] hover:bg-[#F4F6F8] hover:text-[#1E1E1E] transition-colors mr-1 shrink-0"
+                                            >
+                                                <ChevronLeft size={20} />
+                                            </button>
                                             <Avatar className="h-10 w-10">
                                                 <AvatarImage src={selectedChatData.user.avatar} />
                                                 <AvatarFallback className="bg-[#D4E4C8] text-[#1E1E1E] font-bold">
@@ -405,7 +411,7 @@ export default function StudentMessagesPage() {
 
                                         {/* Info Panel */}
                                         {showInfoPanel && (
-                                            <div className="bg-white overflow-hidden flex flex-col shrink-0 w-[280px]">
+                                            <div className="bg-white overflow-hidden hidden md:flex flex-col shrink-0 w-[280px]">
                                                 <div className="p-6 flex flex-col items-center text-center border-b border-[#DDE3EA]">
                                                     <Avatar className="h-20 w-20 mb-4 border-2 border-[#E5F0A0] p-1">
                                                         <AvatarImage src={selectedChatData.user.avatar} className="rounded-full" />

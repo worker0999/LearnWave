@@ -77,7 +77,7 @@ export default function AdminPortal() {
   }
 
   return (
-    <div className={`min-h-screen bg-[#f4f4f0] dark:bg-[#1c1b19] transition-all duration-300 ${navType === 'bottom' ? 'pb-24' : ''}`}>
+    <div className={`min-h-screen bg-[#f4f4f0] dark:bg-[#1c1b19] transition-all duration-300 ${navType === 'bottom' ? 'pb-24' : 'pb-24 md:pb-0'}`}>
       <Sidebar
         expanded={expanded}
         onToggle={() => setExpanded(!expanded)}
@@ -90,14 +90,27 @@ export default function AdminPortal() {
       <div
         className={`transition-all duration-300 ease-in-out flex flex-col min-h-screen w-full ${
           navType === 'side' 
-            ? (isSideExpanded ? 'pl-[280px]' : 'pl-[88px]') 
+            ? (isSideExpanded ? 'md:pl-[280px] pl-0' : 'md:pl-[88px] pl-0') 
             : ''
         }`}
       >
         <AnnouncementBanner />
         {/* Top Header Area */}
         <header className="h-16 px-6 lg:px-8 flex items-center justify-between sticky top-0 z-40 bg-[#f4f4f0]/80 dark:bg-[#1c1b19]/80 backdrop-blur-md border-b border-[#dfd3c3] dark:border-[#42413b]">
-          <div className="flex items-center gap-4 w-80">
+          {/* Logo Area - Left */}
+          <div className="flex items-center gap-2.5 w-auto md:w-64 shrink-0">
+             {/* Icon matching the logo style */}
+             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#42413b] to-[#a9a29e] flex items-center justify-center text-white shadow-sm">
+                <span className="font-extrabold text-sm tracking-widest">LW</span>
+             </div>
+             {/* Text-based logo */}
+             <span className="hidden sm:inline text-2xl font-extrabold tracking-tight drop-shadow-sm text-[#42413b] dark:text-[#f4f4f0]">
+                <span>Learn</span>
+                <span className="text-[#a9a29e]">Wave</span>
+             </span>
+          </div>
+
+          <div className="flex items-center gap-4 w-36 sm:w-80">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#a9a29e]" />
               <input
