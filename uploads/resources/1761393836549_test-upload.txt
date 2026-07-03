@@ -1,4 +1,0 @@
-This is a test file for upload functionality.
-Testing resource upload system.
-Created on: 2025-10-25
-Purpose: Verify upload and download functionality.
