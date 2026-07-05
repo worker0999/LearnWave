@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { getTokenFromHeaders, verifyToken } from '@/lib/auth'
+import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
     // Verify admin authentication
-    const token = getTokenFromHeaders(request.headers)
+    const token = getTokenFromRequest(request)
     if (!token) {
       return NextResponse.json(
         { error: 'Unauthorized' },

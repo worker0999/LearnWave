@@ -1,23 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import jwt from 'jsonwebtoken';
+import { verifyToken, getTokenFromRequest } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
   try {
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const token = getTokenFromRequest(req);
+    if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const token = authHeader.substring(7);
-    let userId: string;
-
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { userId: string };
-      userId = decoded.userId;
-    } catch (error) {
+    const decoded = await verifyToken(token);
+    if (!decoded) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
+    const userId = decoded.userId;
 
     const now = new Date();
 
@@ -37,7 +33,9 @@ export async function GET(req: NextRequest) {
       db.user_mission.findMany({ where: { user_id: userId } })
     ]);
 
-    const progressMap = new Map(userMissions.map(um => [um.mission_id, um]));
+    const progressMap = new Map<string, typeof userMissions[number]>(
+      userMissions.map(um => [um.mission_id, um])
+    );
 
     const missions = activeMissions.map(m => {
       const progress = progressMap.get(m.id);

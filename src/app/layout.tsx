@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   keywords: ["LearnWave", "VTU", "AI Learning", "Education", "Students", "Mentorship", "Academic Platform"],
   authors: [{ name: "LearnWave Team" }],
   icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
+    icon: "/logo.png",
   },
   openGraph: {
     title: "LearnWave - AI-Powered Academic Platform",

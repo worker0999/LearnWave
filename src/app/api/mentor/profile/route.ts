@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getTokenFromHeaders, verifyToken } from '@/lib/auth';
+import { getTokenFromRequest, verifyToken } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
     try {
-        const token = getTokenFromHeaders(request.headers);
+        const token = getTokenFromRequest(request);
         if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const decoded = await verifyToken(token);
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
     try {
-        const token = getTokenFromHeaders(request.headers);
+        const token = getTokenFromRequest(request);
         if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const decoded = await verifyToken(token);

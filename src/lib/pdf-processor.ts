@@ -1,11 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import { PrismaClient } from '@prisma/client'
-
-// pdf-parse is a CommonJS module, so we need to use require
-// const pdf = require('pdf-parse') // Moved to inside functions to avoid build issues
-
-const prisma = new PrismaClient()
+import { db as prisma } from './db'
 
 interface PDFChunk {
     pageNumber: number

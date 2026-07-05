@@ -4,26 +4,22 @@ import { db } from '@/lib/db'
 import { verifyPassword, generateToken } from '@/lib/auth'
 import { awardXP } from '@/lib/xp-engine'
 import { updateStreak } from '@/lib/streak-engine'
+import { isRateLimited } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔐 Login API - DATABASE_URL check:', process.env.DATABASE_URL?.substring(0, 50) + '...');
-
-    // Test database connection
-    try {
-      const testCount = await db.users.count();
-      console.log('✅ Database connection test - User count:', testCount);
-    } catch (dbError) {
-      const dbErrMsg = dbError instanceof Error ? dbError.message : String(dbError)
-      console.error('❌ Database connection test failed:', dbErrMsg);
-      return NextResponse.json(
-        { error: 'Database connection failed' },
-        { status: 500 }
-      )
-    }
-
     const body = await request.json()
     const { email, password } = body
+
+    const ip = request.headers.get('x-forwarded-for') || '127.0.0.1'
+    const rateLimitKey = `rate-limit:login:${ip}:${email || ''}`
+    if (isRateLimited(rateLimitKey, 5, 60 * 1000)) {
+      return NextResponse.json(
+        { error: 'Too many login attempts. Please try again in a minute.' },
+        { status: 429 }
+      )
+    }
 
     // Validate required fields
     if (!email || !password) {
@@ -92,17 +88,7 @@ export async function POST(request: NextRequest) {
     // Set cookie
     const cookieStore = await cookies()
     cookieStore.set('token', token, {
-      httpOnly: false, // Allow client access if needed, though httpOnly: true is safer. But existing frontend reads it from document.cookie? 
-      // Actually, AuthContext manual setting handles client access. 
-      // But middleware prefers cookie. 
-      // I'll set it httpOnly: false so the client JS implies reading it? 
-      // Wait, AuthContext sets it manually. 
-      // If I set it here, I should probably set it httpOnly: true for security, 
-      // but AuthContext expects to read/write it for state sync.
-      // Let's set it httpOnly: false to match AuthContext behavior if it tries to read it.
-      // Better: Set it httpOnly: true, but send token in body. 
-      // AuthContext uses body token to sync state.
-      // Middleware uses cookie. PERFECT.
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 60 * 60 * 24 * 7, // 7 days
@@ -127,7 +113,7 @@ export async function POST(request: NextRequest) {
         await updateStreak(user.id);
         await awardXP(user.id, 'LOGIN');
       } catch (gamifyError) {
-        console.error('Gamification login hook error:', gamifyError);
+        logger.error('Gamification login hook error:', gamifyError);
       }
     }
 
@@ -138,7 +124,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Login error:', error)
+    logger.error('Login error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

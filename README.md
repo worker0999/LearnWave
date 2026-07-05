@@ -196,7 +196,7 @@ RAG allows students to ask questions and receive AI answers compiled directly fr
 - **Mentor Dashboard**: Premium dark navy analytics layout styled after professional dashboard wireframes (gradient banner, stats metric distributions, github activity calendar, custom Recharts graphs, and glassmorphism detail matrices).
 - **Layout Modes**: Supports **Bottom Dock** navigation and classic **Side Sidebar** navigation. Toggleable under Settings.
 - **Glassmorphism**: Backdrop blur elements with semi-transparent card panels.
-- **Security Role Routing**: Next.js middleware guards are active to redirect unauthorized cross-role requests (e.g. students trying to access `/mentor` or `/admin`) back to the homepage login grid automatically.
+- **Security Role Routing**: Next.js proxy guards are active to redirect unauthorized cross-role requests (e.g. students trying to access `/mentor` or `/admin`) back to the homepage login grid automatically.
 
 ---
 

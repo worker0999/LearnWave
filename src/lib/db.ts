@@ -1,12 +1,14 @@
 import { PrismaClient } from '@prisma/client'
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: any
+  prisma: PrismaClient
 }
 
 function createPrismaClient() {
   try {
-    return new PrismaClient({ log: ['query'] })
+    return new PrismaClient({
+      log: process.env.NODE_ENV === 'development' ? ['query'] : ['error']
+    })
   } catch (err: any) {
     console.error('Prisma client initialization failed.')
     console.error('Make sure you ran `npx prisma generate` and that the generated client is present in node_modules/.prisma/client')
@@ -16,7 +18,7 @@ function createPrismaClient() {
   }
 }
 
-export const db: any = globalForPrisma.prisma ?? createPrismaClient()
+export const db = globalForPrisma.prisma ?? createPrismaClient()
 
 if (process.env.NODE_ENV !== 'production') {
   if (!globalForPrisma.prisma) {

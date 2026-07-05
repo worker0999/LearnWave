@@ -1,23 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import jwt from 'jsonwebtoken';
+import { verifyToken, getTokenFromRequest } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
   try {
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const token = getTokenFromRequest(req);
+    if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const token = authHeader.substring(7);
-    let userId: string;
-
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { userId: string };
-      userId = decoded.userId;
-    } catch (error) {
+    const decoded = await verifyToken(token);
+    if (!decoded) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
+    const userId = decoded.userId;
 
     // Fetch all avatars and the user's unlocked/equipped ones
     const [allAvatars, userAvatars] = await Promise.all([
@@ -25,7 +21,9 @@ export async function GET(req: NextRequest) {
       db.user_avatar.findMany({ where: { user_id: userId } })
     ]);
 
-    const unlockedMap = new Map(userAvatars.map(ua => [ua.avatar_id, ua]));
+    const unlockedMap = new Map<string, typeof userAvatars[number]>(
+      userAvatars.map(ua => [ua.avatar_id, ua])
+    );
 
     const avatars = allAvatars.map(av => {
       const userAv = unlockedMap.get(av.id);
@@ -45,20 +43,16 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const token = getTokenFromRequest(req);
+    if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const token = authHeader.substring(7);
-    let userId: string;
-
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { userId: string };
-      userId = decoded.userId;
-    } catch (error) {
+    const decoded = await verifyToken(token);
+    if (!decoded) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
+    const userId = decoded.userId;
 
     const { avatarId } = await req.json();
 

@@ -5,7 +5,7 @@ async function createTestUser() {
   try {
     // Create a test student
     const studentPassword = await hashPassword('student123')
-    const student = await db.user.upsert({
+    const student = await db.users.upsert({
       where: { email: 'student@learnwave.com' },
       update: {},
       create: {
@@ -19,7 +19,7 @@ async function createTestUser() {
     console.log('✅ Test student created:', student.email)
 
     // Create student profile
-    await db.userProfile.upsert({
+    await db.user_profiles.upsert({
       where: { user_id: student.id },
       update: {},
       create: {
@@ -34,7 +34,7 @@ async function createTestUser() {
 
     // Create a test admin
     const adminPassword = await hashPassword('admin123')
-    const admin = await db.user.upsert({
+    const admin = await db.users.upsert({
       where: { email: 'admin@learnwave.com' },
       update: {},
       create: {
@@ -47,7 +47,7 @@ async function createTestUser() {
     console.log('✅ Test admin created:', admin.email)
 
     // Create admin profile
-    await db.userProfile.upsert({
+    await db.user_profiles.upsert({
       where: { user_id: admin.id },
       update: {},
       create: {
@@ -59,7 +59,7 @@ async function createTestUser() {
 
     // Create a test mentor
     const mentorPassword = await hashPassword('mentor123')
-    const mentor = await db.user.upsert({
+    const mentor = await db.users.upsert({
       where: { email: 'mentor@learnwave.com' },
       update: {},
       create: {
@@ -72,7 +72,7 @@ async function createTestUser() {
     console.log('✅ Test mentor created:', mentor.email)
 
     // Create mentor profile
-    await db.userProfile.upsert({
+    await db.user_profiles.upsert({
       where: { user_id: mentor.id },
       update: {},
       create: {

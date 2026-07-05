@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { verifyToken } from '@/lib/auth'
+import { verifyToken, getTokenFromRequest } from '@/lib/auth'
 import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
 
 // ✅ GET /api/admin/resources
 export async function GET(request: NextRequest) {
   try {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '')
+    const token = getTokenFromRequest(request)
     if (!token)
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
 // ✅ POST /api/admin/resources
 export async function POST(request: NextRequest) {
   try {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '')
+    const token = getTokenFromRequest(request)
     if (!token)
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
 // ✅ DELETE /api/admin/resources
 export async function DELETE(request: NextRequest) {
   try {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '')
+    const token = getTokenFromRequest(request)
     if (!token)
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -221,7 +221,7 @@ export async function DELETE(request: NextRequest) {
 // Approve or reject resources
 export async function PATCH(request: NextRequest) {
   try {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '')
+    const token = getTokenFromRequest(request)
     if (!token)
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

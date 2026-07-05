@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyToken } from '@/lib/auth'
+import { verifyToken, getTokenFromRequest } from '@/lib/auth'
 import { processPDFForRAG } from '@/lib/pdf-processor'
-import { PrismaClient } from '@prisma/client'
+import { db as prisma } from '@/lib/db'
 import path from 'path'
-
-const prisma = new PrismaClient()
 
 /**
  * POST /api/resources/process

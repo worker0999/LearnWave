@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyToken } from '@/lib/auth'
+import { verifyToken, getTokenFromRequest } from '@/lib/auth'
 import { searchDocumentChunks, buildContextFromChunks } from '@/lib/pdf-processor'
 import { aiManager } from '@/lib/ai-config'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { db as prisma } from '@/lib/db'
 
 /**
  * POST /api/ai/rag-chat

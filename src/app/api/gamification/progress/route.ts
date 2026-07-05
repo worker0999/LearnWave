@@ -1,24 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import jwt from 'jsonwebtoken';
+import { verifyToken, getTokenFromRequest } from '@/lib/auth';
 import { xpForLevel } from '@/lib/xp-config';
 
 export async function GET(req: NextRequest) {
   try {
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const token = getTokenFromRequest(req);
+    if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const token = authHeader.substring(7);
-    let userId: string;
-
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { userId: string };
-      userId = decoded.userId;
-    } catch (error) {
+    const decoded = await verifyToken(token);
+    if (!decoded) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
+    const userId = decoded.userId;
 
     // Fetch all gamification data for the user
     const [progress, streak, achievementsCount, equippedAvatar, latestRank] = await Promise.all([
@@ -64,8 +60,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error('Gamification progress API error:', error);
     return NextResponse.json({ 
-      error: 'Failed to fetch gamification progress',
-      details: error instanceof Error ? error.message : 'Unknown error' 
+      error: 'Failed to fetch gamification progress'
     }, { status: 500 });
   }
 }

@@ -1,6 +1,6 @@
+import { getTokenFromRequest } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import jwt from 'jsonwebtoken';
 
 export async function GET(req: NextRequest) {
   try {

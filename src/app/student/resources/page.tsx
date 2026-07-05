@@ -10,8 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { PDFPreview } from '@/components/ui/pdf-preview'
-import { useRealtimeUpdates } from '@/hooks/useRealtimeUpdates'
-import { useRealtimeResources } from '@/hooks/useRealtimeResources'
+import { useResourceHub } from '@/hooks/useResourceHub'
 import { 
   BookOpen, 
   Download, 
@@ -169,128 +168,39 @@ const mockResources: Resource[] = [
 ]
 
 export default function ResourceHub() {
-  const [filteredResources, setFilteredResources] = useState<Resource[]>([])
-  const [allResources, setAllResources] = useState<Resource[]>(mockResources)
-  const [subjects, setSubjects] = useState<Subject[]>(mockSubjects)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedSemester, setSelectedSemester] = useState<string>('5')
-  const [selectedSubject, setSelectedSubject] = useState<string>('all')
-  const [selectedType, setSelectedType] = useState<string>('all')
-  const [selectedUnit, setSelectedUnit] = useState<string>('all')
-  const [sortBy, setSortBy] = useState<string>('latest')
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [previewResource, setPreviewResource] = useState<Resource | null>(null)
-  const [showNewResourceNotification, setShowNewResourceNotification] = useState(false)
-  const [newResourceTitle, setNewResourceTitle] = useState('')
-  const [downloading, setDownloading] = useState<string | null>(null)
-  const [downloadError, setDownloadError] = useState<string | null>(null)
-  const [apiLoaded, setApiLoaded] = useState(false)
-
-  // Memoized callbacks to prevent hook dependency issues
-  const onResourceAdded = useCallback((resource: any) => {
-    console.log('🎉 New resource added:', resource.title)
-    setNewResourceTitle(resource.title)
-    setShowNewResourceNotification(true)
-    
-    // Add to resources list
-    const newResource: Resource = {
-      id: resource.id,
-      title: resource.title,
-      description: resource.description,
-      type: resource.type,
-      subject: resource.subject,
-      semester: resource.semester,
-      unit: resource.unit,
-      author: resource.uploadedBy,
-      uploadDate: resource.created_at ? new Date(resource.created_at).toISOString().split('T')[0] : '2024-01-01',
-      downloads: 0,
-      rating: 0,
-      size: resource.fileSize ? `${(resource.fileSize / 1024 / 1024).toFixed(2)} MB` : undefined,
-      fileName: resource.fileName,
-      tags: [],
-      featured: false
-    }
-    
-    setAllResources(prev => [newResource, ...prev])
-    
-    // Hide notification after 5 seconds
-    setTimeout(() => setShowNewResourceNotification(false), 5000)
-  }, [])
-
-  const onResourceDeleted = useCallback((resourceId: string) => {
-    console.log('🗑️ Resource deleted:', resourceId)
-    setAllResources(prev => prev.filter(r => r.id !== resourceId))
-  }, [])
-
-  // Real-time updates for resources using WebSocket
-  const { isConnected } = useRealtimeResources({
-    enabled: true,
-    onResourceAdded,
-    onResourceDeleted
-  })
-
-  // Fallback: Real-time polling updates for resources
-  const { data: resources, loading, refresh } = useRealtimeUpdates<Resource[]>({
-    endpoint: '/api/student/resources',
-    interval: 15000, // 15 seconds
-    dependencies: [searchTerm, selectedSubject, selectedType, selectedSemester]
-  })
-
-  useEffect(() => {
-    // Merge WebSocket and polling data with mock data as fallback
-    if (resources && resources.length > 0) {
-      setAllResources(resources)
-      setApiLoaded(true)
-    } else if (!loading && !apiLoaded) {
-      // If API returns empty and not loading, use mock data
-      setAllResources(mockResources)
-      setApiLoaded(true)
-    }
-  }, [resources, loading, apiLoaded])
-
-  useEffect(() => {
-    // Subjects are already initialized with mockSubjects
-    // This ensures UI is ready immediately
-  }, [])
-
-  const filterResources = useCallback(() => {
-    if (!allResources) return
-    
-    let filtered = allResources.filter(resource => {
-      const matchesSearch = resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           resource.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           resource.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-      
-      const matchesSemester = selectedSemester === 'all' || resource.semester === parseInt(selectedSemester)
-      const matchesSubject = selectedSubject === 'all' || resource.subject === selectedSubject
-      const matchesType = selectedType === 'all' || resource.type === selectedType
-      const matchesUnit = selectedUnit === 'all' || resource.unit === selectedUnit
-
-      return matchesSearch && matchesSemester && matchesSubject && matchesType && matchesUnit
-    })
-
-    // Sort resources
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'latest':
-          return new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime()
-        case 'popular':
-          return b.downloads - a.downloads
-        case 'rating':
-          return b.rating - a.rating
-        case 'name':
-          return a.title.localeCompare(b.title)
-        default:
-          return 0
-      }
-    })
-
-    setFilteredResources(filtered)
-  }, [allResources, searchTerm, selectedSemester, selectedSubject, selectedType, selectedUnit, sortBy])
-
-  useEffect(() => {
-    filterResources()
-  }, [filterResources])
+  const {
+    filteredResources,
+    allResources,
+    subjects,
+    searchTerm,
+    setSearchTerm,
+    selectedSemester,
+    setSelectedSemester,
+    selectedSubject,
+    setSelectedSubject,
+    selectedType,
+    setSelectedType,
+    selectedUnit,
+    setSelectedUnit,
+    sortBy,
+    setSortBy,
+    viewMode,
+    setViewMode,
+    previewResource,
+    setPreviewResource,
+    showNewResourceNotification,
+    newResourceTitle,
+    downloading,
+    downloadError,
+    setDownloadError,
+    apiLoaded,
+    loading,
+    refresh,
+    isConnected,
+    handleDownload,
+    handlePreview,
+    closePreview
+  } = useResourceHub()
 
   const getResourceIcon = (type: string) => {
     switch (type) {
@@ -316,99 +226,6 @@ export default function ResourceHub() {
       default:
         return 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
     }
-  }
-
-  const handleDownload = async (resource: Resource) => {
-    try {
-      console.log('🔄 Starting download for:', resource.fileName || resource.title)
-      setDownloading(resource.id)
-      setDownloadError(null)
-      
-      // Get auth token
-      const token = localStorage.getItem('token')
-      if (!token) {
-        console.error('❌ No auth token found')
-        setDownloadError('Authentication required. Please log in again.')
-        setDownloading(null)
-        return
-      }
-
-      // Create download URL
-      const downloadUrl = `/api/uploads?id=${resource.id}`
-      
-      // Fetch with auth headers
-      const response = await fetch(downloadUrl, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      
-      console.log('📡 Response status:', response.status)
-      console.log('📋 Content-Type:', response.headers.get('content-type'))
-      
-      if (!response.ok) {
-        const errorData = await response.text()
-        console.error('❌ Download failed:', errorData)
-        setDownloadError(`Download failed: ${response.statusText}`)
-        setDownloading(null)
-        return
-      }
-      
-      // Get the blob
-      const blob = await response.blob()
-      console.log('📦 Blob size:', blob.size, 'type:', blob.type)
-      
-      if (blob.size === 0) {
-        setDownloadError('File is empty. Please try again or contact support.')
-        setDownloading(null)
-        return
-      }
-      
-      // Create download link
-      const url = window.URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = resource.fileName || resource.title || 'download'
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      
-      // Clean up the URL
-      window.URL.revokeObjectURL(url)
-      
-      console.log('✅ Download completed for:', resource.fileName)
-      setDownloading(null)
-      
-      // Update download count locally
-      setFilteredResources(prev => prev.map(r => 
-        r.id === resource.id ? { ...r, downloads: r.downloads + 1 } : r
-      ))
-      setAllResources(prev => prev.map(r => 
-        r.id === resource.id ? { ...r, downloads: r.downloads + 1 } : r
-      ))
-    } catch (error) {
-      console.error('❌ Download error:', error)
-      setDownloadError(`Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}`)
-      setDownloading(null)
-    }
-  }
-
-  const handlePreview = (resource: Resource) => {
-    if (resource.type === 'pdf') {
-      console.log('👁️ Opening PDF preview for:', resource.fileName || resource.title)
-      setPreviewResource(resource)
-    } else {
-      // For non-PDF files, open in new tab
-      console.log('🔗 Opening file in new tab:', resource.fileName || resource.title)
-      const token = localStorage.getItem('token')
-      if (token) {
-        window.open(`/api/uploads?id=${resource.id}&preview=true`, '_blank')
-      }
-    }
-  }
-
-  const closePreview = () => {
-    setPreviewResource(null)
   }
 
   const currentSubject = subjects.find(s => s.name === selectedSubject) || subjects[0]
@@ -571,7 +388,7 @@ export default function ResourceHub() {
             <div className="flex items-center space-x-2 text-cyan-200 mt-4">
               <Filter className="w-4 h-4" />
               <span className="text-sm">
-                {filteredResources.length} of {resources?.length || 0} resources
+                {filteredResources.length} of {allResources.length} resources
               </span>
             </div>
           </CardContent>

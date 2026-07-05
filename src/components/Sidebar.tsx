@@ -83,7 +83,7 @@ export function Sidebar({ onNavClick, currentPage }: SidebarProps) {
                   exit={{ opacity: 0 }}
                   className="flex items-center gap-3"
                 >
-                  <div className={`w-8 h-8 ${logoBg} rounded-xl flex items-center justify-center font-bold text-white text-sm`}>L</div>
+                  <img src="/logo.png" alt="LearnWave Logo" className="w-8 h-8 object-contain rounded-xl" />
                   <span className={`font-extrabold text-xl tracking-tight ${logoText}`}>LearnWave</span>
                 </motion.div>
               ) : (
@@ -92,9 +92,9 @@ export function Sidebar({ onNavClick, currentPage }: SidebarProps) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className={`w-10 h-10 ${logoBg} rounded-xl flex items-center justify-center font-extrabold text-white text-lg mx-auto`}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto overflow-hidden"
                 >
-                  L
+                  <img src="/logo.png" alt="LearnWave Logo" className="w-full h-full object-contain" />
                 </motion.div>
               )}
             </AnimatePresence>

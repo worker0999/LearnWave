@@ -1,24 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import { verifyToken, getTokenFromRequest } from '@/lib/auth';
 
 export async function PUT(req: NextRequest) {
     try {
-        const authHeader = req.headers.get('authorization');
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        const token = getTokenFromRequest(req);
+        if (!token) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const token = authHeader.substring(7);
-        let userId: string;
-
-        try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { userId: string };
-            userId = decoded.userId;
-        } catch (error) {
+        const decoded = await verifyToken(token);
+        if (!decoded) {
             return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
         }
+        const userId = decoded.userId;
 
         const { currentPassword, newPassword } = await req.json();
 
@@ -51,8 +47,7 @@ export async function PUT(req: NextRequest) {
     } catch (error) {
         console.error('Password change error:', error);
         return NextResponse.json({
-            error: 'Failed to change password',
-            details: error instanceof Error ? error.message : 'Unknown error'
+            error: 'Failed to change password'
         }, { status: 500 });
     }
 }

@@ -1,24 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { getTokenFromHeaders, verifyToken } from '@/lib/auth'
+import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
+import { logger } from '@/lib/logger'
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('📁 File download request received')
+    logger.debug('📁 File download request received')
 
-    const token = getTokenFromHeaders(request.headers)
+    const token = getTokenFromRequest(request)
 
     if (!token) {
-      console.log('❌ No token provided')
+      logger.debug('❌ No token provided')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const decoded = await verifyToken(token)
     if (!decoded || (decoded.role !== 'STUDENT' && decoded.role !== 'ADMIN')) {
-      console.log('❌ Invalid token or role')
+      logger.debug('❌ Invalid token or role')
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
@@ -27,11 +28,11 @@ export async function GET(request: NextRequest) {
     const preview = searchParams.get('preview') === 'true'
 
     if (!resourceId) {
-      console.log('❌ No resource ID provided')
+      logger.debug('❌ No resource ID provided')
       return NextResponse.json({ error: 'Resource ID is required' }, { status: 400 })
     }
 
-    console.log(`🔍 Looking for resource: ${resourceId}`)
+    logger.debug(`🔍 Looking for resource: ${resourceId}`)
 
     // Get resource from database
     const resource = await db.resources.findUnique({
@@ -53,17 +54,17 @@ export async function GET(request: NextRequest) {
     })
 
     if (!resource) {
-      console.log('❌ Resource not found')
+      logger.debug('❌ Resource not found')
       return NextResponse.json({ error: 'Resource not found' }, { status: 404 })
     }
 
     if (!resource.fileUrl) {
-      console.log('❌ No file URL for resource')
+      logger.debug('❌ No file URL for resource')
       return NextResponse.json({ error: 'File not available' }, { status: 404 })
     }
 
-    console.log(`📂 File path: ${resource.fileUrl}`)
-    console.log(`📄 File name: ${resource.fileName}`)
+    logger.debug(`📂 File path: ${resource.fileUrl}`)
+    logger.debug(`📄 File name: ${resource.fileName}`)
 
     // Increment download count (only for actual downloads, not previews)
     if (!preview) {
@@ -75,21 +76,21 @@ export async function GET(request: NextRequest) {
           }
         }
       })
-      console.log('📊 Download count incremented')
+      logger.debug('📊 Download count incremented')
     }
 
     // Read file from disk
     const filePath = join(process.cwd(), resource.fileUrl)
-    console.log(`🔍 Full file path: ${filePath}`)
+    logger.debug(`🔍 Full file path: ${filePath}`)
 
     if (!existsSync(filePath)) {
-      console.log('❌ File does not exist on disk')
+      logger.debug('❌ File does not exist on disk')
       return NextResponse.json({ error: 'File not found on disk' }, { status: 404 })
     }
 
     try {
       const fileBuffer = await readFile(filePath)
-      console.log(`✅ File read successfully, size: ${fileBuffer.length} bytes`)
+      logger.debug(`✅ File read successfully, size: ${fileBuffer.length} bytes`)
 
       // Determine content type based on file extension
       const fileExtension = resource.fileName?.split('.').pop()?.toLowerCase()
@@ -126,13 +127,13 @@ export async function GET(request: NextRequest) {
           break
       }
 
-      console.log(`📋 Content-Type: ${contentType}`)
+      logger.debug(`📋 Content-Type: ${contentType}`)
 
       const disposition = preview
         ? `inline; filename="${resource.fileName || 'preview'}"`
         : `attachment; filename="${resource.fileName || 'download'}"`
 
-      console.log(`📎 Content-Disposition: ${disposition}`)
+      logger.debug(`📎 Content-Disposition: ${disposition}`)
 
       // Create response with proper headers
       const response = new NextResponse(new Uint8Array(fileBuffer), {
@@ -148,16 +149,16 @@ export async function GET(request: NextRequest) {
         }
       })
 
-      console.log('✅ File response created successfully')
+      logger.debug('✅ File response created successfully')
       return response
 
     } catch (fileError) {
-      console.error('❌ File read error:', fileError)
+      logger.error('❌ File read error:', fileError)
       return NextResponse.json({ error: 'File not found on disk' }, { status: 404 })
     }
 
   } catch (error) {
-    console.error('❌ File serving error:', error)
+    logger.error('❌ File serving error:', error)
     return NextResponse.json({ error: 'Failed to serve file' }, { status: 500 })
   }
 }

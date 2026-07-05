@@ -23,7 +23,7 @@ export function BookSessionModal({ isOpen, onClose, mentor }: BookSessionModalPr
     const { toast } = useToast()
 
     const availableDates = useMemo(() => {
-        const dates = []
+        const dates: Date[] = []
         let current = new Date()
         while (dates.length < 14) {
             if (current.getDay() !== 0) {

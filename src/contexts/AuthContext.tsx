@@ -33,52 +33,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [token, setToken] = useState<string | null>(null)
 
-  useEffect(() => {
-    // Check for existing auth data on mount
-    const storedToken = localStorage.getItem('token')
-    const storedUser = localStorage.getItem('user')
+  // Clear legacy localStorage token synchronously to prevent child components from using it
+  if (typeof window !== 'undefined' && localStorage.getItem('token')) {
+    localStorage.removeItem('token')
+  }
 
-    if (storedToken && storedUser) {
+  useEffect(() => {
+    // Fetch current user from /api/auth/me on mount
+    async function loadUser() {
       try {
-        const parsedUser = JSON.parse(storedUser)
-        setToken(storedToken)
-        setUser(parsedUser)
+        const res = await fetch('/api/auth/me')
+        if (res.ok) {
+          const data = await res.json()
+          setToken(data.token)
+          setUser(data.user)
+        }
       } catch (error) {
-        console.error('Error parsing stored user data:', error)
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
+        console.error('Error fetching user on mount:', error)
       }
     }
+    loadUser()
   }, [])
 
   const login = (newToken: string, newUser: User) => {
     setToken(newToken)
     setUser(newUser)
-    localStorage.setItem('token', newToken)
-    localStorage.setItem('user', JSON.stringify(newUser))
-
-    // Set cookie for middleware (remove secure flag for localhost)
-    const isProduction = process.env.NODE_ENV === 'production'
-    document.cookie = `token=${newToken}; path=/; max-age=604800${isProduction ? '; secure' : ''}; samesite=strict`
   }
 
   const updateUser = (updatedFields: Partial<User>) => {
     setUser(prevUser => {
       if (!prevUser) return null
-      const updated = { ...prevUser, ...updatedFields }
-      localStorage.setItem('user', JSON.stringify(updated))
-      return updated
+      return { ...prevUser, ...updatedFields }
     })
   }
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
     setToken(null)
     setUser(null)
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-
-    // Remove cookie
-    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT'
 
     // Redirect to landing page
     window.location.href = '/'

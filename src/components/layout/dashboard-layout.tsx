@@ -91,11 +91,13 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
                         <AnimatePresence mode="wait">
                             {isSideExpanded ? (
                                 <motion.div key="logo" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-[#E76F51] rounded-lg flex items-center justify-center font-bold">L</div>
+                                    <img src="/logo.png" alt="LearnWave Logo" className="w-8 h-8 object-contain rounded-lg" />
                                     <span className="font-black text-xl tracking-tighter">LearnWave</span>
                                 </motion.div>
                             ) : (
-                                <motion.div key="logo-s" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-10 h-10 bg-[#E76F51] rounded-xl flex items-center justify-center font-black text-xl mx-auto">L</motion.div>
+                                <motion.div key="logo-s" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto overflow-hidden">
+                                    <img src="/logo.png" alt="LearnWave Logo" className="w-full h-full object-contain" />
+                                </motion.div>
                             )}
                         </AnimatePresence>
                     </div>

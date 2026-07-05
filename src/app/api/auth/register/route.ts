@@ -3,12 +3,22 @@ import { cookies } from 'next/headers'
 import { db } from '@/lib/db'
 import { hashPassword, generateToken } from '@/lib/auth'
 import { v4 as uuidv4 } from 'uuid'
+import { isRateLimited } from '@/lib/rate-limit'
 
 // User registration endpoint
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { email, password, name, role = 'STUDENT', usn, branch, semester, bio, expertise } = body
+
+    const ip = request.headers.get('x-forwarded-for') || '127.0.0.1'
+    const rateLimitKey = `rate-limit:register:${ip}:${email || ''}`
+    if (isRateLimited(rateLimitKey, 5, 60 * 1000)) {
+      return NextResponse.json(
+        { error: 'Too many registration attempts. Please try again in a minute.' },
+        { status: 429 }
+      )
+    }
 
     // Validate required fields
     if (!email || !password || !name) {
@@ -106,7 +116,7 @@ export async function POST(request: NextRequest) {
     // Set cookie
     const cookieStore = await cookies()
     cookieStore.set('token', token, {
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 60 * 60 * 24 * 7, // 7 days

@@ -1,7 +1,12 @@
 import bcrypt from 'bcryptjs'
 import { SignJWT, jwtVerify } from 'jose'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
+import { NextRequest } from 'next/server'
+
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is not defined')
+}
+const JWT_SECRET = process.env.JWT_SECRET
 const SECRET_KEY = new TextEncoder().encode(JWT_SECRET)
 
 export interface JWTPayload {
@@ -38,10 +43,13 @@ export async function verifyToken(token: string): Promise<JWTPayload | null> {
   }
 }
 
-export function getTokenFromHeaders(headers: Headers): string | null {
-  const authHeader = headers.get('authorization')
-  if (!authHeader?.startsWith('Bearer ')) {
-    return null
+export function getTokenFromRequest(request: NextRequest): string | null {
+  const authHeader = request.headers.get('authorization')
+  if (authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.substring(7)
+    if (token && token !== 'null' && token !== 'undefined') {
+      return token
+    }
   }
-  return authHeader.substring(7)
+  return request.cookies.get('token')?.value || null
 }

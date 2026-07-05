@@ -1,22 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import jwt from 'jsonwebtoken';
+import { verifyToken, getTokenFromRequest } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
     try {
-        // Try to get token from Authorization header first (custom auth)
-        const authHeader = req.headers.get('authorization');
         let userId: string | null = null;
         let email: string | null = null;
 
-        if (authHeader && authHeader.startsWith('Bearer ')) {
-            const token = authHeader.substring(7);
-            try {
-                const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { userId: string, email: string };
+        const token = getTokenFromRequest(req);
+        if (token) {
+            const decoded = await verifyToken(token);
+            if (decoded) {
                 userId = decoded.userId;
                 email = decoded.email;
-            } catch (error) {
-                // Token invalid, fallback to session or error
             }
         }
 

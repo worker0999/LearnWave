@@ -1,27 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import jwt from 'jsonwebtoken';
+import { verifyToken, getTokenFromRequest } from '@/lib/auth';
 import { mkdir, writeFile, readdir, unlink } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
 
 export async function POST(req: NextRequest) {
     try {
-        // Get token from Authorization header
-        const authHeader = req.headers.get('authorization');
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        const token = getTokenFromRequest(req);
+        if (!token) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const token = authHeader.substring(7);
-        let userId: string;
-
-        try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { userId: string };
-            userId = decoded.userId;
-        } catch (error) {
+        const decoded = await verifyToken(token);
+        if (!decoded) {
             return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
         }
+        const userId = decoded.userId;
 
         // Parse FormData
         const formData = await req.formData();
@@ -29,6 +24,11 @@ export async function POST(req: NextRequest) {
 
         if (!file) {
             return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+        }
+
+        // Enforce max file size check (2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            return NextResponse.json({ error: 'File size exceeds 2MB limit' }, { status: 400 });
         }
 
         // Validate image mimetype
@@ -89,28 +89,23 @@ export async function POST(req: NextRequest) {
     } catch (error) {
         console.error('Avatar upload error:', error);
         return NextResponse.json({
-            error: 'Failed to upload avatar',
-            details: error instanceof Error ? error.message : 'Unknown error'
+            error: 'Failed to upload avatar'
         }, { status: 500 });
     }
 }
 
 export async function DELETE(req: NextRequest) {
     try {
-        const authHeader = req.headers.get('authorization');
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        const token = getTokenFromRequest(req);
+        if (!token) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const token = authHeader.substring(7);
-        let userId: string;
-
-        try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { userId: string };
-            userId = decoded.userId;
-        } catch (error) {
+        const decoded = await verifyToken(token);
+        if (!decoded) {
             return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
         }
+        const userId = decoded.userId;
 
         // Remove old avatar files
         const avatarsDir = join(process.cwd(), 'public', 'uploads', 'avatars');
@@ -142,8 +137,7 @@ export async function DELETE(req: NextRequest) {
     } catch (error) {
         console.error('Avatar delete error:', error);
         return NextResponse.json({
-            error: 'Failed to delete avatar',
-            details: error instanceof Error ? error.message : 'Unknown error'
+            error: 'Failed to delete avatar'
         }, { status: 500 });
     }
 }

@@ -1,24 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import jwt from 'jsonwebtoken';
+import { verifyToken, getTokenFromRequest } from '@/lib/auth';
 
 export async function PUT(req: NextRequest) {
     try {
-        // Get token from Authorization header
-        const authHeader = req.headers.get('authorization');
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        const token = getTokenFromRequest(req);
+        if (!token) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const token = authHeader.substring(7);
-        let userId: string;
-
-        try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { userId: string };
-            userId = decoded.userId;
-        } catch (error) {
+        const decoded = await verifyToken(token);
+        if (!decoded) {
             return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
         }
+        const userId = decoded.userId;
 
         const { name, email, phone, avatarUrl } = await req.json();
 
@@ -68,8 +63,7 @@ export async function PUT(req: NextRequest) {
     } catch (error) {
         console.error('Profile update error:', error);
         return NextResponse.json({
-            error: 'Failed to update profile',
-            details: error instanceof Error ? error.message : 'Unknown error'
+            error: 'Failed to update profile'
         }, { status: 500 });
     }
 }

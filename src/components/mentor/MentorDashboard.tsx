@@ -35,9 +35,9 @@ export function MentorDashboard({ onNavigate }: MentorDashboardProps) {
 
   useEffect(() => {
     // Generate static mockup heatmap data
-    const cols = []
+    const cols: { level: number }[][] = []
     for (let col = 0; col < 26; col++) {
-      const days = []
+      const days: { level: number }[] = []
       for (let d = 0; d < 7; d++) {
         let level = 0
         const rand = Math.random()

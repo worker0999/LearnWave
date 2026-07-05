@@ -111,9 +111,7 @@ export default function MentorHome() {
           {/* Logo Area - Left */}
           <div className="flex items-center gap-2.5 w-auto md:w-64 shrink-0">
              {/* Icon matching the logo style */}
-             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#335765] to-[#74A8A4] flex items-center justify-center text-white shadow-sm">
-                <span className="font-extrabold text-sm tracking-widest">LW</span>
-             </div>
+             <img src="/logo.png" alt="LearnWave Logo" className="w-8 h-8 object-contain rounded-lg" />
              {/* Text-based logo */}
              <span className="hidden sm:inline text-2xl font-extrabold tracking-tight drop-shadow-sm text-[#335765]">
                 <span>Learn</span>

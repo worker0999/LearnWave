@@ -14,9 +14,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if session exists and belongs to the student
-    const session = await db.mentor_sessions.findFirst({
+    const session = await db.bookings.findFirst({
       where: {
-        id: sessionId
+        id: sessionId,
+        student_id: studentId
       }
     })
 
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update session status to CANCELLED
-    const updatedSession = await db.mentor_sessions.update({
+    const updatedSession = await db.bookings.update({
       where: { id: sessionId },
       data: { status: 'CANCELLED' },
       include: {

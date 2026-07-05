@@ -214,19 +214,17 @@ export default function QuizGenerator() {
       topic: quizConfig.topic
     }
 
-    // Award XP
     if (token) {
       try {
-        // Base XP for completion
-        const xpRes = await fetch('/api/gamification/xp', {
+        const xpRes = await fetch('/api/student/quiz/submit', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
-            action: 'QUIZ_COMPLETED',
-            metadata: { score: result.score, subject: result.subject }
+            score: result.score,
+            subject: result.subject
           })
         });
 
@@ -236,31 +234,6 @@ export default function QuizGenerator() {
             showXPToast(xpData.xpGained, 'QUIZ_COMPLETED');
             if (xpData.leveledUp) {
               showLevelUpToast(xpData.level);
-            }
-          }
-        }
-
-        // Bonus XP for high score
-        if (result.score >= 90) {
-          const bonusRes = await fetch('/api/gamification/xp', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-              action: 'QUIZ_SCORE_90',
-              metadata: { score: result.score }
-            })
-          });
-
-          if (bonusRes.ok) {
-            const bonusData = await bonusRes.json();
-            if (bonusData.success) {
-              showXPToast(bonusData.xpGained, 'QUIZ_SCORE_90');
-              if (bonusData.leveledUp) {
-                showLevelUpToast(bonusData.level);
-              }
             }
           }
         }

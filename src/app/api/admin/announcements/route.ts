@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { getTokenFromHeaders, verifyToken } from '@/lib/auth'
+import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 import { v4 as uuidv4 } from 'uuid'
 
 export async function GET(request: NextRequest) {
   try {
     // Verify admin authentication
-    const token = getTokenFromHeaders(request.headers)
+    const token = getTokenFromRequest(request)
     if (!token) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Verify admin authentication
-    const token = getTokenFromHeaders(request.headers)
+    const token = getTokenFromRequest(request)
     if (!token) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     // Verify admin authentication
-    const token = getTokenFromHeaders(request.headers)
+    const token = getTokenFromRequest(request)
     if (!token) {
       return NextResponse.json(
         { error: 'Unauthorized' },

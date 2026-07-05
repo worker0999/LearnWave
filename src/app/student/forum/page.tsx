@@ -281,15 +281,15 @@ export default function CommunityForum() {
     // Award XP
     if (token) {
       try {
-        const xpRes = await fetch('/api/gamification/xp', {
+        const xpRes = await fetch('/api/student/community/post', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
-            action: 'FORUM_POST',
-            metadata: { title: post.title, category: post.category }
+            title: post.title,
+            category: post.category
           })
         });
 

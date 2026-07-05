@@ -523,6 +523,7 @@ enum MissionType {
 enum ActionType {
   LOGIN
   QUIZ_COMPLETED
+  QUIZ_SCORE_90
   WATCH_VIDEO
   FORUM_POST
   ANSWER_ACCEPTED
