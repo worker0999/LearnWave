@@ -1,5 +1,6 @@
 import { db } from './db';
 import { XP_RULES, ActionType, calculateLevel } from './xp-config';
+import { LEVEL_REWARDS, currentTitleForLevel } from './level-rewards';
 
 /**
  * Awards XP to a user based on an action.
@@ -72,6 +73,8 @@ export async function awardXP(userId: string, action: ActionType, metadata?: any
       },
     });
     
+    await grantLevelRewards(userId, progress.level, newLevel);
+
     // Check for level-based achievement unlocks
     await checkAchievementUnlocks(userId, 'LEVEL', newLevel);
   }
@@ -86,6 +89,36 @@ export async function awardXP(userId: string, action: ActionType, metadata?: any
     level: newLevel,
     leveledUp,
   };
+}
+
+async function grantLevelRewards(userId: string, oldLevel: number, newLevel: number) {
+  const milestonesHit = LEVEL_REWARDS.filter(r => r.level > oldLevel && r.level <= newLevel);
+
+  for (const milestone of milestonesHit) {
+    if (milestone.frameKey) {
+      const cosmetic = await db.cosmetic_item.findUnique({ where: { key: milestone.frameKey } });
+      if (cosmetic) {
+        await db.user_cosmetic.upsert({
+          where: { user_id_cosmetic_id: { user_id: userId, cosmetic_id: cosmetic.id } },
+          create: { user_id: userId, cosmetic_id: cosmetic.id },
+          update: {},
+        });
+      }
+    }
+    await db.notification.create({
+      data: {
+        user_id: userId,
+        message: `Level ${milestone.level} unlocked: "${milestone.title}"${milestone.bonusMessage ? ` — ${milestone.bonusMessage}` : ''}`,
+        type: 'LEVEL_REWARD',
+      },
+    });
+  }
+
+  const newTitle = currentTitleForLevel(newLevel);
+  await db.user_profiles.update({ 
+    where: { user_id: userId }, 
+    data: { equipped_title: newTitle } 
+  });
 }
 
 /**

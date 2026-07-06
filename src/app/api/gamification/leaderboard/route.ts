@@ -6,11 +6,23 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const type = searchParams.get('type') || 'global'; // global, monthly, branch
     const branch = searchParams.get('branch');
+    const semesterStr = searchParams.get('semester');
+    const semester = semesterStr ? parseInt(semesterStr) : undefined;
 
     let leaderboard: any[] = [];
 
     if (type === 'global') {
+      const where: any = {};
+      if (semester) {
+        where.users = {
+          user_profiles: {
+            semester: semester
+          }
+        };
+      }
+
       const entries = await db.user_progress.findMany({
+        where,
         take: 10,
         orderBy: { xp: 'desc' },
         include: {
@@ -22,6 +34,7 @@ export async function GET(req: NextRequest) {
                   first_name: true,
                   last_name: true,
                   branch: true,
+                  semester: true,
                 }
               },
               user_avatars: {
@@ -40,16 +53,26 @@ export async function GET(req: NextRequest) {
         xp: e.xp,
         level: e.level,
         branch: e.users.user_profiles?.branch,
+        semester: e.users.user_profiles?.semester,
         avatar: e.users.user_avatars[0]?.avatars?.image_url || null,
       }));
 
     } else if (type === 'monthly') {
       const now = new Date();
+      const where: any = {
+        month: now.getMonth() + 1,
+        year: now.getFullYear()
+      };
+      if (semester) {
+        where.users = {
+          user_profiles: {
+            semester: semester
+          }
+        };
+      }
+
       const entries = await db.leaderboard_entry.findMany({
-        where: {
-          month: now.getMonth() + 1,
-          year: now.getFullYear()
-        },
+        where,
         take: 10,
         orderBy: { xp: 'desc' },
         include: {
@@ -61,6 +84,7 @@ export async function GET(req: NextRequest) {
                   first_name: true,
                   last_name: true,
                   branch: true,
+                  semester: true,
                 }
               },
               user_avatars: {
@@ -78,6 +102,7 @@ export async function GET(req: NextRequest) {
         name: e.users.user_profiles ? `${e.users.user_profiles.first_name} ${e.users.user_profiles.last_name}` : 'Anonymous',
         xp: e.xp,
         branch: e.users.user_profiles?.branch,
+        semester: e.users.user_profiles?.semester,
         avatar: e.users.user_avatars[0]?.avatars?.image_url || null,
       }));
 
@@ -86,7 +111,8 @@ export async function GET(req: NextRequest) {
         where: {
           users: {
             user_profiles: {
-              branch: branch
+              branch: branch,
+              ...(semester && { semester: semester })
             }
           }
         },
@@ -101,6 +127,7 @@ export async function GET(req: NextRequest) {
                   first_name: true,
                   last_name: true,
                   branch: true,
+                  semester: true,
                 }
               },
               user_avatars: {
@@ -119,6 +146,7 @@ export async function GET(req: NextRequest) {
         xp: e.xp,
         level: e.level,
         branch: e.users.user_profiles?.branch,
+        semester: e.users.user_profiles?.semester,
         avatar: e.users.user_avatars[0]?.avatars?.image_url || null,
       }));
     }

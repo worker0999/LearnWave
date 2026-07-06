@@ -104,6 +104,8 @@ export async function POST(request: NextRequest) {
       usn: user.usn,
       branch: user.user_profiles?.branch,
       semester: user.user_profiles?.semester,
+      university: user.user_profiles?.university,
+      college: user.user_profiles?.college,
       avatarUrl: user.user_profiles?.avatar_url || null
     }
 

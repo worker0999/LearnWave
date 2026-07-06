@@ -15,7 +15,7 @@ export async function PUT(req: NextRequest) {
         }
         const userId = decoded.userId;
 
-        const { name, email, phone, avatarUrl } = await req.json();
+        const { name, email, phone, avatarUrl, university, college } = await req.json();
 
         // Split name into first and last name
         const [firstName = '', ...lastNameParts] = name.split(' ');
@@ -33,12 +33,16 @@ export async function PUT(req: NextRequest) {
                             first_name: firstName,
                             last_name: lastName,
                             phone: phone || null,
+                            university: university || null,
+                            college: college || null,
                             ...(avatarUrl !== undefined && { avatar_url: avatarUrl }),
                         },
                         update: {
                             first_name: firstName,
                             last_name: lastName,
                             phone: phone || null,
+                            university: university || null,
+                            college: college || null,
                             ...(avatarUrl !== undefined && { avatar_url: avatarUrl }),
                         }
                     }
@@ -57,6 +61,8 @@ export async function PUT(req: NextRequest) {
                 phone: updatedUser.user_profiles?.phone,
                 usn: updatedUser.usn,
                 role: updatedUser.role,
+                university: updatedUser.user_profiles?.university || null,
+                college: updatedUser.user_profiles?.college || null,
                 avatarUrl: updatedUser.user_profiles?.avatar_url || null
             }
         });

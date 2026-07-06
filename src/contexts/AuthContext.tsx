@@ -12,6 +12,12 @@ interface User {
   branch?: string
   semester?: number
   avatarUrl?: string
+  university?: string
+  college?: string
+  xp?: number
+  level?: number
+  equippedTitle?: string
+  equippedFrame?: string | null
   mentorProfile?: {
     approved: boolean
     rating?: number

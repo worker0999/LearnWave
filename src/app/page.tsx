@@ -66,13 +66,15 @@ export default function Home() {
               Start Learning Free
             </button>
           </Link>
-          <button className="btn-secondary">
-            <svg className="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M10 8l6 4-6 4V8z" fill="currentColor" stroke="none"/>
-            </svg>
-            Watch Demo
-          </button>
+          <Link href="/resources">
+            <button className="btn-secondary">
+              <svg className="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+              </svg>
+              Browse Resources
+            </button>
+          </Link>
         </div>
 
         <div className="hero-stats">
@@ -242,22 +244,6 @@ export default function Home() {
             </ul>
           </div>
 
-          <div className="role-card role-admin">
-            <div className="role-accent admin-accent"></div>
-            <div className="role-badge rb-admin">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 1 0 4.93 19.07 10 10 0 0 0 19.07 4.93z"/></svg>
-              Admin
-            </div>
-            <div className="role-title">Run the platform</div>
-            <ul className="role-features">
-              <li className="admin-li">Real-time platform analytics</li>
-              <li className="admin-li">Full user management</li>
-              <li className="admin-li">Mentor approval workflow</li>
-              <li className="admin-li">Announcement broadcasting</li>
-              <li className="admin-li">Revenue tracking</li>
-              <li className="admin-li">Advanced insights & reports</li>
-            </ul>
-          </div>
         </div>
       </section>
 
@@ -265,11 +251,10 @@ export default function Home() {
       <div ref={ctaRef} className={`cta-banner reveal ${ctaVisible ? 'visible' : ''}`}>
         <div className="cta-banner-text">
           <div className="cta-banner-title">Ready to ride the wave?</div>
-          <div className="cta-banner-sub">Join 12,000+ learners already on LearnWave. Free to start.</div>
+          <div className="cta-banner-sub">Free to start.</div>
         </div>
         <div className="cta-banner-actions">
           <Link href="/auth/register"><button className="btn-dark">Create Free Account</button></Link>
-          <button className="btn-ghost-dark">Talk to Sales</button>
         </div>
       </div>
 
@@ -278,9 +263,7 @@ export default function Home() {
         <div className="footer-logo">LearnWave</div>
         <div className="footer-links">
           <Link href="#">Features</Link>
-          <Link href="#">Pricing</Link>
           <Link href="#">Docs</Link>
-          <Link href="#">Privacy</Link>
           <Link href="#">Contact</Link>
         </div>
         <div className="footer-copy">© 2025 LearnWave. All rights reserved.</div>

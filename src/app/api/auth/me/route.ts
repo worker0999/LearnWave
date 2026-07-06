@@ -18,7 +18,12 @@ export async function GET(request: NextRequest) {
     const user = await db.users.findUnique({
       where: { id: decoded.userId },
       include: {
-        user_profiles: true
+        user_profiles: true,
+        user_progress: true,
+        user_cosmetics: {
+          where: { equipped: true, cosmetics: { type: 'FRAME' } },
+          include: { cosmetics: true }
+        }
       }
     })
 
@@ -30,6 +35,8 @@ export async function GET(request: NextRequest) {
       ? `${user.user_profiles.first_name} ${user.user_profiles.last_name}`.trim()
       : 'User'
 
+    const equippedFrame = user.user_cosmetics?.[0]?.cosmetics?.key || null
+
     const responseUser = {
       id: user.id,
       email: user.email,
@@ -38,7 +45,13 @@ export async function GET(request: NextRequest) {
       usn: user.usn,
       branch: user.user_profiles?.branch,
       semester: user.user_profiles?.semester,
-      avatarUrl: user.user_profiles?.avatar_url || null
+      university: user.user_profiles?.university,
+      college: user.user_profiles?.college,
+      avatarUrl: user.user_profiles?.avatar_url || null,
+      xp: user.user_progress?.xp || 0,
+      level: user.user_progress?.level || 1,
+      equippedTitle: user.user_profiles?.equipped_title || 'Newcomer',
+      equippedFrame: equippedFrame
     }
 
     return NextResponse.json({

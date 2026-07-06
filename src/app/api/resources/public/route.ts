@@ -1,45 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { getTokenFromRequest, verifyToken } from '@/lib/auth'
+import { isRateLimited } from '@/lib/rate-limit'
 
 export async function GET(request: NextRequest) {
   try {
-    const token = getTokenFromRequest(request)
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const ip = request.headers.get('x-forwarded-for') || '127.0.0.1'
     
-    const decoded = await verifyToken(token)
-    if (!decoded) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    // Apply request rate-limit to avoid scraping the public API (60 reqs/min)
+    if (isRateLimited(`rate-limit:public-list:${ip}`, 60, 60 * 1000)) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    }
 
     const { searchParams } = new URL(request.url)
     const semester = searchParams.get('semester')
     const subject = searchParams.get('subject')
+    const branch = searchParams.get('branch')
     const moduleNum = searchParams.get('module_number')
     const type = searchParams.get('type')
     const search = searchParams.get('search')
-
-    const isLibrary = searchParams.get('is_library') === 'true'
+    const scheme = searchParams.get('scheme')
 
     const where: any = {
       is_approved: true,
-      is_library: isLibrary
+      is_public: true,
+      is_library: false // Only VTU syllabus resources are public
     }
 
-    if (!isLibrary) {
-      if (semester) where.semester = parseInt(semester)
-      if (subject) where.subject = subject
-      if (moduleNum) where.module_number = parseInt(moduleNum)
-    } else {
-      // For library books, allow optional subject/semester filters if supplied
-      if (semester) where.semester = parseInt(semester)
-      if (subject) where.subject = subject
-    }
-    
+    if (semester) where.semester = parseInt(semester)
+    if (subject) where.subject = subject
+    if (branch) where.branch = branch
+    if (scheme) where.scheme = scheme
+    if (moduleNum) where.module_number = parseInt(moduleNum)
     if (type) where.type = type
     
     if (search) {
       where.OR = [
         { title: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } }
+        { description: { contains: search, mode: 'insensitive' } },
+        { subject: { contains: search, mode: 'insensitive' } }
       ]
     }
 
@@ -71,13 +69,16 @@ export async function GET(request: NextRequest) {
       createdAt: r.created_at,
       moduleNumber: r.module_number,
       isModelPaper: r.is_model_paper,
-      upvotes: r.upvotes,
-      downvotes: r.downvotes
+      semester: r.semester,
+      subject: r.subject,
+      branch: r.branch,
+      unit: r.unit,
+      scheme: r.scheme
     }))
 
     return NextResponse.json({ success: true, resources: formatted })
   } catch (error) {
-    console.error('Fetch resources error:', error)
+    console.error('Fetch public resources error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

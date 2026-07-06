@@ -5,23 +5,11 @@ import { readFile } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
 import { logger } from '@/lib/logger'
+import { isRateLimited } from '@/lib/rate-limit'
 
 export async function GET(request: NextRequest) {
   try {
     logger.debug('📁 File download request received')
-
-    const token = getTokenFromRequest(request)
-
-    if (!token) {
-      logger.debug('❌ No token provided')
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const decoded = await verifyToken(token)
-    if (!decoded || (decoded.role !== 'STUDENT' && decoded.role !== 'ADMIN')) {
-      logger.debug('❌ Invalid token or role')
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
 
     const { searchParams } = new URL(request.url)
     const resourceId = searchParams.get('id')
@@ -56,6 +44,28 @@ export async function GET(request: NextRequest) {
     if (!resource) {
       logger.debug('❌ Resource not found')
       return NextResponse.json({ error: 'Resource not found' }, { status: 404 })
+    }
+
+    const token = getTokenFromRequest(request)
+
+    if (!token) {
+      if (resource.is_public && resource.is_approved) {
+        const ip = request.headers.get('x-forwarded-for') || '127.0.0.1'
+        if (isRateLimited(`rate-limit:public-download:${ip}`, 20, 60 * 60 * 1000)) {
+          logger.debug(`❌ Rate limit hit for public download: ${ip}`)
+          return NextResponse.json({ error: 'Download limit reached — sign up for unlimited access.' }, { status: 429 })
+        }
+        logger.debug(`🔓 Public resource download allowed: ${resourceId}`)
+      } else {
+        logger.debug('❌ No token provided')
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+    } else {
+      const decoded = await verifyToken(token)
+      if (!decoded || (decoded.role !== 'STUDENT' && decoded.role !== 'ADMIN' && decoded.role !== 'MENTOR')) {
+        logger.debug('❌ Invalid token or role')
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
     }
 
     if (!resource.fileUrl) {

@@ -7,21 +7,31 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
+import { useAuth } from '@/contexts/AuthContext'
 import { Trophy, Medal, Crown, TrendingUp, Users, MapPin } from 'lucide-react'
 
 export default function LeaderboardPage() {
+  const { user } = useAuth()
   const [leaderboard, setLeaderboard] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [type, setType] = useState('global')
+  const [selectedSemester, setSelectedSemester] = useState<string>('all')
 
   useEffect(() => {
     fetchLeaderboard()
-  }, [type])
+  }, [type, selectedSemester, user])
 
   const fetchLeaderboard = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/gamification/leaderboard?type=${type}`)
+      let url = `/api/gamification/leaderboard?type=${type}`
+      if (type === 'branch' && user?.branch) {
+        url += `&branch=${encodeURIComponent(user.branch)}`
+      }
+      if (selectedSemester !== 'all') {
+        url += `&semester=${selectedSemester}`
+      }
+      const response = await fetch(url)
       if (response.ok) {
         const data = await response.json()
         setLeaderboard(data.leaderboard)
@@ -50,7 +60,7 @@ export default function LeaderboardPage() {
           <p className="text-cyan-200">The top scholars of LearnWave community</p>
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
           <Tabs value={type} onValueChange={setType} className="w-full max-w-md">
             <TabsList className="grid grid-cols-3 bg-slate-900/50 border border-white/10">
               <TabsTrigger value="global" className="data-[state=active]:bg-cyan-500">Global</TabsTrigger>
@@ -58,6 +68,22 @@ export default function LeaderboardPage() {
               <TabsTrigger value="branch" className="data-[state=active]:bg-cyan-500">Branch</TabsTrigger>
             </TabsList>
           </Tabs>
+
+          <div className="flex items-center gap-2 bg-slate-900/50 border border-white/10 px-3 py-1.5 rounded-xl">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Semester:</span>
+            <select
+              value={selectedSemester}
+              onChange={(e) => setSelectedSemester(e.target.value)}
+              className="bg-transparent text-white text-sm font-bold focus:outline-none cursor-pointer"
+            >
+              <option value="all" className="bg-[#13131a]">All Semesters</option>
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
+                <option key={sem} value={sem.toString()} className="bg-[#13131a]">
+                  Semester {sem}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Top 3 Podium */}
@@ -127,7 +153,7 @@ export default function LeaderboardPage() {
               </CardTitle>
               <div className="text-sm text-slate-400 flex items-center gap-4">
                 <span className="flex items-center"><Users className="w-4 h-4 mr-1" /> {leaderboard.length} Scholars</span>
-                {type === 'branch' && <span className="flex items-center"><MapPin className="w-4 h-4 mr-1" /> Computer Science</span>}
+                {type === 'branch' && <span className="flex items-center"><MapPin className="w-4 h-4 mr-1" /> {user?.branch || 'General'}</span>}
               </div>
             </div>
           </CardHeader>

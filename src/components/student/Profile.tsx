@@ -1,6 +1,7 @@
 import React from 'react';
 import { User, MapPin, Mail, BookOpen, Award, GraduationCap, Monitor, Calendar, Edit3, Share2, Star } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { xpForLevel } from '@/lib/xp-config';
 
 export function Profile() {
     const { user } = useAuth();
@@ -10,6 +11,24 @@ export function Profile() {
     const initials = user.name
         ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
         : '??';
+
+    const getFrameStyle = (frameKey: string | null | undefined) => {
+        switch (frameKey) {
+            case 'bronze-frame': return 'border-[6px] border-[#CD7F32] shadow-[0_0_15px_rgba(205,127,50,0.3)]';
+            case 'silver-frame': return 'border-[6px] border-[#C0C0C0] shadow-[0_0_15px_rgba(192,192,192,0.3)]';
+            case 'gold-frame': return 'border-[6px] border-[#FFD700] shadow-[0_0_15px_rgba(255,215,0,0.4)]';
+            case 'platinum-frame': return 'border-[6px] border-[#A5B4FC] shadow-[0_0_15px_rgba(165,180,252,0.4)]';
+            case 'diamond-frame': return 'border-[6px] border-[#67E8F9] shadow-[0_0_15px_rgba(103,232,249,0.5)]';
+            case 'legendary-frame': return 'border-[6px] border-[#EF4444] ring-4 ring-[#F97316] animate-pulse shadow-[0_0_25px_rgba(239,68,68,0.6)]';
+            default: return 'border-4 border-[#E8EDF3]';
+        }
+    };
+
+    const currentLevelStartXP = xpForLevel(user.level || 1);
+    const nextLevelStartXP = xpForLevel((user.level || 1) + 1);
+    const progressPercent = nextLevelStartXP > 0 
+        ? Math.min(100, Math.max(0, Math.round(((user.xp || 0) / nextLevelStartXP) * 100))) 
+        : 100;
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -25,7 +44,7 @@ export function Profile() {
                 </div>
 
                 <div className="px-8 relative -mt-16 flex flex-col md:flex-row items-center md:items-end gap-6 text-center md:text-left">
-                    <div className="h-32 w-32 rounded-[32px] border-4 border-[#E8EDF3] bg-white shadow-2xl flex items-center justify-center text-[#1E1E1E] text-4xl font-black z-10 shrink-0 transform hover:scale-105 transition-transform duration-500 overflow-hidden">
+                    <div className={`h-32 w-32 rounded-[32px] bg-white shadow-2xl flex items-center justify-center text-[#1E1E1E] text-4xl font-black z-10 shrink-0 transform hover:scale-105 transition-all duration-500 overflow-hidden ${getFrameStyle(user.equippedFrame)}`}>
                         {user.avatarUrl ? (
                             <img src={user.avatarUrl} alt={user.name} className="h-full w-full object-cover" />
                         ) : (
@@ -34,10 +53,18 @@ export function Profile() {
                     </div>
 
                     <div className="flex-1 pb-2">
+                        {user.equippedTitle && (
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#0ea5e9] mb-1">
+                                🎖️ {user.equippedTitle}
+                            </p>
+                        )}
                         <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-1">
                             <h2 className="text-3xl font-extrabold text-[#1E1E1E] tracking-tight">{user.name || 'Student Name'}</h2>
-                            <div className="bg-[#D4E4C8] text-[#1E1E1E] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-                                Premium Student
+                            <div className="bg-[#1E1E1E] text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-1">
+                                ⚡ Level {user.level || 1}
+                            </div>
+                            <div className="bg-cyan-50 text-cyan-700 border border-cyan-200 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+                                ✨ {user.xp || 0} Total XP
                             </div>
                         </div>
                         <p className="text-[#8A919B] font-bold text-sm tracking-wide">
@@ -59,6 +86,39 @@ export function Profile() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left Column */}
                 <div className="space-y-8">
+                    {/* XP Progress Card */}
+                    <div className="bg-white rounded-[32px] p-8 border border-[#DDE3EA] shadow-sm space-y-4">
+                        <h3 className="text-xs font-black text-[#1E1E1E] uppercase tracking-[0.2em] flex items-center gap-2">
+                            🏆 Level & Experience
+                        </h3>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-2xl font-black text-[#1E1E1E]">Level {user.level || 1}</p>
+                                <p className="text-xs text-[#8A919B] font-semibold uppercase mt-0.5">Title: {user.equippedTitle || 'Newcomer'}</p>
+                            </div>
+                            <span className="text-sm font-black text-cyan-600 bg-cyan-50 px-3 py-1 rounded-full">{user.xp || 0} XP</span>
+                        </div>
+                        
+                        <div className="space-y-1">
+                            <div className="flex justify-between text-[10px] font-bold text-[#8A919B]">
+                                <span>Progress to next level</span>
+                                <span>{user.xp || 0}/{nextLevelStartXP} XP</span>
+                            </div>
+                            <div className="h-2 w-full bg-[#F4F6F8] rounded-full overflow-hidden">
+                                <div 
+                                    className="h-full bg-cyan-500 rounded-full transition-all duration-500" 
+                                    style={{ width: `${progressPercent}%` }}
+                                />
+                            </div>
+                        </div>
+                        <button 
+                            onClick={() => { window.location.search = '?page=level-path'; }}
+                            className="w-full text-center bg-[#F4F6F8] hover:bg-[#1E1E1E] hover:text-white transition-colors text-[10px] font-black uppercase tracking-wider py-2.5 rounded-xl border border-[#DDE3EA] mt-2 block"
+                        >
+                            View Reward Path
+                        </button>
+                    </div>
+
                     <div className="bg-white rounded-[32px] p-8 border border-[#DDE3EA] shadow-sm">
                         <h3 className="text-xs font-black text-[#1E1E1E] uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                             <Star size={14} className="text-[#E5F0A0] fill-[#E5F0A0]" /> Academic Performance

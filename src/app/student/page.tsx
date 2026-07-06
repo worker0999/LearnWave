@@ -19,6 +19,7 @@ const Mentors = dynamic(() => import('@/components/student/Mentors').then(mod =>
 const BookedSessions = dynamic(() => import('@/components/student/BookedSessions').then(mod => mod.BookedSessions))
 const Settings = dynamic(() => import('@/components/student/Settings').then(mod => mod.Settings))
 const Profile = dynamic(() => import('@/components/student/Profile').then(mod => mod.Profile))
+const LevelPath = dynamic(() => import('@/components/student/LevelPath').then(mod => mod.LevelPath))
 import { Search, User, LogOut, Settings as SettingsIcon, UserCircle, ChevronDown } from 'lucide-react'
 import { NotificationBell } from '@/components/student/NotificationBell'
 import { AnnouncementBanner } from '@/components/student/AnnouncementBanner'
@@ -86,6 +87,8 @@ export default function StudentHome() {
         return <Settings />
       case 'profile':
         return <Profile />
+      case 'level-path':
+        return <LevelPath />
       default:
         return (
           <div className="space-y-6">

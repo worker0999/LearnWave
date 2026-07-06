@@ -9,7 +9,7 @@ import { isRateLimited } from '@/lib/rate-limit'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { email, password, name, role = 'STUDENT', usn, branch, semester, bio, expertise } = body
+    const { email, password, name, role = 'STUDENT', usn, branch, semester, bio, expertise, university, college } = body
 
     const ip = request.headers.get('x-forwarded-for') || '127.0.0.1'
     const rateLimitKey = `rate-limit:register:${ip}:${email || ''}`
@@ -76,6 +76,8 @@ export async function POST(request: NextRequest) {
             last_name: lastName,
             branch,
             semester: semester ? parseInt(semester) : undefined,
+            university: role === 'STUDENT' ? university : undefined,
+            college: role === 'STUDENT' ? college : undefined,
             bio: role === 'MENTOR' ? bio : undefined,
             updated_at: new Date()
           }

@@ -230,16 +230,18 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     const body = await request.json()
-    const { resourceId, approved } = body
+    const { resourceId, approved, isPublic } = body
 
     if (!resourceId)
       return NextResponse.json({ error: 'Resource ID is required' }, { status: 400 })
 
+    const updateData: any = {}
+    if (approved !== undefined) updateData.is_approved = approved
+    if (isPublic !== undefined) updateData.is_public = isPublic
+
     const updated = await db.resources.update({
       where: { id: resourceId },
-      data: {
-        is_approved: approved !== undefined ? approved : true
-      }
+      data: updateData
     })
 
     return NextResponse.json({ success: true, resource: updated })

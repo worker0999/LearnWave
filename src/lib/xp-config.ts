@@ -18,7 +18,12 @@ export type ActionType = keyof typeof XP_RULES;
  * Level 4: 900 XP
  * Level 5: 1600 XP
  */
-export const calculateLevel = (xp: number) => Math.floor(Math.sqrt(xp / 100)) + 1;
+export const MAX_LEVEL = 50;
+
+export const calculateLevel = (xp: number) => {
+  const rawLevel = Math.floor(Math.sqrt(xp / 100)) + 1;
+  return Math.min(rawLevel, MAX_LEVEL);
+};
 
 /**
  * Returns the XP required for a specific level

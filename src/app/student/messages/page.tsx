@@ -149,7 +149,7 @@ export default function StudentMessagesPage() {
         {}
     )
 
-    const sideOffset = navType === 'side'
+    const sideOffset = (navType as string) === 'side'
         ? (isSideExpanded ? 'md:pl-[280px] pl-0 pb-[90px] md:pb-0' : 'md:pl-[88px] pl-0 pb-[90px] md:pb-0')
         : 'pb-[90px]'
 

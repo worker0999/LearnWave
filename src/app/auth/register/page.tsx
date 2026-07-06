@@ -21,6 +21,8 @@ export default function RegisterPage() {
     usn: '',
     branch: '',
     semester: '',
+    university: '',
+    college: '',
     bio: '',
     expertise: '',
     experience: '',
@@ -40,6 +42,81 @@ export default function RegisterPage() {
     'Mechanical Engineering',
     'Civil Engineering',
     'Chemical Engineering'
+  ]
+
+  const colleges = [
+    "ACHARYA INSTITUTE OF TECHNOLOGY",
+    "ACHARYA'S NRV SCHOOL OF ARCHITECTURE",
+    "ACHUTHA INSTITUTE OF TECHNOLOGY",
+    "ACS COLLEGE OF ENGINEERING",
+    "ADITYA ACADEMY OF ARCHITECTURE & DESIGN",
+    "ADITYA COLLEGE OF ENGINEERING AND TECHNOLOGY",
+    "AKASH INSTITUTE OF ENGINEERING & TECHNOLOGY",
+    "AKSHAYA INSTITUTE OF TECHNOLOGY",
+    "AMRUTA INSTITUTE OF ENGINEERING & MANAGEMENT SCIENCES",
+    "APS COLLEGE OF ENGINEERING",
+    "BANGALORE COLLEGE OF ENGINEERING AND TECHNOLOGY",
+    "BANGALORE TECHNOLOGICAL INSTITUTE",
+    "BGS COLLEGE OF ENGINEERING AND TECHNOLOGY (BGSCET)",
+    "BMS COLLEGE OF ARCHITECTURE, DESIGN AND PLANNING, BENGALURU",
+    "BMS SCHOOL OF ARCHITECTURE",
+    "BRINDAVAN COLLEGE OF ENGINEERING",
+    "C BYREGOWDA INSTITUTE OF TECHNOLOGY",
+    "CAMBRIDGE INSTITUTE OF TECHNOLOGY NORTH CAMPUS",
+    "CHANNABASAVESHWARA INSTITUTE OF TECHNOLOGY",
+    "CITY ENGINEERING COLLEGE",
+    "CMR INSTITUTE OF TECHNOLOGY",
+    "DAYANANDA SAGAR COLLEGE OF ARCHITECTURE",
+    "DR H N NATIONAL COLLEGE OF ENGINEERING",
+    "DR SRI SRI SRI SHIVAKUMARA MAHASWAMY COLLEGE OF ENGINEERING",
+    "DR. T . THIMMAIAH INSTITUTE OF TECHNOLOGY",
+    "EAST WEST COLLEGE OF ENGINEERING",
+    "EAST WEST SCHOOL OF ARCHITECTURE",
+    "GHOUSIA COLLEGE OF ENGINEERING",
+    "GHOUSIA INSTITUTE OF TECHNOLOGY FOR WOMEN",
+    "GOPALAN COLLEGE OF ENGINEERING AND MANGEMENT",
+    "GOPALAN SCHOOL OF ARCHITECTURE AND PLANNING",
+    "GOVERNMENT ENGINEERING COLLEGE, RAMANAGARA",
+    "GOVERNMENT SRI KRISHNARAJENDRA SILVER JUBILEE TECHNOLOGICAL INSTITUTE",
+    "GOVT. TOOL ROOM & TRAINING CENTRE",
+    "SRI SIDDHARTHA SCHOOL OF ENGINEERING (H M S INSTITUTE OF TECHNOLOGY)",
+    "HKBK COLLEGE OF ENGINEERING",
+    "H M S SCHOOL OF ARCHITECTURE",
+    "IMPACT COLLEGE OF ENGINEERING AND APPLIED SCIENCES",
+    "IMPACT SCHOOL OF ARCHITECTURE",
+    "JNANAVIKAS INSTITUTE OF TECHNOLOGY",
+    "JSS ACADEMY OF TECHNICAL EDUCATION, BANGALORE",
+    "JYOTHY INSTITUTE OF TECHNOLOGY",
+    "K N S INSTITUTE OF TECHNOLOGY",
+    "K S SCHOOL OF ARCHITECTURE",
+    "K S SCHOOL OF ENGINEERING AND MANAGEMENT",
+    "KALPATARU INSTITUTE OF TECHNOLOGY",
+    "M S ENGINEERING COLLEGE",
+    "NITTE SCHOOL OF ARCHITECTURE PLANNING & DESIGN",
+    "R V COLLEGE OF ARCHITECTURE",
+    "R.L. JALAPPA INSTITUTE OF TECHNOLOGY",
+    "RAJIV GANDHI INSTITUTE OF TECHNOLOGY",
+    "RNS SCHOOL OF ARCHITECTURE",
+    "RV INSTITUTE OF TECHNOLOGY AND MANAGEMENT",
+    "S. E. A. COLLEGE OF ENGINEERING & TECHNOLOGY",
+    "SAI VIDYA INSTITUTE OF TECHNOLOGY",
+    "SAMBHRAM INSTITUTE OF TECHNOLOGY",
+    "SAMPOORNA INSTITUTE OF TECHNOLOGY AND RESEARCH",
+    "SHA-SHIB COLLEGE OF ENGINEERING",
+    "SHRIDEVI INSTITUTE OF ENGINEERING AND TECHNOLOGY TUMAKURU",
+    "SIR M V SCHOOL OF ARCHITECTURE",
+    "SIR M. VISVESVARAYA INSTITUTE OF TECHNOLOGY",
+    "SJB SCHOOL OF ARCHITECTURE & PLANNING",
+    "SRI BASAVESHWARA INSTITUTE OF TECHNOLOGY",
+    "SRI KRISHNA INSTITUTE OF TECHNOLOGY",
+    "SRI REVANA SIDDESHWARA INSTITUTE OF TECHNOLOGY",
+    "SRI SAIRAM COLLEGE OF ENGINEERING",
+    "T. JOHN INSTITUTE OF TECHNOLOGY",
+    "THE OXFORD COLLEGE OF ENGINEERING",
+    "THE OXFORD SCHOOL OF ARCHITECTURE (TOSA)",
+    "VEMANA INSTITUTE OF TECHNOLOGY",
+    "VIJAYA VITTALA INSTITUTE OF TECHNOLOGY, BANGALORE",
+    "VIVEKANANDA INSTITUTE OF TECHNOLOGY"
   ]
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,7 +144,9 @@ export default function RegisterPage() {
           ...(formData.role === 'STUDENT' && {
             usn: formData.usn,
             branch: formData.branch,
-            semester: parseInt(formData.semester)
+            semester: parseInt(formData.semester),
+            university: formData.university,
+            college: formData.college
           }),
           ...(formData.role === 'MENTOR' && {
             bio: formData.bio,
@@ -238,59 +317,95 @@ export default function RegisterPage() {
 
             {/* Student Specific Fields */}
             {formData.role === 'STUDENT' && (
-              <div className="animate-in fade-in slide-in-from-top-4 duration-300">
-                <div className="space-y-2 mb-5">
-                  <Label htmlFor="usn" className="text-[#f4f1eb]/80 font-medium">
-                    VTU USN
+              <div className="animate-in fade-in slide-in-from-top-4 duration-300 space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="university" className="text-[#f4f1eb]/80 font-medium">
+                    University
                   </Label>
-                  <Input
-                    id="usn"
-                    type="text"
-                    placeholder="1XX21CS001"
-                    value={formData.usn}
-                    onChange={(e) => handleChange('usn', e.target.value)}
-                    className="h-14 border-white/10 focus:border-[#00d4c8] focus:ring-1 focus:ring-[#00d4c8] bg-[#0a0a0f] text-[#f4f1eb] placeholder:text-[#f4f1eb]/20 rounded-xl"
-                    required
-                  />
+                  <Select value={formData.university} onValueChange={(value) => handleChange('university', value)}>
+                    <SelectTrigger className="h-14 bg-[#0a0a0f] border-white/10 text-[#f4f1eb] focus:border-[#00d4c8] focus:ring-1 focus:ring-[#00d4c8] rounded-xl">
+                      <SelectValue placeholder="Select your university" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#13131a] border-white/10 text-[#f4f1eb]">
+                      <SelectItem value="VTU" className="focus:bg-white/5 focus:text-[#00d4c8]">Visvesvaraya Technological University (VTU)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="space-y-2">
-                    <Label htmlFor="branch" className="text-[#f4f1eb]/80 font-medium">
-                      Branch
-                    </Label>
-                    <Select value={formData.branch} onValueChange={(value) => handleChange('branch', value)}>
-                      <SelectTrigger className="h-14 bg-[#0a0a0f] border-white/10 text-[#f4f1eb] focus:border-[#00d4c8] focus:ring-1 focus:ring-[#00d4c8] rounded-xl">
-                        <SelectValue placeholder="Select your branch" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#13131a] border-white/10 text-[#f4f1eb]">
-                        {branches.map((branch) => (
-                          <SelectItem key={branch} value={branch} className="focus:bg-white/5 focus:text-[#00d4c8]">
-                            {branch}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                {formData.university === 'VTU' && (
+                  <div className="space-y-5 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="space-y-2">
+                      <Label htmlFor="college" className="text-[#f4f1eb]/80 font-medium">
+                        Affiliated College
+                      </Label>
+                      <Select value={formData.college} onValueChange={(value) => handleChange('college', value)}>
+                        <SelectTrigger className="h-14 bg-[#0a0a0f] border-white/10 text-[#f4f1eb] focus:border-[#00d4c8] focus:ring-1 focus:ring-[#00d4c8] rounded-xl">
+                          <SelectValue placeholder="Select your college" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#13131a] border-white/10 text-[#f4f1eb] max-h-60 overflow-y-auto">
+                          {colleges.map((college) => (
+                            <SelectItem key={college} value={college} className="focus:bg-white/5 focus:text-[#00d4c8]">
+                              {college}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="semester" className="text-[#f4f1eb]/80 font-medium">
-                      Semester
-                    </Label>
-                    <Select value={formData.semester} onValueChange={(value) => handleChange('semester', value)}>
-                      <SelectTrigger className="h-14 bg-[#0a0a0f] border-white/10 text-[#f4f1eb] focus:border-[#00d4c8] focus:ring-1 focus:ring-[#00d4c8] rounded-xl">
-                        <SelectValue placeholder="Select semester" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#13131a] border-white/10 text-[#f4f1eb]">
-                        {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
-                          <SelectItem key={sem} value={sem.toString()} className="focus:bg-white/5 focus:text-[#00d4c8]">
-                            Semester {sem}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="space-y-2">
+                      <Label htmlFor="usn" className="text-[#f4f1eb]/80 font-medium">
+                        VTU USN
+                      </Label>
+                      <Input
+                        id="usn"
+                        type="text"
+                        placeholder="1XX21CS001"
+                        value={formData.usn}
+                        onChange={(e) => handleChange('usn', e.target.value)}
+                        className="h-14 border-white/10 focus:border-[#00d4c8] focus:ring-1 focus:ring-[#00d4c8] bg-[#0a0a0f] text-[#f4f1eb] placeholder:text-[#f4f1eb]/20 rounded-xl"
+                        required
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div className="space-y-2">
+                        <Label htmlFor="branch" className="text-[#f4f1eb]/80 font-medium">
+                          Branch
+                        </Label>
+                        <Select value={formData.branch} onValueChange={(value) => handleChange('branch', value)}>
+                          <SelectTrigger className="h-14 bg-[#0a0a0f] border-white/10 text-[#f4f1eb] focus:border-[#00d4c8] focus:ring-1 focus:ring-[#00d4c8] rounded-xl">
+                            <SelectValue placeholder="Select your branch" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#13131a] border-white/10 text-[#f4f1eb]">
+                            {branches.map((branch) => (
+                              <SelectItem key={branch} value={branch} className="focus:bg-white/5 focus:text-[#00d4c8]">
+                                {branch}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="semester" className="text-[#f4f1eb]/80 font-medium">
+                          Semester
+                        </Label>
+                        <Select value={formData.semester} onValueChange={(value) => handleChange('semester', value)}>
+                          <SelectTrigger className="h-14 bg-[#0a0a0f] border-white/10 text-[#f4f1eb] focus:border-[#00d4c8] focus:ring-1 focus:ring-[#00d4c8] rounded-xl">
+                            <SelectValue placeholder="Select semester" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#13131a] border-white/10 text-[#f4f1eb]">
+                            {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
+                              <SelectItem key={sem} value={sem.toString()} className="focus:bg-white/5 focus:text-[#00d4c8]">
+                                Semester {sem}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 

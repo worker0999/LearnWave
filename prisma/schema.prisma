@@ -177,9 +177,12 @@ model user_profiles {
   branch        String?
   year          Int?
   semester      Int?
+  university    String?
+  college       String?
   avatar_url    String?
   bio           String?
   voice_enabled Boolean  @default(true)
+  equipped_title String?
   created_at    DateTime @default(now())
   updated_at    DateTime @default(now())
   users         users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
@@ -199,6 +202,7 @@ model users {
   ai_chat_history   ai_chat_history[]
   bookings          bookings[]
   chat_messages     chat_messages[]
+  community_posts   community_posts[]
   mentors           mentors?
   notes             notes[]
   payments          payments[]
@@ -212,6 +216,7 @@ model users {
   user_streak       user_streak?
   user_achievements user_achievement[]
   user_avatars      user_avatar[]
+  user_cosmetics    user_cosmetic[]
   user_missions     user_mission[]
   user_rewards      user_reward[]
   user_activities   user_activity_log[]
@@ -264,10 +269,13 @@ model resources {
   processed       Boolean           @default(false)
   branch          String?
   downloadCount   Int               @default(0)
+  upvotes         Int               @default(0)
+  downvotes       Int               @default(0)
   is_model_paper  Boolean           @default(false)
   module_number   Int?
   scheme          String?
   is_approved     Boolean           @default(false)
+  is_public       Boolean           @default(false)
   is_library      Boolean           @default(false)
   document_chunks document_chunks[]
   users           users             @relation(fields: [uploaded_by], references: [id], onDelete: Cascade)
@@ -538,4 +546,68 @@ enum RewardType {
   DISCOUNT
   PREMIUM_THEME
   SESSION_MINUTES
+}
+
+model community_posts {
+  id         String   @id @default(cuid())
+  content    String
+  author_id  String
+  role       String   @default("STUDENT")
+  avatar     String?
+  likes      Int      @default(0)
+  comments   Int      @default(0)
+  created_at DateTime @default(now())
+  tags       String[] @default([])
+  users      users    @relation(fields: [author_id], references: [id], onDelete: Cascade)
+}
+
+model study_groups {
+  id          String   @id @default(cuid())
+  subject     String
+  semester    Int
+  members     Int      @default(1)
+  description String
+  created_at  DateTime @default(now())
+}
+
+model community_events {
+  id         String   @id @default(cuid())
+  title      String
+  type       String
+  college    String
+  rsvps      Int      @default(0)
+  date       String
+  created_at DateTime @default(now())
+}
+
+enum CosmeticType {
+  FRAME
+  TITLE_CARD
+  BADGE
+  CHAT_FLAIR
+}
+
+model cosmetic_item {
+  id             String            @id @default(cuid())
+  type           CosmeticType
+  key            String            @unique
+  name           String
+  image_url      String?
+  rarity         Rarity            @default(COMMON)
+  unlock_type    AvatarUnlockType  @default(LEVEL)
+  unlock_value   Int
+  created_at     DateTime          @default(now())
+  user_cosmetics user_cosmetic[]
+}
+
+model user_cosmetic {
+  id          String        @id @default(cuid())
+  user_id     String
+  cosmetic_id String
+  unlocked_at DateTime      @default(now())
+  equipped    Boolean       @default(false)
+  users       users         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  cosmetics   cosmetic_item @relation(fields: [cosmetic_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, cosmetic_id])
 }

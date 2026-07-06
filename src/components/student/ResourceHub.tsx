@@ -109,6 +109,35 @@ export function ResourceHub() {
         }
     };
 
+    const handleVote = async (resourceId: string, voteType: 'upvote' | 'downvote') => {
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/resources/rate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ resourceId, voteType })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                setResources(prev => prev.map(r => {
+                    if (r.id === resourceId) {
+                        return { ...r, upvotes: data.upvotes, downvotes: data.downvotes };
+                    }
+                    return r;
+                }));
+            } else {
+                const err = await res.json();
+                alert(err.error || 'Failed to register vote.');
+            }
+        } catch (error) {
+            console.error('Failed to vote:', error);
+        }
+    };
+
     // View: Onboarding / Preferences Setup
     if (!preferencesSet) {
         return (
@@ -292,6 +321,25 @@ export function ResourceHub() {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2 shrink-0 sm:ml-4 w-full sm:w-auto">
+                                                    <div className="flex items-center gap-1 bg-[#F4F6F8] border border-[#DDE3EA] rounded-xl px-2 py-1 shrink-0">
+                                                        <button
+                                                            onClick={() => handleVote(resource.id, 'upvote')}
+                                                            className="hover:text-green-600 text-slate-400 p-1 transition-colors text-xs"
+                                                            title="Helpful note"
+                                                        >
+                                                            👍
+                                                        </button>
+                                                        <span className="text-xs font-black text-[#1E1E1E] min-w-[16px] text-center">
+                                                            {(resource.upvotes || 0) - (resource.downvotes || 0)}
+                                                        </span>
+                                                        <button
+                                                            onClick={() => handleVote(resource.id, 'downvote')}
+                                                            className="hover:text-red-600 text-slate-400 p-1 transition-colors text-xs"
+                                                            title="Not helpful"
+                                                        >
+                                                            👎
+                                                        </button>
+                                                    </div>
                                                     <button
                                                         onClick={() => {
                                                             setPreviewUrl(getCorrectFileUrl(resource.fileUrl))
