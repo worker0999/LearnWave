@@ -119,12 +119,7 @@ export default function RegisterPage() {
         <div className="relative z-10 max-w-lg w-full">
           {/* Logo */}
           <Link href="/" className="inline-flex items-center gap-3 mb-16 hover:opacity-80 transition-opacity">
-            <div className="w-12 h-12 bg-[#00d4c8] rounded-xl flex items-center justify-center">
-               <svg width="24" height="24" viewBox="0 0 20 20" fill="none">
-                 <path d="M10 2L3 7v6l7 5 7-5V7L10 2z" fill="#0a0a0f"/>
-                 <path d="M10 7v8M3 7l7 4 7-4" stroke="#0a0a0f" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-               </svg>
-            </div>
+            <img src="/logo.png" alt="LearnWave Logo" className="w-12 h-12 object-contain rounded-xl" />
             <span className="text-3xl font-bold text-[#f4f1eb] tracking-tight font-['Outfit']">
               LearnWave
             </span>
@@ -172,12 +167,7 @@ export default function RegisterPage() {
           {/* Mobile Logo */}
           <div className="lg:hidden mb-8 text-center">
             <Link href="/" className="inline-flex items-center justify-center space-x-3 mb-2">
-              <div className="w-10 h-10 bg-[#00d4c8] rounded-xl flex items-center justify-center">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M10 2L3 7v6l7 5 7-5V7L10 2z" fill="#0a0a0f"/>
-                  <path d="M10 7v8M3 7l7 4 7-4" stroke="#0a0a0f" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-                </svg>
-              </div>
+              <img src="/logo.png" alt="LearnWave Logo" className="w-10 h-10 object-contain rounded-xl" />
               <span className="text-2xl font-bold text-[#f4f1eb]">
                 LearnWave
               </span>

@@ -9,11 +9,14 @@ interface SidebarProps {
   expanded?: boolean;
   onToggle?: () => void;
   currentPage: string;
+  forceBottomNav?: boolean;
 }
 
-export function Sidebar({ onNavClick, currentPage }: SidebarProps) {
-  const { navType, isSideExpanded, setIsSideExpanded } = useUI();
+export function Sidebar({ onNavClick, currentPage, forceBottomNav }: SidebarProps) {
+  const { navType: globalNavType, isSideExpanded, setIsSideExpanded } = useUI();
   const { user, logout } = useAuth();
+  
+  const navType = forceBottomNav ? 'bottom' : globalNavType;
   
   const isMentor = user?.role === 'MENTOR';
   const isAdmin = user?.role === 'ADMIN';

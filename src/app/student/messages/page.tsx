@@ -29,7 +29,8 @@ interface Chat {
 
 export default function StudentMessagesPage() {
     const { user, isAuthenticated, logout } = useAuth()
-    const { navType, isSideExpanded } = useUI()
+    const { navType: globalNavType, isSideExpanded } = useUI()
+    const navType = 'bottom' // Force bottom navigation for messages page to match requested layout
     const { toast } = useToast()
     const router = useRouter()
 
@@ -158,6 +159,7 @@ export default function StudentMessagesPage() {
                 expanded={expanded}
                 onToggle={() => setExpanded(!expanded)}
                 currentPage="messages"
+                forceBottomNav={true}
                 onNavClick={(page) => {
                     if (page !== 'messages') router.push(`/student?page=${page}`)
                 }}
@@ -167,18 +169,27 @@ export default function StudentMessagesPage() {
 
                 {/* Header */}
                 <header className="h-16 px-6 lg:px-8 flex items-center justify-between sticky top-0 z-40 bg-[#E8EDF3]/80 backdrop-blur-md shrink-0">
-                    <div className="flex items-center gap-2">
-                        <MessageCircle size={20} className="text-[#8A919B]" />
-                        <h1 className="text-lg font-extrabold text-[#1E1E1E] tracking-tight">Messages</h1>
+                    {/* Logo Area - Left */}
+                    <div className="flex items-center gap-2.5 w-auto md:w-64 shrink-0">
+                        {/* Icon matching the logo style */}
+                        <img src="/logo.png" alt="LearnWave Logo" className="w-8 h-8 object-contain rounded-lg" />
+                        {/* Text-based logo */}
+                        <span className="hidden sm:inline text-2xl font-extrabold tracking-tight drop-shadow-sm">
+                            <span className="text-[#25559C]">Learn</span>
+                            <span className="text-[#7DBA45]">Wave</span>
+                        </span>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <input
-                            placeholder="Search messages..."
-                            className="w-48 pl-3 pr-3 py-1.5 bg-[#F4F6F8] border border-[#DDE3EA] rounded-xl text-sm text-[#1E1E1E] placeholder-[#B0B7BF] focus:border-[#1E1E1E] outline-none"
-                        />
-                        <button className="p-2 bg-[#E5F0A0] rounded-xl hover:bg-[#D4E4C8] transition-colors" title="New Chat">
-                            <Plus size={18} className="text-[#1E1E1E]" />
-                        </button>
+
+                    {/* Search Area - Center */}
+                    <div className="hidden md:flex items-center justify-center flex-1 px-8 max-w-2xl">
+                        <div className="relative w-full">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8A919B]" />
+                            <input
+                                type="text"
+                                placeholder="Search messages..."
+                                className="w-full pl-10 pr-4 py-2.5 rounded-full bg-white border border-[#DDE3EA] focus:border-[#1E1E1E] focus:ring-1 focus:ring-[#1E1E1E]/10 text-[#1E1E1E] placeholder-[#B0B7BF] outline-none transition-all text-sm shadow-sm"
+                            />
+                        </div>
                     </div>
                     <div className="flex items-center gap-3">
                         <button className="p-2 text-[#8A919B] hover:text-[#1E1E1E] hover:bg-white rounded-xl transition-all relative">
@@ -194,8 +205,12 @@ export default function StudentMessagesPage() {
                                 onClick={() => setShowUserMenu(!showUserMenu)}
                                 className="flex items-center gap-1.5 hover:bg-white p-1.5 rounded-xl transition-colors"
                             >
-                                <div className="w-9 h-9 rounded-2xl bg-[#D4E4C8] flex items-center justify-center text-[#1E1E1E]">
-                                    <User size={16} />
+                                <div className="w-9 h-9 rounded-2xl bg-[#D4E4C8] flex items-center justify-center text-[#1E1E1E] overflow-hidden">
+                                    {user.avatarUrl ? (
+                                        <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <User size={16} />
+                                    )}
                                 </div>
                                 <ChevronDown size={14} className="text-[#8A919B]" />
                             </button>
@@ -289,6 +304,12 @@ export default function StudentMessagesPage() {
                                     </button>
                                 ))}
                             </div>
+                            <div className="p-3 border-t border-[#DDE3EA] shrink-0">
+                                <button className="w-full py-2.5 px-4 bg-white border border-[#DDE3EA] text-[#4f46e5] hover:bg-gray-50 rounded-xl flex items-center justify-center gap-2 font-bold text-xs transition-all shadow-sm">
+                                    <Plus size={14} className="rounded-full border border-[#4f46e5] p-[1px] stroke-[3]" />
+                                    <span>Start a new chat</span>
+                                </button>
+                            </div>
                         </div>
 
                         {/* Chat Area */}
@@ -360,7 +381,7 @@ export default function StudentMessagesPage() {
                                                                         <div className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'} max-w-[72%]`}>
                                                                             <div className={`group relative px-4 py-3 rounded-2xl text-sm shadow-sm transition-all ${
                                                                                 isOwn
-                                                                                    ? 'bg-[#1E1E1E] text-white rounded-tr-sm hover:bg-[#333]'
+                                                                                    ? 'bg-[#4f46e5] text-white rounded-tr-sm hover:bg-[#4338ca]'
                                                                                     : 'bg-white border border-[#DDE3EA] text-[#1E1E1E] rounded-tl-sm hover:border-[#B0B7BF]'
                                                                             }`}>
                                                                                 {message.content}
@@ -379,8 +400,8 @@ export default function StudentMessagesPage() {
                                                         </div>
                                                     </div>
                                                 ))}
-                                                <div ref={scrollRef} />
-                                            </div>
+                                                 <div ref={scrollRef} />
+                                             </div>
 
                                             {/* Input Bar */}
                                             <div className="px-5 py-4 border-t border-[#DDE3EA] shrink-0">
@@ -401,9 +422,9 @@ export default function StudentMessagesPage() {
                                                     <button
                                                         type="submit"
                                                         disabled={!newMessage.trim()}
-                                                        className="bg-[#1E1E1E] hover:bg-[#333] text-white rounded-2xl h-11 w-11 flex items-center justify-center shrink-0 transition-all disabled:opacity-30"
+                                                        className="bg-[#4f46e5] hover:bg-[#4338ca] text-white rounded-full h-11 w-11 flex items-center justify-center shrink-0 transition-all disabled:opacity-30"
                                                     >
-                                                        <Send size={20} />
+                                                        <Send size={20} className="rotate-45 -translate-x-[2px] translate-y-[1px]" />
                                                     </button>
                                                 </form>
                                             </div>
@@ -413,22 +434,25 @@ export default function StudentMessagesPage() {
                                         {showInfoPanel && (
                                             <div className="bg-white overflow-hidden hidden md:flex flex-col shrink-0 w-[280px]">
                                                 <div className="p-6 flex flex-col items-center text-center border-b border-[#DDE3EA]">
-                                                    <Avatar className="h-20 w-20 mb-4 border-2 border-[#E5F0A0] p-1">
+                                                    <Avatar className="h-20 w-20 mb-4 border-2 border-green-500 p-1">
                                                         <AvatarImage src={selectedChatData.user.avatar} className="rounded-full" />
                                                         <AvatarFallback className="bg-[#D4E4C8] text-[#1E1E1E] font-bold text-xl">
                                                             {selectedChatData.user.name[0]}
                                                         </AvatarFallback>
                                                     </Avatar>
-                                                    <h3 className="font-extrabold text-[#1E1E1E] text-lg">{selectedChatData.user.name}</h3>
-                                                    <p className="text-xs font-bold text-[#6BBF8A] uppercase tracking-wider mb-2">Verified Mentor</p>
-                                                    <div className="flex gap-2">
-                                                        <button className="p-2 bg-[#F4F6F8] rounded-xl hover:bg-[#E5F0A0] transition-colors border border-[#DDE3EA]">
+                                                    <h3 className="font-extrabold text-[#1E1E1E] text-lg mb-1">{selectedChatData.user.name}</h3>
+                                                    <div className="flex items-center gap-1 bg-green-50 text-green-600 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider mb-4 border border-green-200">
+                                                        <span>Verified Mentor</span>
+                                                        <span className="text-[10px] font-bold">✓</span>
+                                                    </div>
+                                                    <div className="flex gap-3">
+                                                        <button className="p-2.5 bg-white rounded-full hover:bg-gray-50 transition-colors border border-[#DDE3EA] text-[#8A919B]">
                                                             <User size={16} />
                                                         </button>
-                                                        <button className="p-2 bg-[#F4F6F8] rounded-xl hover:bg-[#E5F0A0] transition-colors border border-[#DDE3EA]">
+                                                        <button className="p-2.5 bg-white rounded-full hover:bg-gray-50 transition-colors border border-[#DDE3EA] text-[#8A919B]">
                                                             <Bell size={16} />
                                                         </button>
-                                                        <button className="p-2 bg-[#F4F6F8] rounded-xl hover:bg-[#E5F0A0] transition-colors border border-[#DDE3EA]">
+                                                        <button className="p-2.5 bg-white rounded-full hover:bg-gray-50 transition-colors border border-[#DDE3EA] text-[#8A919B]">
                                                             <Shield size={16} />
                                                         </button>
                                                     </div>
@@ -452,7 +476,7 @@ export default function StudentMessagesPage() {
                                                         </div>
                                                         <div className="flex items-center gap-3 text-[#1E1E1E]">
                                                             <ExternalLink size={14} className="text-[#8A919B]" />
-                                                            <a href="#" className="text-xs font-bold text-[#1E1E1E] underline decoration-[#E5F0A0] decoration-2">portfolio.design</a>
+                                                            <a href="#" className="text-xs font-semibold text-[#4f46e5] hover:underline">portfolio.design</a>
                                                         </div>
                                                     </div>
                                                     <div>
