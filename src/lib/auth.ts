@@ -3,11 +3,13 @@ import { SignJWT, jwtVerify } from 'jose'
 
 import { NextRequest } from 'next/server'
 
-if (!process.env.JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is not defined')
+function getSecretKey(): Uint8Array {
+  const secret = process.env.JWT_SECRET
+  if (!secret) {
+    throw new Error('JWT_SECRET environment variable is not defined')
+  }
+  return new TextEncoder().encode(secret)
 }
-const JWT_SECRET = process.env.JWT_SECRET
-const SECRET_KEY = new TextEncoder().encode(JWT_SECRET)
 
 export interface JWTPayload {
   userId: string
@@ -30,12 +32,12 @@ export async function generateToken(payload: JWTPayload): Promise<string> {
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
-    .sign(SECRET_KEY)
+    .sign(getSecretKey())
 }
 
 export async function verifyToken(token: string): Promise<JWTPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, SECRET_KEY)
+    const { payload } = await jwtVerify(token, getSecretKey())
     return payload as unknown as JWTPayload
   } catch (error) {
     console.error('Verify Token Error:', error)

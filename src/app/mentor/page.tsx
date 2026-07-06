@@ -7,8 +7,8 @@ import { Sidebar } from '@/components/Sidebar'
 import { useAuth } from '@/contexts/AuthContext'
 import { useUI } from '@/contexts/UIContext'
 import { Search, User, LogOut, Settings as SettingsIcon, UserCircle, ChevronDown } from 'lucide-react'
-import { NotificationBell } from '@/components/NotificationBell'
-import { AnnouncementBanner } from '@/components/AnnouncementBanner'
+import { NotificationBell } from '@/components/student/NotificationBell'
+import { AnnouncementBanner } from '@/components/student/AnnouncementBanner'
 
 // Dynamic imports for components
 const MentorDashboard = dynamic(() => import('@/components/mentor/MentorDashboard').then(mod => mod.MentorDashboard))

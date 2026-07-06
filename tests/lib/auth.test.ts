@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { hashPassword, verifyPassword, generateToken, verifyToken } from './auth'
+import { hashPassword, verifyPassword, generateToken, verifyToken } from '@/lib/auth'
 
 describe('Auth Helpers', () => {
   describe('Password Hashing', () => {

@@ -233,16 +233,19 @@ model user_settings {
 }
 
 model platform_settings {
-  id                    String   @id @default("global")
-  platform_name         String   @default("LearnWave")
-  platform_description  String   @default("AI-Powered Academic Support Platform")
-  maintenance_mode      Boolean  @default(false)
-  ai_assistant_enabled  Boolean  @default(true)
-  forum_enabled         Boolean  @default(true)
-  resources_enabled     Boolean  @default(true)
-  mentorship_enabled    Boolean  @default(true)
-  announcements_enabled Boolean  @default(true)
-  updated_at            DateTime @updatedAt
+  id                       String   @id @default("global")
+  platform_name            String   @default("LearnWave")
+  platform_description     String   @default("AI-Powered Academic Support Platform")
+  maintenance_mode         Boolean  @default(false)
+  student_maintenance_mode Boolean  @default(false)
+  mentor_maintenance_mode  Boolean  @default(false)
+  admin_maintenance_mode   Boolean  @default(false)
+  ai_assistant_enabled     Boolean  @default(true)
+  forum_enabled            Boolean  @default(true)
+  resources_enabled        Boolean  @default(true)
+  mentorship_enabled       Boolean  @default(true)
+  announcements_enabled    Boolean  @default(true)
+  updated_at               DateTime @updatedAt
 }
 
 model resources {

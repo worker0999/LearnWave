@@ -1,11 +1,12 @@
 {
-  "name": "nextjs_tailwind_shadcn_ts",
+  "name": "learnwave",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "nodemon --exec \"npx --node-options='--max-old-space-size=4096' tsx server.ts\" --watch server.ts",
     "dev:log": "nodemon --exec \"npx --node-options='--max-old-space-size=4096' tsx server.ts\" --watch server.ts 2>&1 | tee dev.log",
     "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
+    "test": "vitest run",
     "start": "NODE_OPTIONS='--max-old-space-size=4096' tsx server.ts 2>&1 | tee server.log",
     "postinstall": "prisma generate",
     "lint": "next lint",

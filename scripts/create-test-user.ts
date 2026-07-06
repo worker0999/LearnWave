@@ -1,5 +1,5 @@
-import { db } from '../lib/db'
-import { hashPassword } from '../lib/auth'
+import { db } from '../src/lib/db'
+import { hashPassword } from '../src/lib/auth'
 
 async function createTestUser() {
   try {

@@ -13,6 +13,21 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [];
   },
+  // Configure Redirects
+  async redirects() {
+    return [
+      {
+        source: '/ai',
+        destination: '/student/ai-assistant',
+        permanent: true,
+      },
+      {
+        source: '/ai-assistant',
+        destination: '/student/ai-assistant',
+        permanent: true,
+      },
+    ];
+  },
   // Allow local dev origin to suppress Next.js webpack-hmr warnings
   allowedDevOrigins: ['127.0.0.1'],
   // Environment variables

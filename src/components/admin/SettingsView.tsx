@@ -35,6 +35,9 @@ export function SettingsView() {
       contactEmail: 'support@learnwave.com',
       supportPhone: '+91 8012345678',
       maintenanceMode: false,
+      studentMaintenanceMode: false,
+      mentorMaintenanceMode: false,
+      adminMaintenanceMode: false,
       maintenanceMessage: 'Platform is under maintenance.'
     },
     email: {
@@ -165,12 +168,42 @@ export function SettingsView() {
               </div>
               <div className="flex items-center justify-between p-4 bg-[#f4f4f0] dark:bg-[#1c1b19] rounded-xl border border-[#dfd3c3] dark:border-[#42413b]">
                 <div>
-                  <p className="text-[#42413b] dark:text-[#f4f4f0] font-medium">Maintenance Mode</p>
-                  <p className="text-[#a9a29e] text-sm">Disable platform access for users</p>
+                  <p className="text-[#42413b] dark:text-[#f4f4f0] font-medium">General Maintenance Mode</p>
+                  <p className="text-[#a9a29e] text-sm">Disable platform access for all non-admin users</p>
                 </div>
                 <Switch
                   checked={settings.general.maintenanceMode}
                   onCheckedChange={(checked) => updateSetting('general', 'maintenanceMode', checked)}
+                />
+              </div>
+              <div className="flex items-center justify-between p-4 bg-[#f4f4f0] dark:bg-[#1c1b19] rounded-xl border border-[#dfd3c3] dark:border-[#42413b]">
+                <div>
+                  <p className="text-[#42413b] dark:text-[#f4f4f0] font-medium">Student Portal Maintenance Mode</p>
+                  <p className="text-[#a9a29e] text-sm">Restrict access specifically for the student portal</p>
+                </div>
+                <Switch
+                  checked={settings.general.studentMaintenanceMode}
+                  onCheckedChange={(checked) => updateSetting('general', 'studentMaintenanceMode', checked)}
+                />
+              </div>
+              <div className="flex items-center justify-between p-4 bg-[#f4f4f0] dark:bg-[#1c1b19] rounded-xl border border-[#dfd3c3] dark:border-[#42413b]">
+                <div>
+                  <p className="text-[#42413b] dark:text-[#f4f4f0] font-medium">Mentor Portal Maintenance Mode</p>
+                  <p className="text-[#a9a29e] text-sm">Restrict access specifically for the mentor portal</p>
+                </div>
+                <Switch
+                  checked={settings.general.mentorMaintenanceMode}
+                  onCheckedChange={(checked) => updateSetting('general', 'mentorMaintenanceMode', checked)}
+                />
+              </div>
+              <div className="flex items-center justify-between p-4 bg-[#f4f4f0] dark:bg-[#1c1b19] rounded-xl border border-[#dfd3c3] dark:border-[#42413b]">
+                <div>
+                  <p className="text-[#42413b] dark:text-[#f4f4f0] font-medium">Admin Portal Maintenance Mode</p>
+                  <p className="text-[#a9a29e] text-sm">Restrict admin portal access (Requires secret bypass parameter in URL to override)</p>
+                </div>
+                <Switch
+                  checked={settings.general.adminMaintenanceMode}
+                  onCheckedChange={(checked) => updateSetting('general', 'adminMaintenanceMode', checked)}
                 />
               </div>
             </div>

@@ -14,6 +14,7 @@ import { Progress } from '@/components/ui/progress'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { useAIAssistant } from '@/hooks/useAIAssistant'
 import { useAuth } from '@/contexts/AuthContext'
+import RAGChat from '@/components/student/rag-chat'
 import { 
   Brain, 
   FileText, 
@@ -123,7 +124,8 @@ export default function AIAssistant() {
     handleQuizAnswer,
     copyToClipboard
   } = useAIAssistant();
-if (!isAuthenticated || !user) {
+
+  if (!isAuthenticated || !user) {
     return (
       <DashboardLayout userRole="STUDENT">
         <div className="flex items-center justify-center h-full">
@@ -155,7 +157,7 @@ if (!isAuthenticated || !user) {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-white/10 border-white/20">
+          <TabsList className="grid w-full grid-cols-6 bg-white/10 border-white/20">
             <TabsTrigger value="chat" className="text-white data-[state=active]:bg-cyan-500">
               <MessageSquare className="w-4 h-4 mr-2" />
               Doubt Solver
@@ -175,6 +177,10 @@ if (!isAuthenticated || !user) {
             <TabsTrigger value="assignment" className="text-white data-[state=active]:bg-cyan-500">
               <GraduationCap className="w-4 h-4 mr-2" />
               Assignment Helper
+            </TabsTrigger>
+            <TabsTrigger value="rag" className="text-white data-[state=active]:bg-cyan-500">
+              <BookOpen className="w-4 h-4 mr-2" />
+              Library Q&A
             </TabsTrigger>
           </TabsList>
 
@@ -734,6 +740,9 @@ if (!isAuthenticated || !user) {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+          <TabsContent value="rag">
+            <RAGChat embed={true} />
           </TabsContent>
         </Tabs>
       </div>

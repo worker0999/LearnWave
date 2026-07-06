@@ -4,24 +4,24 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { Sidebar } from '@/components/Sidebar'
-import { WelcomeCard } from '@/components/WelcomeCard'
+import { WelcomeCard } from '@/components/student/WelcomeCard'
 import { useAuth } from '@/contexts/AuthContext'
 import { useUI } from '@/contexts/UIContext'
 import { Button } from '@/components/ui/button'
 
 // Dynamic imports for large components to save memory and improve performance
-const HomeContent = dynamic(() => import('@/components/HomeContent').then(mod => mod.HomeContent))
-const ResourceHub = dynamic(() => import('@/components/ResourceHub').then(mod => mod.ResourceHub))
-const AIAssistant = dynamic(() => import('@/components/AIAssistant').then(mod => mod.AIAssistant))
-const Announcements = dynamic(() => import('@/components/Announcements').then(mod => mod.Announcements))
-const Community = dynamic(() => import('@/components/Community').then(mod => mod.Community))
-const Mentors = dynamic(() => import('@/components/Mentors').then(mod => mod.Mentors))
-const BookedSessions = dynamic(() => import('@/components/BookedSessions').then(mod => mod.BookedSessions))
-const Settings = dynamic(() => import('@/components/Settings').then(mod => mod.Settings))
-const Profile = dynamic(() => import('@/components/Profile').then(mod => mod.Profile))
+const HomeContent = dynamic(() => import('@/components/student/HomeContent').then(mod => mod.HomeContent))
+const ResourceHub = dynamic(() => import('@/components/student/ResourceHub').then(mod => mod.ResourceHub))
+const AIAssistant = dynamic(() => import('@/components/student/AIAssistant').then(mod => mod.AIAssistant))
+const Announcements = dynamic(() => import('@/components/student/Announcements').then(mod => mod.Announcements))
+const Community = dynamic(() => import('@/components/student/Community').then(mod => mod.Community))
+const Mentors = dynamic(() => import('@/components/student/Mentors').then(mod => mod.Mentors))
+const BookedSessions = dynamic(() => import('@/components/student/BookedSessions').then(mod => mod.BookedSessions))
+const Settings = dynamic(() => import('@/components/student/Settings').then(mod => mod.Settings))
+const Profile = dynamic(() => import('@/components/student/Profile').then(mod => mod.Profile))
 import { Search, User, LogOut, Settings as SettingsIcon, UserCircle, ChevronDown } from 'lucide-react'
-import { NotificationBell } from '@/components/NotificationBell'
-import { AnnouncementBanner } from '@/components/AnnouncementBanner'
+import { NotificationBell } from '@/components/student/NotificationBell'
+import { AnnouncementBanner } from '@/components/student/AnnouncementBanner'
 
 export default function StudentHome() {
   const router = useRouter()

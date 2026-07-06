@@ -41,6 +41,9 @@ export async function GET(request: NextRequest) {
         platformName: settings.platform_name,
         platformDescription: settings.platform_description,
         maintenanceMode: settings.maintenance_mode,
+        studentMaintenanceMode: settings.student_maintenance_mode,
+        mentorMaintenanceMode: settings.mentor_maintenance_mode,
+        adminMaintenanceMode: settings.admin_maintenance_mode,
         contactEmail: 'support@learnwave.com', // Defaults
         supportPhone: '+91 8012345678', // Defaults
         maintenanceMessage: 'Platform is under maintenance.' // Defaults
@@ -103,6 +106,9 @@ export async function PUT(request: NextRequest) {
       if (settings.platformName !== undefined) updateData.platform_name = settings.platformName
       if (settings.platformDescription !== undefined) updateData.platform_description = settings.platformDescription
       if (settings.maintenanceMode !== undefined) updateData.maintenance_mode = settings.maintenanceMode
+      if (settings.studentMaintenanceMode !== undefined) updateData.student_maintenance_mode = settings.studentMaintenanceMode
+      if (settings.mentorMaintenanceMode !== undefined) updateData.mentor_maintenance_mode = settings.mentorMaintenanceMode
+      if (settings.adminMaintenanceMode !== undefined) updateData.admin_maintenance_mode = settings.adminMaintenanceMode
     } else if (category === 'features') {
       if (settings.aiAssistantEnabled !== undefined) updateData.ai_assistant_enabled = settings.aiAssistantEnabled
       if (settings.forumEnabled !== undefined) updateData.forum_enabled = settings.forumEnabled

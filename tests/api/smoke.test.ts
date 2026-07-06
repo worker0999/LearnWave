@@ -78,10 +78,10 @@ vi.mock('@/lib/streak-engine', () => {
 })
 
 import { db } from '@/lib/db'
-import { POST as loginHandler } from './auth/login/route'
-import { GET as meHandler } from './auth/me/route'
-import { POST as quizSubmitHandler } from './student/quiz/submit/route'
-import { POST as communityPostHandler } from './student/community/post/route'
+import { POST as loginHandler } from '@/app/api/auth/login/route'
+import { GET as meHandler } from '@/app/api/auth/me/route'
+import { POST as quizSubmitHandler } from '@/app/api/student/quiz/submit/route'
+import { POST as communityPostHandler } from '@/app/api/student/community/post/route'
 import { generateToken } from '@/lib/auth'
 
 describe('API Smoke Tests', () => {
